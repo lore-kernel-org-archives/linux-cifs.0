@@ -1,101 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.172
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795622977;
-	b=MmvAYNuaSh9zwAWCodKNNAlaHB748lT0YIRi/wEDSEn0rN3FjQRz3+D//coIDuP/dG7j
-	 a01AGo1g5VzzN15bWjkj3JrRfT3ppxr42cYp7fhT24z8vztBNOMFa5CenMWARmdbVa7fM
-	 ITChOTjoOKsN3Q7mT/Wbl2+FoK5I5Q8CTkAXsr9revME3+WTJ8zVV6WuQnHrLEfduDqK+
-	 baI10yjOjo+HDnTHqypFOLTIPDmgEcOogE6JoBNg7BEt5+D+SivYJTpWUccMCprJsBZPA
-	 +PzFXS1+VpvPZ58DdEL26ViHzdJYlv7r47PEtwwmYviTKKpgJ2Menu1Wfwocdx5Q4jw==
+	t=1795623090;
+	b=sBi5K1RmhmFN3cv5k/fi3fHHLLoHp6Pi0fSbw04o4efofDSEnj9LHieH1ZFbCvrKTlsW
+	 9m28PIictsRXxsvzmd7LI6eJKitn4c5RYeWMEULnLnJqtFwUwp8RpBjaDw+MXLzIiyAdK
+	 +SsgBuIUi+dXSdROHNgP/rMygcdXhmnvDJVnUwWYmwcMwGtbALMBkw8UjfQDLw2473bqM
+	 8jMZQyZ0a62en70R7/kKzSMN08yHe7TffS02L3AE65zy67JPIITKAFdf11qiyrXx9JT6G
+	 bF18dEgK3YoTFded8d6muq0TaGswEkrUhIDPyuF2teAPnYB3LHqHpKvj8v347SPU7Ig==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795622977;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795623090;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=u8edI8FeQSZp9/9wYopp3WXqEDb0aEYd4PyW+vHqD04=;
-	b=mansKO7etXISKamzC5D8QHQT5lNbLaOhpw2oAaL4UhESiRv0vcJPqWseYbFXSrzscVwK
-	 RR7gfKJ+McugnMxlEQxqFudAcCc8TPsc3KmLBj/+EVVPY+pqYzWkF4yq+CdOzP39m1xOa
-	 zcU4D1X9eY33UjLcc/UvHm50QK4NDvMOqR4xfJUrev7KqAw8vsZAN01PtVRzabywXNA2B
-	 LzjBCVD3daTGEEaTicT5bkixaNBEPD4yzi1A4Tgvy1ce9buYGa6+pqtny6lOrZnYjEy4t
-	 Ncj84ZMPtVb5iO89etf3n/u35gYwdDkpkyDvyKMZlna7+5B0CLxPPHPQGdAt/fuFJwA==
+	bh=hqeM9bcRy4K57cIOrdP0ZMwShWjCWd1IsL+uvjRPcsI=;
+	b=mFc0xmdL/lAqVXcpDWI0OzTs0wAh0ZPT2yWnqMfCtA0UYA/eQNwghuwfoAxEdqLCoNIU
+	 MjeXGVAm6MTDLvlT/C4yV+V2tf+8hYfndD0YkIf3tr78u8TdprBIMU0NyD3H7n6i0YIcW
+	 yygR305fyAXQNwQ/MTzwfFHGwDkrErSM4+FncV7DpLhgniZuzuQYWVlxGs2u9Jw56qBgf
+	 0GDL0w5kdEYf6gn8LXngTP7Iap/gWkdlrBIwkhp/apsFmRz7T9kSVEuHOrIbzAZYCbQM3
+	 stHQVMWhIeQCS4Lm4VLdTpAjfvnA+iDG/3ti6lVMZKHes9eaJ9h3cDuh7uSmjIp/sjw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RGdvFyZb;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.169
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NODj3lVf;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.172
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8696606A32D
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 16:09:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D8696606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E017F606A32D
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 16:11:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E017F606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RGdvFyZb
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8b3577deeb0so2716270b3a.3
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 08:09:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795622976; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NODj3lVf
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-8a0880a46e7so3623649b3a.1
+        for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 08:11:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795623089; cv=none;
         d=google.com; s=arc-20260327;
-        b=crxjztH1St1xXvAfD797doOuE77lwm+tgNpfAxMCY79Qm6uOrftORi1zDkaAn9afUc
-         L0tTFayvd1taiRq8taqJnLrcyYTZnPQ0Ebeq9LrGR2kg2Ii1cTmSRHQEBQCdPNgrFQ3o
-         KcX9mH54KW9KYHYMWzBWfd5n5bjM+AehHvdlt7y48dXfJWOYndlySlo/ltwfl4hQdhXg
-         ZsXmPLDuM4LquvvQ9i9ecNeUoMftPLWLNIKngUqApNjns/c9Tmqz5zeUUNluv/LlP2vo
-         uEbrNnYa4oeJKCKMXMFuP7EbZpCko/LUy2chEEoaF/qZV5Dy4EPp7OY7gYJUiO40PRJw
-         5RLQ==
+        b=Vz8eQ2sGJMkCtzrwodQ4CdMMPHJ6inspRzmMj/UzTS9+AjGOKSlyDDsJKTNZJwCHAG
+         3JO+6fXUlUb7bnxivUdD6r5/km9KR7cqgWxo+vU27H1fZtJVIoHfK/ebdI/Nk4Lkq1Gl
+         /nX8LAFE/eQ8KAMT47MnfVWXpapfMfszVtgCJt+ly93JrnKAriaO0gQA2ZaDmG/+1LY/
+         af2pozgFgRkt73EDnsor2aml2N2SBlDBtM2OxaLMiIspD+JYQtnTrxc/oBULmPgrUC73
+         r89gGh2Ecfr8RVnIinKqyyyUERrt9J/RpZaPeFgD2S8smXdjDUZ9QWUjxANYWoH9N7Id
+         65gA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=u8edI8FeQSZp9/9wYopp3WXqEDb0aEYd4PyW+vHqD04=;
-        fh=qzOhVdeSs2exL0rKtGHoZCmAZQfrEh+Trf9urXjE4Zc=;
-        b=RyRifrAjXqq1HWiBOkr9Dvwe08SaW2xSP9RVHtOO/ufbDpG45Yn8tAkWTh03lEiR5G
-         qFujLFXh90QDsZKZYKeWZ3Y64M/+EIIJyfvxdl+R/NK5aBUga2CdmsECpFMQ5u6Dzvkr
-         Wn6i4ljquKAYKNTNcZd7IlOst81RoQlX1fVI08rX9NidBeVw5vmbonNmCX/sEd2YmwTe
-         SDpBWLgyJrD1bAP3aA2KVPinT8IavApkTuSLdrSmYlOx1/9xGHb6IVwTqBamvg8U04Nz
-         kQ7htixNjm8HZqkSrMNctBfYkScOJkSFe+3bkGfzy2PvsexYyT9k8FIfLw2EynHEeQGY
-         uGKg==;
+        bh=hqeM9bcRy4K57cIOrdP0ZMwShWjCWd1IsL+uvjRPcsI=;
+        fh=KiRqRh4cjt925S1xeZ6QUeSktvsJe+aDCKgDR/AZMIs=;
+        b=eXI3FMeszfNq5+2GI+/Dpiy/Eww0faQZyOYQuv9a411N+d/bw3/jPiXS7Y4DHXklPR
+         R7xRG/1Z6OLEpNphpVPpyep6+/dqWnob/jbbUL3DMSs5apja6QyaqWgN0GTN7fWDvZL9
+         y3w1saV8viEeJ6AJ4mKb6BYFhXvPsyrSG2JDmaTJEm21mq6ffcqQdZvEVEnsSZbymkZB
+         KABFQ3V9je104bkMH0ACuIMxo1WsJ2LWkT6Yo/d8DBw0sJcTtfnvl7bi2w8Elve7BINs
+         fhlyfm84LJ8d5uS9X6TvT5AR2mfRwHFiJaTTSxoobhvDprO/UctetWAE8PFFA0xt2pPf
+         XH/A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795622976; x=1796227776; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795623089; x=1796227889; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=u8edI8FeQSZp9/9wYopp3WXqEDb0aEYd4PyW+vHqD04=;
-        b=RGdvFyZbnMzNIxg36iRggwLlKAwT0D2LJK5qIOQEokaFn9B/SqNAhRJJ6ajydAMEdv
-         jeeRJ5zHBU6TDPEb4o/EjfOgDDi6q9p/h9+pmtoJ5xyUqPTjEaTrMIvZrC2n1t2Ce8QC
-         zH53VNmgHFtJxqLXblMQrg8+ULfuqxKpHjShKn1LCGkU9p1gBycyLMbokKZqHsipyox3
-         gaTpRp19sCmfI0tKscIXN8Hk40GiG0v6tKVhHzSbLnuI6cKGWUyhOsPY4e20/JmbKJ7B
-         KT6CyEJnlZBM2N491xGlvktrqXeb+9QvIJ3E3p//lkADFkpWcBFer5DAEB6qoJD0ijmu
-         Sihw==
+        bh=hqeM9bcRy4K57cIOrdP0ZMwShWjCWd1IsL+uvjRPcsI=;
+        b=NODj3lVf27NLa5PNBNlwhqOy7RD3x4UNdg2eJVTWlAp8lXO71qHafHTQMqdrrrssA7
+         Q2SyGZSNrDV0wFNdADu9X6eG20gokyyDnWgPl0Zy43Rumm1ZyNdUc4vVNMiBLUOiUwIr
+         6bn4CkZ/kiHORV8fjvHT9sfPHU5PKMdTUmXBltIXxjW1HYed4yuLd9xPpuoQyJpR1skE
+         JRdxEN+jAnkLJWxKFiFW4GDDfWu7uOVE9Kc/eCpTTBFZv9UDvGkGObljvZp2IvlVnyz5
+         5ndBJTziiNIbzbFFa8Dl7qhco1Nnv7pb98JsaSUFCu8d9uTxgsDibqZ03V3Nmbl4seHO
+         6oHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795622976; x=1796227776;
+        d=1e100.net; s=20260707; t=1795623089; x=1796227889;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=u8edI8FeQSZp9/9wYopp3WXqEDb0aEYd4PyW+vHqD04=;
-        b=YpaL/rY2bva863ydWhfXr37wtyOcIOQ8fosUtWquZiM1r6ynS2a3q4zse705jqgRJt
-         1U/+jtr8mDgydiO4HzaYB6sx0gLlbtkN9auZpGxK+sjZI2MeYC+5yBpmS0U97NvFbPrx
-         pSveIgU+L4/VUa5s6VTeElbYeiXMRk0gBQPHhm8p9wTfL0b9HY4bkKMbawgfx4eRiOtA
-         azZWZwjrVFM02bJ5lsTAbTpuOnW4xrPMT8bFHRDfD3+87A6gkJxXsaQd2xmFgSLpengB
-         fIKZRlggbsSWCEVsPppVIQW/40IW74gdw/+SpNuBidNf+ApzttDSbMdQJbMAYW7gd53w
-         lASA==
-X-Forwarded-Encrypted: i=1; AL+hErHU8MNmvBVVC2DCYm0Khoy80UiZ9ESwwbk7cDKo1mQfty1+JfhwUqIM8Da3oVxZkihbjmAZxeEMD8O8@vger.kernel.org
-X-Gm-Message-State: APuU4Z/ZFnOkIvMMl0veyHiHJJbkf70yig0hjtt+hGNT3rhYGsrG+RaJ
-	qz7NbxL3LlqsPL91Eapk5BchxY21ffQ2Qs8bSlsT13e9pO2HzkcV6IqR+64YOkVqINRfAmFs7KN
-	4UVlKllF9DAczcktpYPpZECFVxY8nLA0=
-X-Gm-Gg: AZFdTZc5VmHv/17edCAA6Lhy2OKYSMIF8I47vntqOhWs5CJNpYHPH8aHh5vvHeOKrfh
-	8wKOhRcGFVABiVt51WFxJRwC06C+chWK+mPEb8XYc6DiW4Si76ic0doYyLQr8Gj/pF+Kq3HXNpL
-	ICOrcVVBERyusJtFt1DA8wwypXpLYzYYJ+hKl13yoIwFGU0FrDYLfJIdYQZdck7FV2pUK4R9wps
-	v7REiN/JLxDxQ+aUByL0VLmo4eZk7zqNK7WdVXRdtFJOUDwAUKNLtoJYVLqIKaC4Hobnph7hEJG
-	iVQgmz7mfguXQGoJdmb9C7mn8I31Chg6p1rRMyzp2ACwdseyEDff7TnS2nPL84fFoWA1XDtI4gZ
-	JBoCb1Kk6YxnTHZVNJebeAA5ZmWJ3i1qx5V2RdM78thjle1obpF4LHClEQEN4G2i09n6NHItpmf
-	6PAhvzDSQEfI3etHWuBo4OT94Mj4zazOO0Eqv6nq5b4TsFxA12ivSNeyd6hA41hQwRV/sG
-X-Received: by 2002:a05:6a00:ad05:b0:8a0:70ff:ab28 with SMTP id
- d2e1a72fcca58-8c87daf37damr15090565b3a.60.1795622976032; Wed, 25 Nov 2026
- 08:09:36 -0800 (PST)
+        bh=hqeM9bcRy4K57cIOrdP0ZMwShWjCWd1IsL+uvjRPcsI=;
+        b=qWrtA0bd6VGTZIKqe/oZYMzFebOx8hWgb8D57dnkCrvVbIje1+IwbPzm+A00SV0XFy
+         EBrIDTu4W2iF/j7pmRhk9QaW709qYDXTtL+tVZzjncl/3JF+SfDqKOXfytiCS70LvXSH
+         d0lpwcN+/9TGUVTfgechoTuezXsrTWtEKIoWeAeddPBkBWrUId02WECUDZxtGoGnOjUG
+         hHZcAtmy8jVz1gexC3mwAKenSvp+lCi8/xPAgZmjqWZ0UJBwnUNAdTQEm1pvcD0hzfMc
+         JW35CNuwa8ZJwVsONMdMSu4Vq06ftIRlggUaTp/hmVb5rAz3pJqgjhbSmVfYeUQ4tzKo
+         do5w==
+X-Forwarded-Encrypted: i=1; AL+hErHnBPJEtrR0yX0xbwMTjU2BpChS6STt/EEnHA8sIb88GeWupSmRmiwqRGjAApYysU2zMvFK5trNzst6@vger.kernel.org
+X-Gm-Message-State: APuU4Z9TYX++ZM+RZQHhb4HFAokQctyU7GV6hRl1CXqWLyhdprqoQvSL
+	oItyppWDB3XERDkHMn1eosQsJwr5T3S1tFJzuHhIF8WafAjw8qxMgz0UDFK7nmjBXPYt3GzS1Je
+	h+SLdA93ft8ghm8uvS/0DeAR7MnaAuIg=
+X-Gm-Gg: AZFdTZdoexjdkJ4QBGJGp80PVn96GXvSv7dKl4yjImVPg3cT1g2sNF7KrLl17jWyjBT
+	bnoh1EddeW20VMIYS6KOk7C4kmQb/tib8TtC/XP2v3TyoqkSJiLZJPbW2EcTrCZ5AhuwIpsrmNC
+	cP9j1UXdV0Bov7P4Afd+wMUPNzpJD2yKD+HCMoh3n/+mfgNnoNy5nM5ui2fBrGlA4q4JeXGJR6f
+	gOeFTS1Cw0DJwuLhGtnQHpFmC01H6HX8GCLcNIZcrle14wITjU+FVAkFTuaLAudrDaXlvfCvA9j
+	bUUI9mGpSDknmUBj4e8/KKVRp+jswcHVaScTd9mdO6/0richJAzqEStjzY1GhjVmdTjvckakZdb
+	/8f8VFaenMc9trkIlg63FOJAhuwom4C6WgwO+o48vGyBDdaFsy4xYqEXTzW/HQocpfNd17N6iMC
+	tW7CVsZj/voSSewyYEe7wiltmYrq5++iuzjLd2zcB7ebnAI7UIbRLP7LrZ6mVhKfkooMSNzyoKo
+	2qaGcwQAy2Qt78iDQ==
+X-Received: by 2002:a05:6a00:84d:b0:883:4a94:8132 with SMTP id
+ d2e1a72fcca58-8c7dd9d6a17mr12973536b3a.20.1795623089256; Wed, 25 Nov 2026
+ 08:11:29 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,14 +106,14 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <a0b0796446aa6da7e62134343e27abb459c3e4cf.1795393691.git.lucien.xin@gmail.com>
- <179548327264.3135.6491698928014688203@kernel.org>
-In-Reply-To: <179548327264.3135.6491698928014688203@kernel.org>
+References: <6a6d9da5d2d7ae5dfd1a6cdcd409326023fc7c2c.1795393691.git.lucien.xin@gmail.com>
+ <179548327574.3135.6574572531783833085@kernel.org>
+In-Reply-To: <179548327574.3135.6574572531783833085@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 25 Nov 2026 11:09:24 -0500
-X-Gm-Features: Aa3M54rOBsjgMkrX6FiWjub5OGP-lBrvCJFM9rh8E12fgXwHp5rULcB25ZvsU6o
-Message-ID: <CADvbK_f42EbbC0fgn1a_HkrgAbqgmtGExogvNq6CZa892tz_cQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v19 07/15] quic: add connection id management
+Date: Wed, 25 Nov 2026 11:11:17 -0500
+X-Gm-Features: Aa3M54o1KhSLEBbvf_IuXRh_AZAPAxe2wdTrfHcpNM5mGPKS186BqyC7tIAvBxU
+Message-ID: <CADvbK_cacMFPHz3hAqXcY92C2yAzq=+ajxZYZL_RQrYmY5Ft9Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v19 08/15] quic: add path management
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@kernel.org, pabeni@redhat.com, horms@kernel.org, 
@@ -132,10 +133,10 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Nov 23, 2026 at 8:21=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
 te:
 >
-> Thank you for your contribution! Sashiko AI review found 1 potential
+> Thank you for your contribution! Sashiko AI review found 4 potential
 > issue(s) to consider.
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 1 =C2=B7 Low: 0
+> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 2 =C2=B7 Low: 2
 >
 > If you believe none of the issues are legitimate, please reply to each
 > issue of Medium severity or higher and explain why the AI is wrong.
@@ -145,118 +146,283 @@ k
 y
 > (one such reply per series is enough).
 >
-> - [Medium] quic_conn_id_retire() (net/quic/connid.c) handles 'retire the
->   last live consecutive CID' with `if (WARN_ON_ONCE(id_set->use_count <=
-=3D=E2=80=A6
+> - [Medium] In net/quic/path.c, quic_path_bind() decides whether a path
+>   may take a port by looking at the credentials of the task that happens=
+=E2=80=A6
+> - [Medium] quic_path_bind() binds a real UDP port (explicit or ephemeral)
+>   on behalf of the caller via quic_udp_sock_create() ->=E2=80=A6
+> - [Low] The comment on quic_path_detect_alt() in net/quic/path.c does not
+>   describe what the function does.
+> - [Low] Two PLPMTUD field comments in struct quic_path_group
+>   (net/quic/path.h) do not match how path.c uses the fields.
 >
 > --
 >
-> quic: add connection id management
+> quic: add path management
 >
-> This patch adds struct quic_conn_id_set to manage source and destination
-> connection IDs. It provides helpers to add, retire, find and look up CIDs=
-.
-> Source CIDs are also inserted into a global RCU hash table, which the RX
-> path uses to look up the socket.
+> This patch adds struct quic_path_group to manage the active and alternate
+> QUIC paths. Each path is backed by a refcounted UDP tunnel socket wrapper
+> (quic_udp_sock) kept in a global hash table, with helpers to bind, unbind=
+,
+> swap and detect alternate paths for connection migration. It also adds a
+> basic PLPMTUD state machine that is driven by probe sends, ACKs and ICMP
+> feedback.
 >
-> > diff --git a/net/quic/connid.c b/net/quic/connid.c
+> > diff --git a/net/quic/path.c b/net/quic/path.c
 > > new file mode 100644
-> > index 0000000000000..1ddf8bc9b7910
+> > index 0000000000000..946f5e44b6350
 > > --- /dev/null
-> > +++ b/net/quic/connid.c
-> > @@ -0,0 +1,313 @@
+> > +++ b/net/quic/path.c
+> > @@ -0,0 +1,608 @@
 >
 > [ ... ]
 >
-> > +/* Retire a connection ID by marking it dead, then remove consecutive =
-dead
-> > + * entries from the head of the list. The caller must ensure the numbe=
-r falls
-> > + * within the consecutive range [first_number, last_number].
-> > + */
-> > +void quic_conn_id_retire(struct quic_conn_id_set *id_set, u32 number)
+> > +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk,
+> > +                                               union quic_addr *a)
 > > +{
-> > +     struct quic_common_conn_id *common, *tmp, *retired =3D NULL;
-> > +     struct list_head *list;
+>
+> [ ... ]
+>
+> > +     us =3D kmalloc_obj(*us);
+> > +     if (!us)
+> > +             return ERR_PTR(-ENOMEM);
 > > +
-> > +     list =3D &id_set->head;
-> > +     list_for_each_entry(common, list, list) {
-> > +             if (common->number > number)
-> > +                     break;
-> > +             if (common->number =3D=3D number) {
-> > +                     if (common->dead)
-> > +                             return;
-> > +                     retired =3D common;
-> > +                     break;
-> > +             }
-> > +     }
-> > +
-> > +     if (!retired)
-> > +             return;
-> > +
-> > +     if (WARN_ON_ONCE(id_set->use_count <=3D 1))
-> > +             return;
+> > +     quic_udp_conf_init(sk, &udp_conf, a);
+> > +     err =3D udp_sock_create(net, &udp_conf, &sock);
 >
 > [Severity: Medium]
-> Can a peer reach this WARN_ON_ONCE() using only its own
-> RETIRE_CONNECTION_ID frames?
+> Can this let a confined, unprivileged process bind UDP ports that its LSM
+> policy does not allow?
 >
-> For the source set, number comes from the peer. The v19 changelog moved
-> this guard below the duplicate-retire check so duplicates would not hit
-> the WARN, which suggests peer-chosen numbers are expected to get here.
+> udp_sock_create() goes through udp_sock_create4()/udp_sock_create6(), whi=
+ch
+> call sock_create_kern() and then kernel_bind():
 >
-> A retired source CID that is not at the head of the list is only marked
-> dead. It stays on the list and stays hashed. quic_conn_id_lookup() does
-> not check ->dead:
+> net/ipv4/udp_tunnel_core.c:udp_sock_create4() {
+>     ...
+>         err =3D sock_create_kern(net, AF_INET, SOCK_DGRAM, 0, &sock);
+>     ...
+>         err =3D kernel_bind(sock, (struct sockaddr_unsized *)&udp_addr,
+>                           sizeof(udp_addr));
+>     ...
+> }
 >
->         hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node=
-) {
->                 if (net !=3D sock_net(s_conn_id->sk))
->                         continue;
->                 if (s_conn_id->common.id.len !=3D len ||
->                     memcmp(scid, &s_conn_id->common.id.data, len))
->                         continue;
+> kernel_bind() in net/socket.c calls sock->ops->bind() directly. That mean=
+s
+> security_socket_bind() never runs for the UDP socket that actually holds
+> the port.
 >
-> Later in the series, quic_packet_get_sock() in net/quic/packet.c uses
-> this lookup to route the packet to the socket and set cb->seqno. It does
-> not check the dead flag either.
+> The socket is also created with kern=3D1, so it gets a kernel label inste=
+ad
+> of the caller's. The user socket create hooks (LSM and cgroup-BPF inet so=
+ck
+> create) are skipped as well.
 >
-> Take a source set {0, 1, 2}, all live, use_count =3D 3, with the peer
-> using CID 0:
+> The only remaining bind check is on the QUIC socket. SELinux classes an
+> IPPROTO_QUIC socket as rawip_socket, and sel_netport_sid() with
+> sk_protocol =3D=3D IPPROTO_QUIC does not match any udp port labels.
 >
->   peer sends RETIRE(1), then RETIRE(2)
->     -> use_count =3D 1, CIDs 1 and 2 are dead but still hashed
->   no replacement CID is issued (count still includes the dead middle
->   entries, so max_count or QUIC_CONN_ID_LIMIT may already be reached)
->   peer sends a packet with DCID =3D CID 1 carrying RETIRE(0)
->     -> quic_conn_id_lookup() still finds CID 1
->     -> quic_conn_id_retire(id_set, 0)
->     -> WARN_ON_ONCE(id_set->use_count <=3D 1)
+> As a result, the port bound here is not covered by udp_socket
+> name_bind/node_bind rules with per-port labels, or by Smack/AppArmor netw=
+ork
+> rules. Per-packet LSM checks and netfilter socket-owner matching would al=
+so
+> see a kernel socket rather than the user.
 >
-> RFC 9000 Section 19.16 allows RETIRE(0) in that packet, since sequence
-> number 0 is not the DCID of the packet carrying the frame.
+> Other UDP tunnel users either require CAP_NET_ADMIN (vxlan, geneve, fou,
+> tipc) or take the port from an admin sysctl (SCTP over UDP). Here an
+> unprivileged user picks the port. The CAP_NET_BIND_SERVICE and uid checks=
+ in
+> quic_path_bind() do not mediate the UDP bind itself.
 >
-> On panic_on_warn systems this would be a panic the peer can trigger
-> remotely. Without panic_on_warn, the retirement is silently dropped.
+> quic_path_bind() has no callers yet in this series. quic_bind() and
+> quic_connect() arrive in the next patchset, so the user-reachable path
+> can't be confirmed here.
 >
-> quic_conn_id_retire() returns void, so the caller cannot tell a refused
-> retirement from a successful one. That means it cannot turn this case
-> into a PROTOCOL_VIOLATION.
->
-> Would it make sense to return an error here instead of warning? Or to
-> reject packets addressed to dead source CIDs?
->
-> No caller of quic_conn_id_retire() exists in this series yet. Whether
-> this fires depends on how the RETIRE_CONNECTION_ID handler in the
-> follow-up patchset checks the number before calling it.
+> Does the UDP tunnel bind need some form of LSM mediation before the port =
+is
+> bound on the caller's behalf?
 >
 False.
 
-The WARN_ON_ONCE is a defensive invariant for catching programming errors,
-not a peer-reachable path. The RETIRE_CONNECTION_ID handler in the next
-patchset validates the sequence number before calling this function and
-ensures replacement CIDs are issued before use_count drops too low.
+QUIC does not implement LSM hooks yet. The UDP tunnel socket is an internal
+kernel transport detail, same pattern as SCTP's UDP encapsulation. LSM
+mediation will apply to user-facing QUIC sockets, not the internal tunnel.
 
+> [ ... ]
+>
+> > +/* Binds a QUIC path to a local port and sets up a UDP socket. */
+> > +int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 =
+path)
+> > +{
+>
+> [ ... ]
+>
+> > +     port =3D ntohs(a->v4.sin_port);
+> > +     if (port) {
+> > +             if (inet_port_requires_bind_service(net, port) &&
+> > +                 !ns_capable(net->user_ns, CAP_NET_BIND_SERVICE))
+> > +                     return -EACCES;
+> > +             head =3D quic_udp_sock_head(net, port);
+> > +             mutex_lock(&head->lock);
+> > +             us =3D quic_udp_sock_lookup(sk, a, port);
+> > +             if (us) {
+> > +                     if (!uid_eq(current_fsuid(), sk_uid(us->sk))) {
+> > +                             mutex_unlock(&head->lock);
+> > +                             return -EADDRINUSE;
+> > +                     }
+>
+> [Severity: Medium]
+> Is it intended that both checks here use the credentials of the task that
+> calls quic_path_bind(), rather than the QUIC socket's own credentials?
+>
+> The ns_capable(CAP_NET_BIND_SERVICE) check runs before the lookup. So it
+> also applies when an existing tunnel socket is only being reused and
+> refcounted.
+>
+> The reuse branch then compares current_fsuid() with sk_uid(us->sk). That
+> value is the fsuid of whoever first created the kernel tunnel socket.
+>
+> For comparison, the SO_REUSEPORT model in inet_csk_bind_conflict() and
+> udp_lib_get_port() compares the new socket's sk_uid with the existing
+> socket's sk_uid.
+>
+> Consider a server that binds port 443 as root and then drops privileges. =
+A
+> later explicit-port quic_path_bind() for 443, for example for an accepted
+> child socket or a migration path, would get -EACCES (capability gone) or
+> -EADDRINUSE (fsuid changed). Is that the expected result?
+>
+> Likewise, a QUIC socket passed to another process via SCM_RIGHTS would be
+> judged by the receiver's credentials. A kernel thread caller would pass
+> both checks no matter who owns the socket.
+>
+> The commit message and the code comments don't describe this model. The
+> only mention is the v15 changelog line. quic_path_bind() has no callers i=
+n
+> this series, so whether a reuse bind can follow a privilege drop depends =
+on
+> the next patchset.
+>
+> Would comparing sk_uid(sk) against sk_uid(us->sk), or at least documentin=
+g
+> the intended model, make sense here?
+>
+False.
+
+The CAP_NET_BIND_SERVICE check uses current task credentials, consistent
+with how inet_bind() works. The fsuid comparison on tunnel reuse prevents
+cross-user hijacking. In the accept path, the same process that created the
+tunnel is accepting, so the fsuid matches. A server that drops privileges
+after bind would not re-bind, and it reuses the existing tunnel created
+before the drop.
+
+> [ ... ]
+>
+> > +/* Detects and records a potential alternate path.
+> > + *
+> > + * If the new source or destination address differs from the active pa=
+th, and
+> > + * alternate path detection is not disabled, the function updates the =
+alternate
+> > + * path slot (path[1]) with the new addresses.
+> > + *
+> > + * This is typically called on packet receive to detect new possible n=
+etwork
+> > + * paths (e.g., NAT rebinding, mobility).
+> > + *
+> > + * Returns true if the alternate path (path[1]) matches (sa, da), rega=
+rdless
+> > + * of whether it was newly detected or already present. Returns false =
+if the
+> > + * addresses don't match the alternate path.
+> > + */
+> > +bool quic_path_detect_alt(struct quic_path_group *paths, union quic_ad=
+dr *sa,
+> > +                       union quic_addr *da, struct sock *sk)
+> > +{
+>
+> [ ... ]
+>
+> > +     if (!quic_path_saddr(paths, 1)->v4.sin_port)
+> > +             quic_path_set_saddr(paths, 1, sa);
+> > +
+> > +     if (!quic_cmp_sk_addr(sk, quic_path_saddr(paths, 1), sa))
+> > +             return false;
+> > +
+> > +     if (!quic_path_daddr(paths, 1)->v4.sin_port)
+> > +             quic_path_set_daddr(paths, 1, da);
+> > +
+> > +     return quic_cmp_sk_addr(sk, quic_path_daddr(paths, 1), da);
+> > +}
+>
+> [Severity: Low]
+> This isn't a bug, but the comment doesn't match the code. It says path[1]
+> is updated with the new addresses, but path[1] is never overwritten. Only=
+ a
+> saddr or daddr whose port is 0 gets filled in.
+>
+> The function can also modify path[1] and still return false. Suppose
+> path[1].saddr is empty but path[1].daddr already holds a different peer
+> address. Then path[1].saddr is set to sa, the daddr comparison fails, and
+> the function returns false.
+>
+> That leaves path[1] with the new source paired with the old destination,
+> which matches neither candidate. The "Returns false if the addresses don'=
+t
+> match the alternate path" text implies the false case has no side effects=
+.
+>
+> Within this patch, path[1].daddr is only set by quic_path_detect_alt()
+> itself (saddr first) or by quic_path_swap(). quic_path_unbind() clears bo=
+th
+> fields together, so this half-written state may not be reachable yet.
+>
+> Could the comment describe the fill-only-empty-fields behaviour and the
+> possible partial update on a false return?
+>
+> [ ... ]
+>
+> > diff --git a/net/quic/path.h b/net/quic/path.h
+> > new file mode 100644
+> > index 0000000000000..c2537cf65a7d4
+> > --- /dev/null
+> > +++ b/net/quic/path.h
+> > @@ -0,0 +1,191 @@
+>
+> [ ... ]
+>
+> > +     /* MTU discovery handling */
+> > +     struct { /* PLPMTUD probing (rfc8899) */
+> > +             s64 number; /* Packet number used for current probe */
+> > +             u16 pmtu;   /* Confirmed path MTU */
+> > +
+> > +             u16 probe_size; /* Current probe packet size */
+> > +             u16 probe_high; /* Highest failed probe size */
+> > +             u8 probe_count; /* Retry count for current probe_size */
+>
+> [Severity: Low]
+> This isn't a bug, but these two field comments don't match how path.c use=
+s
+> the fields.
+>
+> probe_high is also set when no probe has failed. In SEARCH state,
+> quic_path_pl_recv() does this once probe_size reaches the 9000 byte cap:
+>
+>         paths->pl.probe_high =3D QUIC_MAX_PLPMTU;
+>
+> so the field works as an upper search bound, not only as a failed size.
+>
+> probe_count is incremented on every quic_path_pl_send() call, including t=
+he
+> first probe of a new size:
+>
+>         paths->pl.probe_count++;
+>
+> so the probe_count < QUIC_MAX_PROBES check counts total probes sent for t=
+he
+> current size, not retries.
+>
 > [ ... ]
 >
 > --
