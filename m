@@ -1,52 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587230;
-	b=3wgU8ksfJEuHNRnrsb959h6NjxvHDOGaNvNF/FIfVcmuLanpcgpKgW3lgFq6LhCL2Lji
-	 gGAsQ9KWXRV6Q7EFlZ5FXCNhOhmTN415NrmOBuveJekasPgjR3N6ArcLHJHY0bNDqIPc8
-	 EUVqyS6/tsrZ5rk24j33ODQWbLtuIn+UFJhP2TkhDniTPnz5AFztTsAQD635doft92MUQ
-	 4U7LyklBN71/VhUNW2Oos61EbNcKqLo/oBuyXrnRvGrSqYUjLhx0iMMeS9dYH4cWM6VkI
-	 o9M5xHizDXDLhs8I7I+YZAjp082d2VEFtFgqDJYzFZJ5Ckc8lYY2euBowtxVscA5Elw==
+	t=1795587235;
+	b=uZ6Gc00Yl7ts2OS97tRnCeHSHdtmcJ+kQenokGO19ihoeMmYLksYOg9umkE3mcc72H5b
+	 J8P/znID5mXbmmRAsj7PxdyjH4TDlzZjw3T9pfButjXdE93pzS1qgjbll39AcXrceVYTb
+	 kfXLSrDDOk/+64NNgC55yi43dzdRytEeBO3LmCfpwx26xmWD9N0e9f+UaKlVEAVlTP/0i
+	 uY4ZTaWMRyjbRFV1onR+lGHmdN0U1NgZK2azl1b0h7hqFYD7TQ/gJndEugIay62l88H5M
+	 kL+MNt8TensTwsgMna63s++NdEV6e/RiP6AqBgUvCSJcOul15T11cXv/dMo0Jd0IF/Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587230;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587235;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=1lJ3K/EilkHlytmEnlIWdtZUx18zfJBzx5n6NoVgMZA=;
-	b=IETCTbMrlrJwwETGjpYASCVYLHGHQcwtvBvXPzN0s/iZBgrXf4yj3YwDVcPDc4/0qlyL
-	 oeGaysoyHcZvNmx0nzcUSwAdPAPmJmnJZH6W3BulFJ436L46/u6SsqYG+114C+kCyfPX/
-	 pk6Dkn6gs5mD9PG+PHb2e/XtTO5dGP5jJb8fLqmaGrCNKWbHa7qggEVRMDj3Rz9f/7WQS
-	 dfyaxY/9q8DXo05eUbKM5hVRSzSnslY/xgtO3yRT7t6je2UjvQMJ10QHMmGQA9pzbQjtw
-	 zX65xKTtGPRQQaYmPgsvdkur42FVBsV/Wj/+Jfd9o1GNNyl7xUNpk/s5EKTMcN9DMIg==
+	bh=RebRu2g/z31wGx+2OCPyrPhThAdN2yCx9u1zbQ7clX4=;
+	b=pAmBl6Q0JvLhFiNlSWKBxO1lO7l1PgAitwhAdxlq1oY+QbjfWtRWnwBA+iTcgdHy2HZ2
+	 GT09SwVxmyEgdCL/vZP13go18vn8PIIUGVsn5AqWh3EaFs0plGeIbx0uIXyrT7iFlX89v
+	 oIzw2eWaL8hibKMEY7vuIB+cn5u2eJ3a1Hu00+Ij41I2TORkeJkqozt09BRXzs0NHSG0i
+	 9XQzAwG4Khpq/EMrHKcdISasOT92v1FpLDkjl0CnnyB91nVsBTtPPjBs4BTmk0FcKyxxY
+	 B3PpVbJv42fNjTInCtKlyuGmv0tRvE/PDw+IPA9V9HTYi+wmiCIR3Arxum7TWc6/kNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=RqltCb+4;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b="sbfW4h2/";
 	arc=none smtp.remote-ip=198.137.202.133
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE95606A31E;
-	Wed, 25 Nov 2026 06:13:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EEE95606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37027606A697;
+	Wed, 25 Nov 2026 06:13:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 37027606A697
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=RqltCb+4
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=sbfW4h2/
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=1lJ3K/EilkHlytmEnlIWdtZUx18zfJBzx5n6NoVgMZA=; b=RqltCb+47NdqyaEvOeyiNTu41X
-	84FUK7YH1lzhc+XRDU7RDe1ATmwD2JLDQQHYXSptW+C8cOoyJXaeMMoxDrj52mgJbJABc7Wp7C6Ek
-	yMmn7sxUNjG9+JacqyjWHOLLSx44CbPR/BUHV3axpjiiSm5gCjQQXyxxA7H3gdH1t4MGWdJOzFgY/
-	LdhuYc4NBwg0ll800pMNrxw416aXG455yKA7ZRyCJXxDYUE7E96+EFTBNvaDVaODEWfUflZDK22Vc
-	WudMF3wjFMpxyZ/vO15PD+q5sQEnuA9btI8rOSE+Z/fRZgBFloydCASmKFi4tcauXjXpi+0t0+GV5
-	I+QiQsxQ==;
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=RebRu2g/z31wGx+2OCPyrPhThAdN2yCx9u1zbQ7clX4=; b=sbfW4h2/B6I9JDHOZSZ9flrwqH
+	bhgZPywMW/8HTQaTMbMZKWKRmF/u4H8iCdmE2NXlrIG4l3MwtdK3OE1zXboVyKtO4xeMZ0w0La58S
+	NUE75yCeRbWpCVAQjyZpaIf80DbRSUhaAoWrrqLcAWR8iu4WOHNah3s4A4nj0JBDNqnhlSL3vIUzn
+	zDTTHK+2eUQZNijcwbCFLcBgvYFCfQ6LtgapA4kghONZMaWOka0RBTX02MgSmk/fuJzJpuoxgBYne
+	nZ/aqBW5VeYLOcer0h7Ymqf3LabTYXxS5PH5V6a/fF6uEcyOJXuoXqnamYCYTvhmMUeoOMSzKcIBX
+	rGjDwO8A==;
 Received: from [50.53.43.113] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xW6GF-00000008Wvh-2FgZ;
-	Wed, 25 Nov 2026 06:13:43 +0000
+	id 1xW6GQ-00000008Wvh-0lyd;
+	Wed, 25 Nov 2026 06:13:54 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: linux-kernel@vger.kernel.org
 Cc: Randy Dunlap <rdunlap@infradead.org>,
@@ -132,10 +132,12 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	Matthew Brost <matthew.brost@intel.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	intel-xe@lists.freedesktop.org
-Subject: [PATCH v3 00/12] docs: ioctl-number: update entries
-Date: Tue, 24 Nov 2026 22:13:27 -0800
-Message-ID: <20261125061340.3402300-1-rdunlap@infradead.org>
+Subject: [PATCH v3 04/12] docs: ioctl-number: update networking entries
+Date: Tue, 24 Nov 2026 22:13:31 -0800
+Message-ID: <20261125061340.3402300-5-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.56.1
+In-Reply-To: <20261125061340.3402300-1-rdunlap@infradead.org>
+References: <20261125061340.3402300-1-rdunlap@infradead.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -145,54 +147,25 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Update file names that define ioctls and update the range of
-ioctl function numbers that are used where they have changed.
+Update the list of files where networking ioctls are defined and update
+the ranges of function numbers that are used.
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+v2: address sashiko comments (duplicat bnep.h entry; missing its
+    "conflict" marker);
+    drop moderated mailing lists
+v3: rebase
 
 [Since having multiple maintainers trying to merge these would
 cause some conflicts, it would be more manageable for Jon to
 take all of these through the docs-next tree.]
 
- [PATCH 01/12 v2] docs: ioctl-number: update MM entries
- [PATCH 02/12 v2] docs: ioctl-number: update sound entries
- [PATCH 03/12 v2] docs: ioctl-number: update block entries
- [PATCH 04/12 v2] docs: ioctl-number: update networking entries
- [PATCH 05/12 v2] docs: ioctl-number: update video/fbdev entries
- [PATCH 06/12 v2] docs: ioctl-number: update SCSI entries
- [PATCH 07/12 v2] docs: ioctl-number: update MTD entries
- [PATCH 08/12 v2] docs: ioctl-number: update USB entries
- [PATCH 09/12 v2] docs: ioctl-number: update virtualization entries
- [PATCH 10/12 v2] docs: ioctl-number: update FS entries
- [PATCH 11/12 v2] docs: ioctl-number: update platform entries
- [PATCH 12/12 v2] docs: ioctl-number: update DRM entries
-
- Documentation/userspace-api/ioctl/ioctl-number.rst |   91 ++++++++---
- 1 file changed, 72 insertions(+), 19 deletions(-)
-
-v2 changes:
-- address sashiko review comments
-- drop addition of arch/x86/kvm/x86.c (Sean Christopherson)
-- drop moderated mailing lists
-v3 changes:
-- update the scarlett2 sound driver ioctl range (sashiko)
-- rebase all patches in the series
-
-
 Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Shuah Khan <skhan@linuxfoundation.org>
 Cc: linux-doc@vger.kernel.org
-Cc: David Hildenbrand <david@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>
-Cc: linux-mm@kvack.org
-Cc: Jaroslav Kysela <perex@perex.cz>
-Cc: Takashi Iwai <tiwai@suse.com>
-Cc: linux-sound@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -206,60 +179,88 @@ Cc: Eric Dumazet <edumazet@kernel.org>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org
-Cc: Helge Deller <deller@gmx.de>
-Cc: linux-fbdev@vger.kernel.org
-Cc: dri-devel@lists.freedesktop.org
-Cc: MPT-FusionLinux.pdl@broadcom.com
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-Cc: "Martin K. Petersen" <mkp@kernel.org>
-Cc: linux-scsi@vger.kernel.org
-Cc: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Vignesh Raghavendra <vigneshr@ti.com>
-Cc: Zhihao Cheng <chengzhihao1@huawei.com>
-Cc: linux-mtd@lists.infradead.org
-Cc: Neill Kapron <nkapron@google.com>
-Cc: Andrey Konovalov <andreyknvl@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-usb@vger.kernel.org
-Cc: Juergen Gross <jgross@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: xen-devel@lists.xenproject.org
-Cc: Hans de Goede <hansg@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eugenio Pérez <eperezma@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: virtualization@lists.linux.dev
-Cc: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: "Theodore Ts'o" <tytso@mit.edu>
-Cc: linux-ext4@vger.kernel.org
-Cc: Mike Marshall <hubcap@omnibond.com>
-Cc: devel@lists.orangefs.org
-Cc: Paulo Alcantara <pc@manguebit.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-Cc: Chao Yu <chao@kernel.org>
-Cc: linux-f2fs-devel@lists.sourceforge.net
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: Tzung-Bi Shih <tzungbi@kernel.org>
-Cc: Benson Leung <bleung@chromium.org>
-Cc: David Airlie <airlied@gmail.com>
-Cc: Simona Vetter <simona@ffwll.ch>
-Cc: dri-devel@lists.freedesktop.org
-Cc: Alex Deucher <alexander.deucher@amd.com>
-Cc: Christian König <christian.koenig@amd.com>
-Cc: amd-gfx@lists.freedesktop.org
-Cc: Jani Nikula <jani.nikula@linux.intel.com>
-Cc: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
-Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
-Cc: Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: intel-gfx@lists.freedesktop.org
-Cc: Matthew Brost <matthew.brost@intel.com>
-Cc: Thomas Hellström <thomas.hellstrom@linux.intel.com>
-Cc: intel-xe@lists.freedesktop.org
+
+ Documentation/userspace-api/ioctl/ioctl-number.rst |   22 +++++++----
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+--- linux-next-20261123.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
++++ linux-next-20261123/Documentation/userspace-api/ioctl/ioctl-number.rst
+@@ -130,8 +130,9 @@ Code  Seq#    Include File
+ 'A'   10-53  sound/core/pcm_compat.c                                   conflict!
+ 'B'   00-1F  linux/cciss_ioctl.h                                       conflict!
+ 'B'   00-0F  include/linux/pmu.h                                       conflict!
+-'B'   C0-FF  advanced bbus                                             <mailto:maassen@uni-freiburg.de>
++'B'   C0-FF  advanced bbus                                             conflict! <mailto:maassen@uni-freiburg.de>
+ 'B'   00-0F  xen/xenbus_dev.h                                          conflict!
++'B'   C8-D4  net/bluetooth/bnep/bnep.h                                 conflict! <mailto:linux-bluetooth@vger.kernel.org>
+ 'C'   all    linux/soundcard.h                                         conflict!
+ 'C'   00-68  sound/compress_offload.h                                  conflict!
+ 'C'   01-2F  linux/capi.h                                              conflict!
+@@ -172,10 +173,9 @@ Code  Seq#    Include File
+ 'H'   FC     sound/pci/asihpi/hpios.h                                  conflict!
+ 'H'   00-0F  uapi/misc/habanalabs.h                                    conflict!
+ 'H'   A0     uapi/linux/usb/cdc-wdm.h
+-'H'   C0-F0  net/bluetooth/hci.h                                       conflict!
++'H'   C0-F0  net/bluetooth/hci_sock.h                                  conflict!
+ 'H'   C0-DF  net/bluetooth/hidp/hidp.h                                 conflict!
+ 'H'   C0-DF  net/bluetooth/cmtp/cmtp.h                                 conflict!
+-'H'   C0-DF  net/bluetooth/bnep/bnep.h                                 conflict!
+ 'H'   F1     linux/hid-roccat.h                                        <mailto:erazor_de@users.sourceforge.net>
+ 'H'   F8-FE  sound/firewire.h                                          conflict!
+ 'I'   all    linux/isdn.h                                              conflict!
+@@ -219,11 +219,12 @@ Code  Seq#    Include File
+ 'T'   all    linux/soundcard.h                                         conflict!
+ 'T'   00-AF  sound/asound.h                                            conflict!
+ 'T'   all    arch/x86/include/asm/ioctls.h                             conflict!
+-'T'   C0-DF  linux/if_tun.h                                            conflict!
++'T'   C0-E3  linux/if_tun.h                                            conflict!
+ 'U'   all    sound/asound.h                                            conflict!
+ 'U'   00-CF  linux/uinput.h                                            conflict!
+ 'U'   00-EF  linux/usbdevice_fs.h
+ 'U'   C0-CF  drivers/bluetooth/hci_uart.h
++'U'   00     net/nfc/nci_core.h                                        conflict!
+ 'V'   all    linux/vt.h                                                conflict!
+ 'V'   all    linux/videodev2.h                                         conflict!
+ 'V'   C0     linux/ivtvfb.h                                            conflict!
+@@ -242,8 +243,8 @@ Code  Seq#    Include File
+ 'Z'   14-15  drivers/message/fusion/mptctl.h
+ '['   00-3F  linux/usb/tmc.h                                           USB Test and Measurement Devices
+                                                                        <mailto:gregkh@linuxfoundation.org>
+-'a'   all    linux/atm*.h, linux/sonet.h                               ATM on linux
+-                                                                       <http://lrcwww.epfl.ch/>
++'a'   all    linux/atm*.h, linux/sonet.h, linux/atmbr2684.h            ATM on linux
++             linux/atmdev.h, net/atm/ioctl.c                           <http://lrcwww.epfl.ch/>
+ 'b'   00-FF                                                            conflict! bit3 vme host bridge
+                                                                        <mailto:natalia@nikhefk.nikhef.nl>
+ 'b'   00-0F  linux/dma-buf.h                                           conflict!
+@@ -264,6 +265,7 @@ Code  Seq#    Include File
+ 'f'   00-0F  fs/ocfs2/ocfs2_fs.h                                       conflict!
+ 'f'   13-27  linux/fscrypt.h
+ 'f'   81-8F  linux/fsverity.h
++'f'   7b-7c  arch/{alpha,mips,sh,xtensa}/include/uapi/asm/sockios.h
+ 'g'   00-0F  linux/usb/gadgetfs.h
+ 'g'   20-2F  linux/usb/g_printer.h
+ 'g'   01-0F  mm/gup_test.h                                             conflict!
+@@ -308,8 +310,11 @@ Code  Seq#    Include File
+ 'q'   80-FF  linux/telephony.h                                         Internet PhoneJACK, Internet LineJACK
+              linux/ixjuser.h                                           <http://web.archive.org/web/%2A/http://www.quicknet.net>
+ 'r'   00-1F  linux/msdos_fs.h and fs/fat/dir.c
+-'s'   all    linux/cdk.h
++'s'   all    linux/cdk.h                                               conflict!
++'s'   07-09  arch/{alpha,mips,sh,xtensa}/include/uapi/asm/sockios.h    conflict!
++'s'   64-65  arch/sh/include/uapi/asm/sockios.h                        conflict!
+ 't'   00-7F  linux/ppp-ioctl.h
++'t'   46-4D  drivers/net/ppp/ppp_generic.c
+ 't'   80-8F  linux/isdn_ppp.h
+ 't'   90-91  linux/toshiba.h                                           toshiba and toshiba_acpi SMM
+ 'u'   00-1F  linux/smb_fs.h                                            gone
+@@ -334,7 +339,8 @@ Code  Seq#    Include File
+ '|'   80-9F  samples/                                                  Any sample and example drivers
+ 0x80  00-1F  linux/fb.h
+ 0x81  00-1F  linux/vduse.h
+-0x89  00-06  arch/x86/include/asm/sockios.h
++0x89  00-07  asm-generic/sockios.h
++0x89  06-07  linux/sockios.h
+ 0x89  0B-DF  linux/sockios.h
+ 0x89  E0-EF  linux/sockios.h                                           SIOCPROTOPRIVATE range
+ 0x89  F0-FF  linux/sockios.h                                           SIOCDEVPRIVATE range
