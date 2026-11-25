@@ -1,55 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.17
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795563179;
-	b=Ox8O2btqbnwnVS5SKkFj3/3fkkhh0L28iyeYIoTjXSd+0kwOyUDLVZ1yywZil0wk8F3g
-	 rNClqNLlh6pkeYvdxqn5Rdk82sxF4CBcdw64GmZgpUKkGGtoBflxnFo9BZPVious5b8Bz
-	 WQbKCDTHYL/wCEKAr5KhmuF/ToWQl43EC4u8bbh6rgSjhX6PRVwacLswLqxKEP1mdHC63
-	 Gur6Zsl9feCefMS2G/KI6INSG3/jOghMhwBqrGyUhRbi5s27ddjouKuRSM92X4O03UMxl
-	 gQFWe67PKFE0I4AAfQDNe4JRA7R+llvZwfcAeMWaOPG6MUY/JLAXcwYozTvyhMMq78w==
+	t=1795580954;
+	b=R/lQzI8dOAIVs8M559Ghih0ISd4vLgVqf2UmYoxvIS4ittcq2mG7yKGa/zmHtxtN7x71
+	 Jpfm/EjGp7evC9RSdBZpVATH9icKunIYPUuRFCGUNL3FDQzmeG7rcNv5/+BAvqB7uBARb
+	 5dBf0NYvdMVWwJ/Lm8yiguciJZmDcWEy3Dz+tw4jCS4eC5KdSMGqL9Ux7CElU1MW22hPY
+	 E62m5m4t+nVoabVT5i/y7Htnp8DU00MnCaOg4v3JbAmVhIHwpsYeEsG0ncjwT8XKqSMwZ
+	 DbLsZ4lwIXfhMH6m6OgB8GSbQKyfu/vti+h2eHxAJ7bl4iRtg4aUJ8PdCAd1XT5IPTw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795563179;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=biO3B9Kl/OErjoAa33t6cDrrXZV7UDFM5oyQJ9E7oag=;
-	b=PQZQWmCS5mJK5ZxUzS2dMr5Q90EXeYOc6hcO0w2DIn264eiWna644VkQJfGF1toesHL6
-	 MLP7ULDzQMb78p2hpvGaIFG5uM0f0ZUDzGJqB0y+Ju3jaPB0aP3sxPTK7TzxfOf16ZlUZ
-	 VEFbQmpZeia32HbxU1fzRs1PNWzmfm+JT6r4i40R8ESrtEItHDmGCWCuE8hgehuLlkEIi
-	 i9/MUPCxkgVtTWDVx/VzuYMooCq+zfu1iXAAVkYZKrtp1GJ42jWMjEu2ZQMxG9Ul3zpSU
-	 cVnA+8NbGVAIbqyX0aRr5nSUPBtcfPnt+zGOrUoeT0q9oeyiTr0KA53s7U58swY9z0w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795580954;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=rqapGEif3pOFnTQjLzudYGSBpb8F1n57DN8SWyMte9E=;
+	b=zX15VEW7RWJ6iv4Yatotwln621iizJK77Q9VX4qyYPYVe5cLeP0RxP7nUbUIfxlXrkXs
+	 wZJ8hX4YD8WD7tsVKq1uHDv0hWUaKDLlN52nZnOKSM1Dtnq6BCDNtVosM4+4fPMGTySrS
+	 QjmpFg/XNkkT9O2D6eHY0qjz92dSgTozQttqv10lQGcvTcd0h+7jLIo1U8nx8dPBSw5nb
+	 FUgDnfBoYXsqtk1oz42GnKf37tSflk95BD/Qv+oPQqryjKHkHU1PpSIlmkX6uAy6BnJ8j
+	 1b2O9/aHvt3I2vED7UoS6ivR7vLRlOfTS4PIpQzqvBjXULdg28UjJZCGDkk2fXBFgsA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aBL+0eAl;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=chenxiaosong.com;
+	spf=pass smtp.mailfrom=chenxiaosong.com;
+	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=o4Qzim7j;
+	arc=none smtp.remote-ip=95.215.58.17
+Received: from mta1.migadu.com (out-17.mta1.migadu.com [95.215.58.17])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDAA606A31E
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 23:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F56606A321
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 04:29:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32F56606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aBL+0eAl
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E211C1F000D0
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 23:32:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795563178;
-	bh=biO3B9Kl/OErjoAa33t6cDrrXZV7UDFM5oyQJ9E7oag=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=aBL+0eAlBk0bY9QF3GNdwqiLBUJjNLzfZhlzuL390QMlbfJgBeLJSfgkkaDTNOtSr
-	 YCvWCoO5YeRNNnZTMvULdhcKA+f1zSMNCU3OgOqkv1zs178PY4XRZadG+7hmaZWP1u
-	 Ny2+IQWIbjgtoLo3kT8n90XfUUVEk1qaCrbvQLaJPi2rX9oY1pRHmWo3n5XvifBAN7
-	 LiqecKsb+y9mDZOxmNO+vKUspKMzufU2AA+T6qvaMzI6/OALmsZu5jx/PtTJqyXJU+
-	 whf+irEH2ogmZIhcD7OT3ApX7eRRnt25BxBCtwvEOn4GZ4jZu0lCTOLePDf1OCuyOU
-	 mYKfNt+xyH6Fg==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c50933bdf4bso999419166b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 15:32:58 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGaj78UKiehhrgfczRDZsnia3G0lsGOgNJvqAxYHnuRdieoBU2NnzANT3+XpAikKs5A+9J2k/0fGPs7@vger.kernel.org
-X-Gm-Message-State: APuU4Z9jt8T2TyTYHxKBfzkwjG2fzT97u1hDUGPDc1MCwPTKVeLc7bZs
-	vuee0AdhNtNziKKk9vZxv9YPj4VGQCGthE1EV2cFh+1qT0kLAM/qAvU4zMRVVpRHTyI1r262xA6
-	8O3CaRvDjY5EvT9Vsu7GkB7NF9mwpmJU=
-X-Received: by 2002:a17:906:9c89:b0:c51:3b7a:f0b6 with SMTP id
- a640c23a62f3a-c513b7b053bmr1319019466b.3.1795563177553; Tue, 24 Nov 2026
- 15:32:57 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=o4Qzim7j
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=W+sC4+T1oBRbe2aR0eng8GaPnp96q47rE2lkk+nu9V4=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795580951; v=1; x=1796185751;
+ b=o4Qzim7jPimtxnu1EOxk5IiMOP8bNgJ7m8Uyx2UZ1hk6Fy+kOoUbsaKuvraRg4tk7jkFjRqa
+ cEsP7SY/nHyfXk2h3C2bCXnQ6nxHwu23qdVltVTT9vLIPUsHVsCFu+9Q4SOzOOQF+531DROk/34
+ e8FKyqjicbuVIcjEw2wv0mHJm/PKyVW1oYeKMteAnYKljOb2NZUEWtuYLsRjAjsfthkZGWIa7AD
+ iM0JqSZLEN10+rs2Y+7zsLnLNzAT3irXTt11UbPz38AvlJsMAiUKLklQhZfExpI7S9uiczkGAYz
+ XEVjk/p06pZtJ9jAHOLdu5i/n1ST7EyqpcyzUaokHBaYQ==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id ef756b0f33637438;
+	Wed, 25 Nov 2026 04:29:10 +0000
+X-Mizu-Trace-ID: ef756b0f33637438
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <a5b87baf-0573-4c47-85f4-0629dc1cf000@chenxiaosong.com>
+Date: Wed, 25 Nov 2026 12:29:01 +0800
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,31 +60,66 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261124075613.469257-1-zhang.guodong@linux.dev> <20261124075613.469257-3-zhang.guodong@linux.dev>
-In-Reply-To: <20261124075613.469257-3-zhang.guodong@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 25 Nov 2026 08:32:45 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8UDVSs_Nxsz7rcsjGrbKv=J-zdTm=Fidt8u_9Aek5VoA@mail.gmail.com>
-X-Gm-Features: Aa3M54qvHh-lyDR0o-1PM3Iqbw134GeNLQilOubGkrFzqadgMzcOOniYLBr3n4I
-Message-ID: <CAKYAXd8UDVSs_Nxsz7rcsjGrbKv=J-zdTm=Fidt8u_9Aek5VoA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] smb/server: fix file name conversion on big-endian systems
-To: ZhangGuoDong <zhang.guodong@linux.dev>
-Cc: tom@talpey.com, senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] ksmbd: splice READ payloads over TCP
+To: Huiwen He <huiwen.he@linux.dev>, Namjae Jeon <linkinjeon@kernel.org>,
+ linux-cifs@vger.kernel.org
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey
+ <tom@talpey.com>, linux-kernel@vger.kernel.org
+References: <20261124132554.1185817-1-huiwen.he@linux.dev>
+Content-Language: en-US
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20261124132554.1185817-1-huiwen.he@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 24, 2026 at 4:56=E2=80=AFPM ZhangGuoDong <zhang.guodong@linux.d=
-ev> wrote:
->
-> From: ZhangGuoDong <zhangguodong@kylinos.cn>
->
-> Use CPU byte order for temporary UTF-16 buffers to avoid incorrect
-> file name conversion on big-endian architectures.
->
-> Fixes: 0c180317c654 ("ksmbd: add support for surrogate pair conversion")
-> Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
-> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Applied it to #ksmbd-for-next.
-Thanks!
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+On 11/24/26 21:25, Huiwen He wrote:
+> From: Huiwen He <hehuiwen@kylinos.cn>
+> 
+> ksmbd reads file data into a private response buffer. TCP then copies
+> the payload into an skb. If the reply must be queued, ksmbd also
+> copies the unsent bytes into a queue buffer.
+> 
+> This series uses MSG_SPLICE_PAGES to avoid those TCP copies for plain,
+> standalone READs: patch 1 splices the initial TCP send from private
+> pages and a header page fragment, and patch 2 retains references to
+> unsent payload folios on the send queue so the send worker can splice
+> them as well.
+> 
+> Summary of fio sequential read results (16 jobs, QD32 per job, SMB3.1.1
+> tmpfs; each column is relative to the preceding commit):
+> 
+> Channels  I/O         Throughput change        Host Gcycles/GiB change
+>                       patch 1    patch 2          patch 1    patch 2
+>         1  4 KiB        -0.3%      -0.9%            +1.8%      -1.1%
+>         1  64 KiB      +28.4%      +0.9%           -31.5%      -5.9%
+>         1  256 KiB     +60.8%      +5.3%           -40.5%     -22.5%
+>         1  1 MiB       +51.5%      +9.2%           -33.1%     -32.2%
+>         4  4 KiB        +0.2%      +0.2%            +0.9%      +0.2%
+>         4  64 KiB       +3.9%      +2.6%            -6.9%      +0.8%
+>         4  256 KiB     +12.1%      -0.4%           -43.0%      -0.8%
+>         4  1 MiB       +17.6%      +7.1%           -39.5%     -34.7%
+> 
+> Huiwen He (2):
+>    ksmbd: send READ payloads with MSG_SPLICE_PAGES
+>    ksmbd: retain unsent READ pages on the TCP send queue
+> 
+>   fs/smb/server/connection.c    |  18 +++
+>   fs/smb/server/connection.h    |   1 +
+>   fs/smb/server/ksmbd_work.c    |  24 ++--
+>   fs/smb/server/ksmbd_work.h    |   8 +-
+>   fs/smb/server/smb2pdu.c       |  74 +++++++++--
+>   fs/smb/server/transport_tcp.c | 223 ++++++++++++++++++++++++++++++----
+>   fs/smb/server/transport_tcp.h |   1 +
+>   7 files changed, 301 insertions(+), 48 deletions(-)
+> 
+> 
+> base-commit: 89d5e8fdd5a74a318d18b7267c4ec5d70b2285f1
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
