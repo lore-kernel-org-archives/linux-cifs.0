@@ -1,56 +1,143 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795580954;
-	b=R/lQzI8dOAIVs8M559Ghih0ISd4vLgVqf2UmYoxvIS4ittcq2mG7yKGa/zmHtxtN7x71
-	 Jpfm/EjGp7evC9RSdBZpVATH9icKunIYPUuRFCGUNL3FDQzmeG7rcNv5/+BAvqB7uBARb
-	 5dBf0NYvdMVWwJ/Lm8yiguciJZmDcWEy3Dz+tw4jCS4eC5KdSMGqL9Ux7CElU1MW22hPY
-	 E62m5m4t+nVoabVT5i/y7Htnp8DU00MnCaOg4v3JbAmVhIHwpsYeEsG0ncjwT8XKqSMwZ
-	 DbLsZ4lwIXfhMH6m6OgB8GSbQKyfu/vti+h2eHxAJ7bl4iRtg4aUJ8PdCAd1XT5IPTw==
+	t=1795587230;
+	b=Fnf8r4XK+AVDWbXTX0xZJxV0xSB+cXElYWMokE7F/2YXWflrt9jCg6i/hpTYwgEL25ZN
+	 KvoxtR7dTp80ppo8a+se/oNLP8i9rkbO2x97ryWREwGe4SU51Tsy/LzeWVCc1q/anj8gl
+	 wK8TTA/lygwRBjL5Xv5vKM85YrHXDAmb3Lf0iu0CV/5NnwWYrMSeZj+/Rlu2ZjYwp7oz7
+	 n2Mz+xfqcGBGCkNBn9IRp6P3yxaMBO3RWxuhQTkv9XkcaYSSIpouy5WIGy7BZZL0Zn94B
+	 ieMbdciDIkOyDr+77w+o7e/l5Pbs/K2K9DpikggyJydX/3gnsWNcfDDHyTGyL8ggWIw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795580954;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=rqapGEif3pOFnTQjLzudYGSBpb8F1n57DN8SWyMte9E=;
-	b=zX15VEW7RWJ6iv4Yatotwln621iizJK77Q9VX4qyYPYVe5cLeP0RxP7nUbUIfxlXrkXs
-	 wZJ8hX4YD8WD7tsVKq1uHDv0hWUaKDLlN52nZnOKSM1Dtnq6BCDNtVosM4+4fPMGTySrS
-	 QjmpFg/XNkkT9O2D6eHY0qjz92dSgTozQttqv10lQGcvTcd0h+7jLIo1U8nx8dPBSw5nb
-	 FUgDnfBoYXsqtk1oz42GnKf37tSflk95BD/Qv+oPQqryjKHkHU1PpSIlmkX6uAy6BnJ8j
-	 1b2O9/aHvt3I2vED7UoS6ivR7vLRlOfTS4PIpQzqvBjXULdg28UjJZCGDkk2fXBFgsA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587230;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=Z4IewevnDUR+3Yga8umWQJFbQaMK6YhJ+IYMzmfvhho=;
+	b=z5QmXlf6mhfkAAi77hmKto+O1hOwg8cS7qOSMzOqXYI0p3yVbXzcuEehQ161m62OkR3W
+	 aYmbt4AuPEvp0q1r1+e0u985P152bOYq9SZM5KcslOv5LWObZSsq8DuB/PiHI+Qna1hLK
+	 8EL2jaiiUd8YEdhX4Ty3VQDF06J/VFugpnpzYKFeBeDLxsdavoHXpAoO+8ZVOaFDvHkzo
+	 7JtmaPYT/kDWm4YMpPZqG5YwI+0eVJE2wlARUl+cLOySiSkkyrZ9qkxC7z2LETYvYgrsC
+	 HitJ8wADTOwtSLR/TTKBKL5yoxz78fVH6l3TIZgMi8HxSWY884I2yTOObP0CZ25A9Lw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chenxiaosong.com;
-	spf=pass smtp.mailfrom=chenxiaosong.com;
-	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=o4Qzim7j;
-	arc=none smtp.remote-ip=95.215.58.17
-Received: from mta1.migadu.com (out-17.mta1.migadu.com [95.215.58.17])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=Eu3Xj08W;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F56606A321
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 04:29:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32F56606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF4B606A321;
+	Wed, 25 Nov 2026 06:13:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EEF4B606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=o4Qzim7j
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=W+sC4+T1oBRbe2aR0eng8GaPnp96q47rE2lkk+nu9V4=;
- c=simple/simple; d=chenxiaosong.com;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795580951; v=1; x=1796185751;
- b=o4Qzim7jPimtxnu1EOxk5IiMOP8bNgJ7m8Uyx2UZ1hk6Fy+kOoUbsaKuvraRg4tk7jkFjRqa
- cEsP7SY/nHyfXk2h3C2bCXnQ6nxHwu23qdVltVTT9vLIPUsHVsCFu+9Q4SOzOOQF+531DROk/34
- e8FKyqjicbuVIcjEw2wv0mHJm/PKyVW1oYeKMteAnYKljOb2NZUEWtuYLsRjAjsfthkZGWIa7AD
- iM0JqSZLEN10+rs2Y+7zsLnLNzAT3irXTt11UbPz38AvlJsMAiUKLklQhZfExpI7S9uiczkGAYz
- XEVjk/p06pZtJ9jAHOLdu5i/n1ST7EyqpcyzUaokHBaYQ==
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id ef756b0f33637438;
-	Wed, 25 Nov 2026 04:29:10 +0000
-X-Mizu-Trace-ID: ef756b0f33637438
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <a5b87baf-0573-4c47-85f4-0629dc1cf000@chenxiaosong.com>
-Date: Wed, 25 Nov 2026 12:29:01 +0800
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=Eu3Xj08W
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=Z4IewevnDUR+3Yga8umWQJFbQaMK6YhJ+IYMzmfvhho=; b=Eu3Xj08W3NJugRAeAckfLLB7fP
+	nWb2k/gRos5t782SZ8XOZ03pXXlaHouCGrgvKjtcuJ4S0EO1YL+gg3XlmFEkwgMOjvRt/NqQcEQmk
+	pM6rqd0iD7C6aQo5piQb85EOxe6mnzcb1cTfastxEm3miz2l40RVZ0EWbOow/EM1P6l8WGtpymXDs
+	lH8ot30ghbW9dh3KshpcJwOcl5WTdzFR+pzMpwniEwWD2+5fhenpAkoIfJh1SlSH3NAJcjDgFu1xI
+	pInFJMLrApWbVUHkDO9yAOXHCHiwHy+toq2qGLgACisBmGlm/1UCCcxJ3fDDE7dAfemvx0nRgchMx
+	dhT33leQ==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xW6GH-00000008Wvh-3rUv;
+	Wed, 25 Nov 2026 06:13:45 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-doc@vger.kernel.org,
+	David Hildenbrand <david@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	linux-mm@kvack.org,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	linux-sound@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowangio@gmail.com>,
+	David Heidelberg <david@ixit.cz>,
+	oe-linux-nfc@lists.linux.dev,
+	Chas Williams <3chas3@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Helge Deller <deller@gmx.de>,
+	linux-fbdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	MPT-FusionLinux.pdl@broadcom.com,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <mkp@kernel.org>,
+	linux-scsi@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	linux-mtd@lists.infradead.org,
+	Neill Kapron <nkapron@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-usb@vger.kernel.org,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	xen-devel@lists.xenproject.org,
+	Hans de Goede <hansg@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Jan Kara <jack@suse.cz>,
+	linux-fsdevel@vger.kernel.org,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	linux-ext4@vger.kernel.org,
+	Mike Marshall <hubcap@omnibond.com>,
+	devel@lists.orangefs.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	linux-cifs@vger.kernel.org,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>,
+	linux-f2fs-devel@lists.sourceforge.net,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Tzung-Bi Shih <tzungbi@kernel.org>,
+	Benson Leung <bleung@chromium.org>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	amd-gfx@lists.freedesktop.org,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	intel-gfx@lists.freedesktop.org,
+	Matthew Brost <matthew.brost@intel.com>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	intel-xe@lists.freedesktop.org
+Subject: [PATCH v3 01/12] docs: ioctl-number: update MM entries
+Date: Tue, 24 Nov 2026 22:13:28 -0800
+Message-ID: <20261125061340.3402300-2-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.56.1
+In-Reply-To: <20261125061340.3402300-1-rdunlap@infradead.org>
+References: <20261125061340.3402300-1-rdunlap@infradead.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -60,66 +147,48 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] ksmbd: splice READ payloads over TCP
-To: Huiwen He <huiwen.he@linux.dev>, Namjae Jeon <linkinjeon@kernel.org>,
- linux-cifs@vger.kernel.org
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey
- <tom@talpey.com>, linux-kernel@vger.kernel.org
-References: <20261124132554.1185817-1-huiwen.he@linux.dev>
-Content-Language: en-US
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20261124132554.1185817-1-huiwen.he@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Add ioctl number entries for test_hmm_uapi and gup_test.
 
-On 11/24/26 21:25, Huiwen He wrote:
-> From: Huiwen He <hehuiwen@kylinos.cn>
-> 
-> ksmbd reads file data into a private response buffer. TCP then copies
-> the payload into an skb. If the reply must be queued, ksmbd also
-> copies the unsent bytes into a queue buffer.
-> 
-> This series uses MSG_SPLICE_PAGES to avoid those TCP copies for plain,
-> standalone READs: patch 1 splices the initial TCP send from private
-> pages and a header page fragment, and patch 2 retains references to
-> unsent payload folios on the send queue so the send worker can splice
-> them as well.
-> 
-> Summary of fio sequential read results (16 jobs, QD32 per job, SMB3.1.1
-> tmpfs; each column is relative to the preceding commit):
-> 
-> Channels  I/O         Throughput change        Host Gcycles/GiB change
->                       patch 1    patch 2          patch 1    patch 2
->         1  4 KiB        -0.3%      -0.9%            +1.8%      -1.1%
->         1  64 KiB      +28.4%      +0.9%           -31.5%      -5.9%
->         1  256 KiB     +60.8%      +5.3%           -40.5%     -22.5%
->         1  1 MiB       +51.5%      +9.2%           -33.1%     -32.2%
->         4  4 KiB        +0.2%      +0.2%            +0.9%      +0.2%
->         4  64 KiB       +3.9%      +2.6%            -6.9%      +0.8%
->         4  256 KiB     +12.1%      -0.4%           -43.0%      -0.8%
->         4  1 MiB       +17.6%      +7.1%           -39.5%     -34.7%
-> 
-> Huiwen He (2):
->    ksmbd: send READ payloads with MSG_SPLICE_PAGES
->    ksmbd: retain unsent READ pages on the TCP send queue
-> 
->   fs/smb/server/connection.c    |  18 +++
->   fs/smb/server/connection.h    |   1 +
->   fs/smb/server/ksmbd_work.c    |  24 ++--
->   fs/smb/server/ksmbd_work.h    |   8 +-
->   fs/smb/server/smb2pdu.c       |  74 +++++++++--
->   fs/smb/server/transport_tcp.c | 223 ++++++++++++++++++++++++++++++----
->   fs/smb/server/transport_tcp.h |   1 +
->   7 files changed, 301 insertions(+), 48 deletions(-)
-> 
-> 
-> base-commit: 89d5e8fdd5a74a318d18b7267c4ec5d70b2285f1
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+v2: no change
+v3: rebase
 
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+[Since having multiple maintainers trying to merge these would
+cause some conflicts, it would be more manageable for Jon to
+take all of these through the docs-next tree.]
 
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Cc: linux-doc@vger.kernel.org
+Cc: David Hildenbrand <david@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>
+Cc: linux-mm@kvack.org
+
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- linux-next-20261123.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
++++ linux-next-20261123/Documentation/userspace-api/ioctl/ioctl-number.rst
+@@ -147,6 +147,8 @@ Code  Seq#    Include File
+ 'G'   00-0F  xen/gntalloc.h, xen/gntdev.h                              conflict!
+ 'H'   00-7F  linux/hiddev.h                                            conflict!
+ 'H'   00-0F  linux/hidraw.h                                            conflict!
++'H'   00-0F  lib/test_hmm_uapi.h                                       conflict!
++                                                                       <mailto:linux-mm@kvack.org>
+ 'H'   01     linux/mei.h                                               conflict!
+ 'H'   02     linux/mei.h                                               conflict!
+ 'H'   03     linux/mei.h                                               conflict!
+@@ -252,6 +254,8 @@ Code  Seq#    Include File
+ 'f'   81-8F  linux/fsverity.h
+ 'g'   00-0F  linux/usb/gadgetfs.h
+ 'g'   20-2F  linux/usb/g_printer.h
++'g'   01-0F  mm/gup_test.h                                             conflict!
++                                                                       <mailto:linux-mm@kvack.org>
+ 'h'   00-7F                                                            conflict! Charon filesystem
+                                                                        <mailto:zapman@interlan.net>
+ 'h'   00-1F  linux/hpet.h                                              conflict!
