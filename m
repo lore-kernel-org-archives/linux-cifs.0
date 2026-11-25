@@ -1,54 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.194
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795597114;
-	b=Az4VGCX3qHmjVM3QF40HZTQQgVou17Vwa4/NZvJHNIfLyG96z9JBd8XtCQFA2yrC80/Y
-	 Frq3xfExejSrJ5w3lRp1XDiEQkWINLrWcDugcCcLCV2svX6Cjt2igEZ6VA2rMmbLGpJZh
-	 jZrS8v11FU0mTJ22xxShFh0y9jzBpLCjK2kfIh3plWUXxJZyMBLhPD411ezfDkvV6ocbm
-	 0tcXq/ZecYk0CQR8hVE+BRxWaBVdexVMvUh0KPwWp1NfxtM2DJbfzKMjl0nWJdcxkSbb2
-	 JZoJEO5Xv2RYUZRO5oOBELgM50sC95Ah5VQ+ShMwV9pRBIo7CHH4SUYYwrfFdy7x34Q==
+	t=1795603758;
+	b=IZPjbmNBJxpCsbD1pQYXXY4mtgXbrdCr3z+CVQdnJWWKXFDMgA0G1qdDih/vU2etjL1J
+	 90h/whx2bNwbjsb4YEC4+p/e14dIubVpoE0pPUnafFil1DDAXj99z/III71nPS0VebcAp
+	 ZNadZwM92r/Y7Ni5tjvg6GMXV1d9bzwxftjAERVXLHGOs+/IixR7zwZh4ae8y5XtDwOf7
+	 K6naeepeT8HIebZBM3YiO1nkrrVIk+PQSkA6q74JbYQRYSBBt3//AoEk/aWV7rmVy6Nh4
+	 LsntQwuo4GN6hKyQi2ZtUPQQYFvOTofq7BCIn3GWdG/K6zgyti9IVrAG5Hnh00VgNww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795597114;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=bc7nuZMJjZ66RAXa3XZY4QgSdXa+1/f74i4Vd6ipG/k=;
-	b=cpLmhjBHJOlS4oq1WB+hWpXgKD70wTQ+FbODVOmqo4zgI/PNJ1dGaH0uoYcJcXBcVYrs
-	 74VlxEGoiJEFg3rsuQ1jKjE132GbAZaaxnqpg9Ws1hEJY/vbKY5QwBGKsHLyZzKMHo/1K
-	 puBabntaIhrr7h3DKT+CYJOI+lGSJdT5f76J9r8Z4T0bXrxu0FoVk+2pJnv1+1OsBA+ZB
-	 EyaMWeJzHFDJjmtjyOcvT776YGSN3PzAngp5KO2CpmIS9K/qtpSYWll9WVAte/7BWHHme
-	 lRfyW2y/pWVgysC0A14SJPbfTIBr3UmYfxcMwArSC5Dv7/p8NufjxkanLSmI9M0bHlA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795603758;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=jwhDmbkEnqAYgPih35sFF6PgtzAuGQbaxdcECiZ/v6w=;
+	b=ILNgqZz0owpZBSo3gZ5F/Z0/ssHGYKkUVh+WapAs7qxxBi5hHdhNHGSQy/bbGKxG1Imy
+	 QYCRX5i6zllfkvxBN39FbDFohA7vsUwWH9vU+kcrj2IigEXWQugc8SZcL18TQ12E4lLu7
+	 sItP625+PZU3SEKh48gUyv3cC36/D3S3HEDAG1dhWr2fBMoKBFtWfHL5hQLzT1+5CNt/V
+	 yb8lqOrROa32h9jeZffWtqxPsKGkfNlMXQ4aatoc7/f13wFRPz0DreATNg6weFIAm7K7O
+	 uCSX4YRQa5Bop6C3CSct9mklUcOPo3YqU4IscvHhHGgfdH6aXnfatLjhYxnDI7JxSRQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QUsAl538;
-	arc=none smtp.remote-ip=95.215.58.194
-Received: from mta1.migadu.com (out-194.mta1.migadu.com [95.215.58.194])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hNprz5NE;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21D3606A330
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 08:58:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B21D3606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689DE606A31E
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 10:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QUsAl538
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=23kp1HdGjIM/G8/9zl1qp3aH6HKsh3N0XvtatOV79V4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795597111; v=1; x=1796201911;
- b=QUsAl538dWTfDlpiXoNuSpX6tiLDrai6hCFVGrpE4QOjfibJ61qzB8XJaT1ZmKPgq5YSUdVI
- 9hPhiQDwxHaBaxBPx8ALiyFLBgTsoCtMzELBJs3LTCxXzLOXxVYy2ASuDPZpWrYzA3lk5drnvUI
- G5M2lTqtmNpBSZjoMLLNvCC0=
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 2c9cec84fe8096d0;
-	Wed, 25 Nov 2026 08:58:31 +0000
-X-Mizu-Trace-ID: 2c9cec84fe8096d0
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <ec609ac9-c250-4e38-a0d1-9f7ff5252436@linux.dev>
-Date: Wed, 25 Nov 2026 16:58:23 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hNprz5NE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F003A1F000D1
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 10:49:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795603758;
+	bh=jwhDmbkEnqAYgPih35sFF6PgtzAuGQbaxdcECiZ/v6w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=hNprz5NE5CVY6pAlCM2rBMLLlgN0pL6Hq7aGrQgSNAv3coT/zKpXr5OKC67GUINSA
+	 FaC4j0BI3cN8L+TPlHRPngVPKjl59C3B/62vmh4/xH3qu8EC5UJFy0Nda/dOLfNJM8
+	 Qjo0Z08RYzOwVmiS4yxgvZN0Qf8OsoC6Iqa0+K0G00VA8DBipqjkkwLGXrf60CZY6t
+	 j+PNssXICSS6kUBvnsgJulHVFt+3HLuajZ/RtkuCZ1PrmwH5N+chM4KKBQ5OUisfu4
+	 dKluviPl/2yxLm92H1ADjtiPz5LqUqJip+IwCUkFk584srvfrs4mov8VIjHiW5pxBN
+	 63bWtEdsioX0w==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c50cc7540b7so788129966b.0
+        for <linux-cifs@vger.kernel.org>; Wed, 25 Nov 2026 02:49:17 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErGS43NDX9ErBT2E3f2I+cV3JKhiL9YmLu3AuKDnAxV6uiqoHbhm/xma2FrtnO10d3CFrvUUBQHcha4L@vger.kernel.org
+X-Gm-Message-State: APuU4Z8f3TZChdz2Ge3VbfjZIZ2DXskuhYZT0g87thfXaLDMYot00wlL
+	qv5NYRtPObKiWsS9xUmFbnQWUvMnztu3FXy1NaX/nfqLpYuL2uw2uZNtl0f8o4NXTz4swJlMCV5
+	5kIvG92/VW1g9IFKk9swZE0G3w8WcGZU=
+X-Received: by 2002:a17:907:7403:b0:c51:36d6:d96d with SMTP id
+ a640c23a62f3a-c513a39efcemr1086694866b.4.1795603756522; Wed, 25 Nov 2026
+ 02:49:16 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,91 +59,188 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] ksmbd: splice READ payloads over TCP
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Sergey Senozhatsky
- <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
- ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-kernel@vger.kernel.org
-References: <20261124132554.1185817-1-huiwen.he@linux.dev>
- <CAKYAXd_GDhds=X8OgLCU6f6MqtF4A-7fZiQz-829SWSdUKJbdA@mail.gmail.com>
-Content-Language: en-US
-From: hehuiwen <huiwen.he@linux.dev>
-In-Reply-To: <CAKYAXd_GDhds=X8OgLCU6f6MqtF4A-7fZiQz-829SWSdUKJbdA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20261124162331.895789-1-icb@fastmail.org>
+In-Reply-To: <20261124162331.895789-1-icb@fastmail.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 25 Nov 2026 19:49:01 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_H9fwPKQBO-uLMZnQZA4Sg=dM7we0vgxTOJ0ex=i9JCw@mail.gmail.com>
+X-Gm-Features: Aa3M54ogizKlAXuipOrZ52kVPLUpn3_loDl4z4PNvXKbL_V8blH0opLjZzr90Og
+Message-ID: <CAKYAXd_H9fwPKQBO-uLMZnQZA4Sg=dM7we0vgxTOJ0ex=i9JCw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/2] ksmbd: decode and encode security descriptors in
+ one place
+To: Ian Bridges <icb@fastmail.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Namjae,
+On Wed, Nov 25, 2026 at 1:23=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
+e:
+>
+> ksmbd reads and writes NT security descriptors (SDs) in five places:
+> QUERY_INFO, CREATE, inheritance, SET_INFO, and the access check. Each
+> walks the raw bytes with its own bounds checks, and those walks in
+> smbacl.c have needed a long run of fixes. This series replaces them with
+> one decoder and one encoder, so the bounds are checked in one place and
+> the callers handle no SD bytes.
+>
+> Patch 1 adds the decoder and the encoder with their KUnit suite, and
+> nothing calls them yet. ksmbd_sd_decode() validates a whole
+> self-relative SD and returns a struct ksmbd_sd in a single allocation.
+> The struct is plain data that the callers read directly, and every
+> pointer in it points at bytes the decoder has checked. ksmbd_sd_encode()
+> checks a struct that a caller filled in and writes the SD to a buffer it
+> allocates.
+>
+> Patch 2 is the cutover of the existing code to the new codec. The
+> functions in smbacl.c keep their names and their logic, and only the
+> code that read or wrote the bytes of an SD is replaced. The decisions
+> the callers make are meant to stay as they are. A decision changes only
+> where the decoder reads an SD differently from the walk it replaces, or
+> refuses one the walk accepted. Other changes to those decisions are left
+> for later patches.
+>
+> The earlier proposal [1] left the access check, smb_check_perm_dacl(),
+> as it is. This series converts it with the others, because the loader
+> of the stored SD now returns a decoded SD.
+>
+> If you would rather have the codec and its tests as separate patches, I
+> can split patch 1.
+Keeping the codec and its KUnit tests in the same patch is fine with me.
 
-On a single TCP connection, pure per-CPU makes the RX thread and workers 
-fight for the same core.
+>
+> Changes in behavior
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> The message of patch 2 lists the changes, and the rules the decoder
+> enforces are the sd_malformed() calls in patch 1, each reached by a
+> KUnit case. The changes below are the ones I would like feedback on.
+> Changes 9 and 11 come with questions.
+>
+> A malformed SD is refused whole on every path. The walks have no common
+> notion of a malformed SD. Some malformed SDs are refused by no walk
+> today. Some are refused on one path and read on another. Some are cut
+> short at the bad ACE, and the ACEs before it are still used. The decoder
+> refuses an SD that breaks a structural rule of MS-DTYP. Most of the
+> rules are bounds. The rules below go further. Each item says what the
+> series refuses and what the walks do with it today.
+>
+> 1. The decoder refuses an ACL if it cannot read all AceCount ACEs
+>    within AclSize. Today SET_INFO and inheritance refuse a count above
+>    (AclSize - 8) / 18, and otherwise each walk uses the ACEs it can
+>    read. Using the ACEs that fit would enforce a part of an ACL.
+> 2. The decoder accepts Revision 1 for an SD and for a SID, and
+>    AclRevision 2 or 4 for an ACL. It refuses any other value. Today no
+>    walk refuses another value, and the SD is stored and used. The
+>    revision says which layout follows.
+> 3. MS-DTYP 2.4.4.1 requires AceSize to be a multiple of 4, and the
+>    decoder refuses an AceSize that is not. Today no walk checks it, and
+>    each steps by AceSize to the next ACE.
+> 4. The decoder refuses an ACE type that MS-DTYP gives no layout. These
+>    are 0x03, 0x04, 0x08, 0x0E, 0x10, and anything above 0x13. Today
+>    every ACE is read as a plain ACE with its SID at byte 8, so an ACE
+>    of these types is stored, returned, and inherited. Without a layout
+>    the decoder cannot say where the SID is. This is stricter than
+>    MS-DTYP 2.4.5, which lists 0x03 and 0x08 among the types an ACL can
+>    hold.
+> 5. In an object ACE, two bits of the Flags say which GUIDs come before
+>    the SID. The decoder refuses any other bit. Today the walks read the
+>    Flags as the start of the SID, and SET_INFO stores the ACE if those
+>    bytes pass for a SID.
+> 6. The decoder refuses a nonzero OffsetDacl in a stored SD without
+>    DACL_PRESENT. Today QUERY_INFO, inheritance, and the access check
+>    use the DACL at that offset. SET_INFO already refuses this from a
+>    client. The two fields disagree about whether the SD has a DACL.
+>
+> Not everything that MS-DTYP forbids is refused, for example a SACL ACE
+> type in a DACL. Two things are let through for a reason. An SD without
+> SELF_RELATIVE is read as self-relative, since ksmbd has stored SDs with
+> the bit clear. A malformed SACL in a stored SD is dropped so that the
+> DACL remains usable. A malformed SACL sent by a client makes SET_INFO or
+> the CREATE context fail.
+>
+> A refused SD is handled as follows.
+>
+> 7. From a client, in SET_INFO or a CREATE context, parse_sec_desc()
+>    returns -EINVAL, as it does for the SDs it refuses today. Nothing is
+>    mapped and nothing is stored. The file that a CREATE made stays, as
+>    it does today when the SD is refused.
+> 8. QUERY_INFO of a malformed stored SD fails with
+>    STATUS_INVALID_SECURITY_DESCR. Today the reply holds the ACEs ahead
+>    of the malformed one, or a NULL DACL if the header of the DACL is
+>    malformed. An open that runs the access check is denied first
+>    (change 9). So this is what a handle that was open already gets, or
+>    one opened with FILE_DELETE_ON_CLOSE, for which smb2_open() does not
+>    call smb_check_perm_dacl().
+> 9. The access check denies every request against a malformed stored SD.
+>    Today it decides on the ACEs ahead of the malformed one, and it
+>    makes no check if the header of the DACL is malformed. An SD that
+>    cannot be read whole cannot be enforced, and the part that was not
+>    read may hold its deny ACEs. The same check hides such a file from a
+>    directory listing on a share with hide unreadable set. The cost is
+>    that such a file cannot be repaired through an open that runs the
+>    check, since WRITE_DAC is denied as well. A handle that already has
+>    WRITE_DAC can still set a new SD.
+> 10. Inheritance does not inherit from a parent whose stored SD is
+>     malformed. The new file gets the SD built from its inode, as when
+>     the parent has none. Today that happens for some of these SDs, and
+>     for others the file inherits the ACEs ahead of the malformed one.
+>
+> A stored SD can be malformed because a client sent a malformed SD to a
+> ksmbd that stored it unchecked, or because the SD inside the xattr was
+> damaged. ksmbd has also written two kinds of malformed SD itself, both
+> when a file inherited from its parent. I have found no others. In the
+> first kind, the parent had an inheritable object ACE, and inheritance
+> wrote that ACE without its GUIDs.
+>
+> The second kind matters most. Before commit 4616bbc5389a ("ksmbd: build
+> an inherited security descriptor with its own offsets"), inheritance
+> wrote the child's SD at the parent's offsets. If the parent stored its
+> DACL before its owner and group, and the child's DACL came out larger
+> than the parent's, the larger DACL overwrote the child's owner or group.
+> The DACL itself is intact, and no client made the SD malformed. Today
+> the access check uses that DACL. With this series the overwritten SID
+> makes the check deny, WRITE_DAC included.
+>
+> That leads to two questions about change 9. When only the owner or the
+> group of a stored SD is malformed, should ksmbd refuse the SD, or drop
+> that SID as it drops a malformed SACL and use the DACL? When the DACL of
+> a stored SD cannot be read, should the access check deny, or treat it as
+> an empty DACL so that the owner keeps READ_CONTROL and WRITE_DAC to
+> repair the file?
+if only the owner or group SID is malformed, I=E2=80=99d ignore that SID an=
+d
+use the valid DACL. If the DACL itself is unreadable, I=E2=80=99d deny acce=
+ss.
+It could contain an OWNER RIGHTS ACE that limits the owner=E2=80=99s implic=
+it
+rights.
 
-Pure unbound fixes that, but causes other problems: parallel workers 
-still contend on srv_mutex and send small replies one by one, cross-CPU
-execution hurts locality, and under schedutil spreading the load can 
-drop workers onto lower-frequency CPUs (on the 64 KiB READ send path we
-saw ~1.97 GHz with per-CPU vs. ~0.9 GHz with unbound). For serial 1-job
-QD=1 writes, there is no overlap to benefit from either.
+>
+> One change is not about malformed SDs.
+>
+> 11. A DACL that would pass 65535 bytes fails with -E2BIG. Today the
+>     POSIX ACL entries that do not fit are left out. build_sec_desc()
+>     fails with -ENOMEM if an allocation fails while the POSIX ACL
+>     entries are mapped. Today the rest of that POSIX ACL is left out. A
+>     DACL cut short reads as the whole DACL, to a client and to the
+>     access check. An inherited DACL that is too large is handled as it
+>     is today, and the new file gets the SD built from its inode.
+>     Inherited ACEs now keep their data, so a child DACL can pass the
+>     limit where it did not before.
+>
+>     A default ACL too large for a DACL takes about 1800 named users for
+>     a file and about 700 for a directory. CREATE then returns
+>     STATUS_UNEXPECTED_IO_ERROR after it has created the file or
+>     directory. A retry with FILE_CREATE gets
+>     STATUS_OBJECT_NAME_COLLISION. A retry that may open the existing
+>     file succeeds, and the file has no stored SD.
+>
+>     Should CREATE succeed without storing the SD, or should ksmbd
+>     remove the new file or directory before it returns the error?
+I=E2=80=99d let CREATE succeed without storing the generated SD, since the
+inherited POSIX ACL is already in place.
 
-For example（Throughput：MiB/s）：
-
-Workload           jobs/QD   PERCPU  UNBOUND   Change
------------------  -------  -------  -------  -------
-1ch, 64 KiB READ     16/32  2051.38  1387.34  -32.37%
-1ch,  4 KiB WRITE    16/32   215.82   182.71  -15.34%
-1ch,  1 MiB WRITE      1/1  1948.84  1109.46  -43.07%
-4ch, 64 KiB WRITE    16/32  2788.42  2497.57  -10.43%
-4ch,  1 MiB WRITE    16/32  3482.73  3291.34   -5.50%
-
-So I tried sending only WRITE requests to an unbound workqueue, batching
-completed WRITE replies, and only using the unbound queue when WRITEs
-actually overlap (keeping serial WRITEs per-CPU). So far, across 
-low/high QD, small/large blocks, READ/WRITE/mixed, and multichannel, it 
-performs better than per-CPU without introducing the unbound regressions.
-
-However, given how complex the overlap-detection logic is, I'm not
-confident enough in its reliability yet and want to see if there's a
-simpler way. Right now I'm thinking of keeping a few switchable modes in
-ksmbd and picking the one that works best in most cases as the default.
-What do you think?
-
-Thanks,
-Huiwen
-
-在 2026/11/25 15:29, Namjae Jeon 写道:
-> On Tue, Nov 24, 2026 at 10:30 PM Huiwen He <huiwen.he@linux.dev> wrote:
->>
->> From: Huiwen He <hehuiwen@kylinos.cn>
->>
->> ksmbd reads file data into a private response buffer. TCP then copies
->> the payload into an skb. If the reply must be queued, ksmbd also
->> copies the unsent bytes into a queue buffer.
->>
->> This series uses MSG_SPLICE_PAGES to avoid those TCP copies for plain,
->> standalone READs: patch 1 splices the initial TCP send from private
->> pages and a header page fragment, and patch 2 retains references to
->> unsent payload folios on the send queue so the send worker can splice
->> them as well.
->>
->> Summary of fio sequential read results (16 jobs, QD32 per job, SMB3.1.1
->> tmpfs; each column is relative to the preceding commit):
->>
->> Channels  I/O         Throughput change        Host Gcycles/GiB change
->>                       patch 1    patch 2          patch 1    patch 2
->>         1  4 KiB        -0.3%      -0.9%            +1.8%      -1.1%
->>         1  64 KiB      +28.4%      +0.9%           -31.5%      -5.9%
->>         1  256 KiB     +60.8%      +5.3%           -40.5%     -22.5%
->>         1  1 MiB       +51.5%      +9.2%           -33.1%     -32.2%
->>         4  4 KiB        +0.2%      +0.2%            +0.9%      +0.2%
->>         4  64 KiB       +3.9%      +2.6%            -6.9%      +0.8%
->>         4  256 KiB     +12.1%      -0.4%           -43.0%      -0.8%
->>         4  1 MiB       +17.6%      +7.1%           -39.5%     -34.7%
->>
->> Huiwen He (2):
->>    ksmbd: send READ payloads with MSG_SPLICE_PAGES
->>    ksmbd: retain unsent READ pages on the TCP send queue
-> I don't see any patch using unbound workqueues in this series. Will
-> you send it to the list later ? or need to check it more?
-> 
-> Thanks.
-
+BTW, I cannot apply patch 2/2 to the current ksmbd-for-next. Can you fix it=
+?
+Thanks.
