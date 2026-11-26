@@ -1,83 +1,84 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795705720;
-	b=3+mxBc/sABfpxaqBJJmuQ+6Cznx6rt/fKAKa5G5VaCK4BcIdpZBkEaGC4isCPn5Idj7w
-	 tnaUIHQwuPpEibnT5beM2U1W8FcBSuF5zc7m/uqkaQsapjrDRGUilF7bP59hRaHUNLtIF
-	 klvmDCyGSyRpY+2kRLLSwqUpSV15pVifRN53+FWxDQQnzMdDCCK5n6QxV0K870mpi0G13
-	 5/sHpa7eUGsO5rkpw6xR9hb4uwVOirkgMTCWNwpJqCfwq2s+hLaHWIOgQKP4shmZafijJ
-	 F8acyouQJGwhJXyu6pcXdggHDjDzwYjKwWae/B7OydR9pSD+x83psaVugTC8MSaiS6Q==
+	t=1795705721;
+	b=c9mxIt8j7T/KoLDwbgN/4ivAiTfXnsxCa5BrR0jIBeUXKdsqvDfcyTAjkK0MVY1L2c5e
+	 Y5ZHruiDu3jg8PTeF+vl+fPFGA/f7ZdSQ2F1rH+eBr+/JLnp2TlJpkl62BziV5HbtH6cz
+	 pkMdU8V8K6hhk+Tdtkdiahpnz6ATwVJZlIauu4Ti5keNPuF17Fwr/7qmI3GJV835hn7bk
+	 0XAb4UX8RRbKMFK3tMX84M75+fV94o9E4Tip5nIMId8ovdIpF/f82dFnGPeqePVfLQA8F
+	 obdR44C+V4D/oUs3K6necYwT8PBA+XkGT9nMLeF8dC/I2QvpDbIzMX79B/gdIMRXC8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795705720;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795705721;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=F+pemLdMavBpUhvirOkrglF1IQk74cgV/zlxd3rVwe8=;
-	b=aPVGqtWdSGB5mvs4sll4AT6BWtCQzAtwwkyBSs53JlMmCKQiIlTsuzQ2LYMak0k4UETI
-	 KsPyU1ZHoSZb12+kKOsmHBoGJV7TXEtYf+CKg2pCeIEdd0dFMl3Pq1X26QlwP8bAofwZW
-	 /ImgJpVeg8bVM7xt93a9WzJit+S9qttR9DFEBBLUWzjOBmoR0CQFL9hOE/cf6O48a1fRF
-	 tX5x2UYQAgn8+NvHnF5DZlgS81/H06Tpif3eRULwUUwzHvDCMT4fbO0YZaKXid5hD4d5k
-	 id0oxDJ7ue/8pdRRqGMW+i9kAtiQFckgXdJhuzElOmEu79xbGWP3irCv42vPBNG7sEw==
+	bh=baX0uOuAFizNTsTDSKWrZnJ1i/LidaT/qdEz9s6Znmg=;
+	b=0RoA54UovgAdUgBy8owFciBjsBo6nn+O3eloLEWeA9X8YIdpnFZBJMpikOwFo+FeUX4g
+	 Uahqwd2WVIVLKEo7Ytozk3Sr5Xcc4THQK2dY1fJjYf/jzL4uRDXDYu7SyUm+XRzF+rATQ
+	 9//7XHKI+DhWHmAkyokAnn2LA/8zo9gh2fys1dd+2gjBZSrJZyv7QvmKBl/8q2C+9YyOx
+	 RsjniQOzHQ2A7lHj8Dus8s1UHJp6U676pTt88iY1Vsc6IbFSBIpNU9GCN3ZFNJur1EwSj
+	 2NO+Zi8/AVUfFHIxhxz0tpYolhq9O+Jzul841Gpewlu1G8BgD80j/JOl303xz0ctL/A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=rootsys.at;
 	spf=pass smtp.mailfrom=rootsys.at;
-	dkim=pass header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b=Q4wlzjEN;
+	dkim=pass header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b="i/M9s7P8";
 	arc=none smtp.remote-ip=209.85.128.52
 Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21316606A32E
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 15:08:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 21316606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A97606A31C
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 15:08:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 99A97606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rootsys.at
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rootsys.at
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b=Q4wlzjEN
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a214c5c4c0so68207315e9.3
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 07:08:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b=i/M9s7P8
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bb70074ab2so76136815e9.0
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 07:08:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rootsys.at; s=google; t=1795705718; x=1796310518; darn=vger.kernel.org;
+        d=rootsys.at; s=google; t=1795705719; x=1796310519; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=F+pemLdMavBpUhvirOkrglF1IQk74cgV/zlxd3rVwe8=;
-        b=Q4wlzjENfgH0gxnBNAbuJS4cpIr1E1yhtOBRq+J3E0Rgopbwa8Ux2vzxbv2XkraIcl
-         KLSXNTN1ofu0vCaO0Cf3RhwQos/zk0/PN8IQ1/ZdSW13622RKSNmOG0DGVtQU3J5Nyqe
-         4FSHd8SDfeGQEKMBFeMEdWfSPCA0lcDTNXEfSIDIRFIzVznLKuvgi+T7N4xyPqWygtYb
-         a6e2AWbH9htzuiCH4dWWz3c6N9Dk8tdSyMGXl5tmKDkUlQiANHbDU6aMmJUQJA4MTJiX
-         CF878i4rlivJGhN1q7WyuKOIBLNMnU4E13XhWFSZkXZCH9pY/j4b2n21gSUYeQDZHjay
-         KeBg==
+        bh=baX0uOuAFizNTsTDSKWrZnJ1i/LidaT/qdEz9s6Znmg=;
+        b=i/M9s7P8Dw3oCoeDyGFVI7/DtTCauUAG3VVmhaOf6epXgb12Q1N+SGeYjiZWOhI3tr
+         hRGamnObdIJXXDZUbvP5bi/5HcjzK29wf9G+jeHZdb2Yd3BCKDWOhWPekdtz4U1a004q
+         7Ph7caNFq02+fR2jsAtc6Qw2ldpkyDCetylrrUHvH/cEJGgY7/028YtTCQCu2R9pbKPC
+         JZmQKPgFldNhifsBZyIJ3/RgzDbQRxmS3l88SuKb2+Fxf5TJsBXhO6ZPF4kljTzw1nJb
+         FDOIiz6BLF8oxTZoXYBBk9GWveex1aFjwLsjrsKvwXr6e8WcR3fS7DHEbAwlDc4iiOC7
+         y84w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795705718; x=1796310518;
+        d=1e100.net; s=20260707; t=1795705719; x=1796310519;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=F+pemLdMavBpUhvirOkrglF1IQk74cgV/zlxd3rVwe8=;
-        b=aWX7ySSK0q9jqb/2T92kmfJ3Tty1sqgLhoeGqa14gHcvjd3zqnvwXSO5CrtmFQs5ud
-         LZ9HOk19Fr7pAueiuEun8YwxBP7nDnDQkTKe+llSClMencgmoYlcUwcOIjDxr5Gn6fH8
-         fOV3zcMpnQpG43eOlVxJoToD2JWcTJ7vwjO7d510dDoSy8kEHKBxKjTYe5HxURCQrlrP
-         IP5qsWs+9f3BvV9I7o4Nf0tcs58/Wel1Ztbdk8pZToB8WZqfgbD/MtIrCfb1c/8BeWOr
-         q/MrjxxlGJuPimvV41DIvFwwyluCG60s70LaO2ltyK6h8XN++Z2tm7Sf6NRMh8EDXtw1
-         lw2w==
-X-Forwarded-Encrypted: i=1; AL+hErGvqI/6b/dtySstKy0iWNiEeVE1XlkOiO0lUk5aV/JOGezZsslbAlg1MZr5b6Vcl9qW0TE1pigOa01j@vger.kernel.org
-X-Gm-Message-State: APuU4Z+f27U+y2mafBkvoJxSUy+CIe8C+/tAGTnj2jFwhi+JOEx0ds6q
-	zFg/nxF8joN8Y88dDuJFkeN2Xs8T4WCD+wvSmsW6XW9yuPrfPTZmzxn1fPOzvEuicJOe
-X-Gm-Gg: AZFdTZdUi/Hd+DSIEAzPTRIjA90rplRhwt5DrFfFQ3FBlwlsFvSLaR8MkWJNxXUpzyR
-	baEJJphdTxMdxy1HjzDHA0ZUnIO2qO2OD+699fut8/oaKtGSu9xTes9n05kpxR1R2bZYX1WdfMO
-	YlZI1L9VhH1EyYuU4lu//+tipUhbAWBD/I9jn/XfqsovXfFHD9HA7t5dgdDCvV8THbieuyL2yux
-	AJgBbKhChML7SO46UHSiP6nC2AmCdASD+bhv7PEGLnc1ZADLfxqYrLMCb/Sn9Am5Uo32rQ/QhHl
-	oGFe1mXYtNDZ+w4eIlRGUg/CV+XsYAkMTvMNzUHxjAk0JZzL+UNFZ4fjTJFNDN47dgWy1SD7PwA
-	flCQ0Ihc3MvhmGvQTr6gZz+Sv3U42II0ADEZEOsMgnvQ4RSpYA/8+VeL2bfCUEA4XbNLR/J6I7T
-	4I+UvoCdJWmvcKqTKJejBhFqh3OKXMwurcS6eg+RD3VoZvzRauKjzQHyvp9ynXslwPkf7dgoD4K
-	o4gOT2SzNJ67gDrZvpuqGJ/w1UWHoLJkakdv43sRjOVy9nQN8m67NY/AsOhMoKWroizV9RD90cz
-	tJi9mjKR417hRJ79LcQpv139YVjci+fo4jwtsv/awuE5qY+UpFEpOvcUWxNtJyv1Kf25
-X-Received: by 2002:a05:600c:4e0e:b0:4a1:da58:1ee with SMTP id 5b1f17b1804b1-4bb88938dc9mr450553585e9.31.1795705718295;
-        Thu, 26 Nov 2026 07:08:38 -0800 (PST)
+        bh=baX0uOuAFizNTsTDSKWrZnJ1i/LidaT/qdEz9s6Znmg=;
+        b=hxc4MPjIh+6o6rqR+gdNX+ZrNH/oONG/iD2Bbh9k0VeubwQhRJwpTQG8wdHXx1X2nZ
+         m60GPJiac+LBYEPz9tOdVV2i26YKStmJgRBnRrMipCAU0pDtGh1eMJnPG8ION3N/OXsF
+         VEg3lIf08QhjxzCiT9h6kd+dNS83Q1QaGz+BSQ02V4InqN/lGr+sx7jsnm0f4ahRcUk/
+         n1KRzqd2RYewabzZa0ludnc4v0k3Hzoq1ggqqmhOHLCCLfDj9WH+BVhwscTMVfx2CPMt
+         ymYzMuXk2boYiSxWIB9ZRZ4O0FX8Tppeuh/LKcs2JjrnGv6Fp9p4waVgAK8RtupWrp1R
+         08nw==
+X-Forwarded-Encrypted: i=1; AL+hErHVHdCXmyS0QDtt8fQSlp3M9gl/N92vkqwPsTrhsrSxk7Xh8KQIWak40WYxYDh3FwTgKyRvu3fW1WCb@vger.kernel.org
+X-Gm-Message-State: APuU4Z9krlDG8LYliGZ0cJkHJvycnrWBBtevsqw9lr9/IufoZVeO+v9G
+	M3LxShny4iH3EaRB9a4PYN4AHg4CWrRCKsCMFGxgwDjN8wwX2y6SIDIn/j7n/QTIjKOi
+X-Gm-Gg: AZFdTZfmaVTyoEWihBJ0fEiNpyzSfx7eVCOlH06nR0wp55L2Is/gzdD7Q5aYttvJZdB
+	sCONQWB+P7p638nzAcU03/shVJWI27toFL6BArSGctWOz4r2IUzr8lBMFJYycEqR1H9h7u7aIhQ
+	7ITAw+Mp7duYjc66cAwoAFwd7T7V0YiHdqIKyVitw83UKZRY9eSuLUYGWzGVwdrAHbnSaXyHNNN
+	MIZG9kQR2uDRokVObelNULl7udE54q8MVZb0+IrmJUO8dHqr3G7kTPPPJ1SO4MY6fBEB4y1QFYl
+	nYeCsnwDo2xemZEGnohTt5flLsSAz0kPb0BIxgwrfHvSk5r1pM/PTUKiyh6YTtz+pjuIM+gjHz1
+	4NKjcocKcG7pekuKnFZBIGuEwWbc6pPD6FwnjOFCJ7QlWPSL4Kh4/MCnOA6v18dluBU6AS2MfMP
+	ESkJdover4V/PUUHwUpRu6IqW4R4SGXYk7k1+QoOXtwrca9y43C+WQN044be37ko51O+fNgwjbM
+	arEQr9f8CrUIbWrw60S5BzLDYFayWoFBBkpX7e0Ujlzd8rm7oRaoVbW/t4syORQQZnsj1W8uI4D
+	lKEcFRFTfc0eD9bPj/TgzyY/QeFUPM+cga+bYqSkhBBuMHUjymVT4xg1s+e5ul2xaQvXd9J6Cky
+	QNQFCQt2WhBHDiQ==
+X-Received: by 2002:a05:600c:64c8:b0:4bb:68e5:b952 with SMTP id 5b1f17b1804b1-4bb88819be1mr405854245e9.16.1795705719116;
+        Thu, 26 Nov 2026 07:08:39 -0800 (PST)
 Received: from rootsys.at (clnet-p094-053.ikbnet.co.at. [83.175.94.53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8538b2c5sm599850045e9.5.2026.11.26.07.08.37
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8538b2c5sm599850045e9.5.2026.11.26.07.08.38
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 26 Nov 2026 07:08:37 -0800 (PST)
+        Thu, 26 Nov 2026 07:08:38 -0800 (PST)
 From: RootSys GmbH Research <team@rootsys.at>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Michail Andreas Michalopoulos <mike.michalo@gmail.com>,
@@ -87,12 +88,12 @@ Cc: Michail Andreas Michalopoulos <mike.michalo@gmail.com>,
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
 	linux-cifs@vger.kernel.org,
 	RootSys GmbH Research <research@rootsys.at>
-Subject: [PATCH v2 0/4] ksmbd: enforce mandatory signing and encryption on requests
-Date: Thu, 26 Nov 2026 16:08:32 +0100
-Message-ID: <cover.1795701726.git.research@rootsys.at>
+Subject: [PATCH v2 1/4] ksmbd: keep negotiated capabilities per connection
+Date: Thu, 26 Nov 2026 16:08:33 +0100
+Message-ID: <0a11d02c7eb33fb38b2a0cf3cdd44e31dd08e3ba.1795701726.git.research@rootsys.at>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20261119103805.29514-1-research@rootsys.at>
-References: <20261119103805.29514-1-research@rootsys.at>
+In-Reply-To: <cover.1795701726.git.research@rootsys.at>
+References: <20261119103805.29514-1-research@rootsys.at> <cover.1795701726.git.research@rootsys.at>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -106,194 +107,114 @@ Content-Transfer-Encoding: 8bit
 
 From: RootSys GmbH Research <research@rootsys.at>
 
-ksmbd does not enforce "server signing = mandatory" or "smb3 encryption =
-mandatory" on requests once a client has offered a cipher in NEGOTIATE,
-which the Linux and current Windows clients always do. sess->sign is
-cleared for such sessions, and the gate added by 2bebf2470af1 ("ksmbd:
-enforce signing required by the session") only looks at sess->sign, so
-an unsigned plaintext request is executed on a session that requires
-signing, and a plaintext request on a session that was told
-SMB2_SESSION_FLAG_ENCRYPT_DATA. A client that offers no cipher at all
-gets a plaintext session even with mandatory encryption. On SMB 3.0 and
-3.0.2, one client's SMB2_GLOBAL_CAP_ENCRYPTION is ORed into the static
-per-dialect table and changes how every later session of that dialect
-is set up, until the module is reloaded.
+init_smb2_1_server(), init_smb3_0_server(), init_smb3_02_server() and
+init_smb3_11_server() point conn->vals at the static
+smb21/smb30/smb302/smb311_server_values tables and then OR capability
+bits into conn->vals->req_capabilities. Those bits therefore land in
+the table shared by every connection of that dialect and are never
+cleared, not even by restarting the server or changing its
+configuration; later NEGOTIATE responses advertise them.
 
-The consequence is that a man-in-the-middle between a client and ksmbd
-can inject requests into an authenticated session and have them run
-with the victim's credentials, and that an NTLM relay to ksmbd is not
-stopped by either setting, which is what the two settings exist for.
+For SMB 3.0 and 3.0.2 this changes security decisions:
+smb3_encryption_negotiated() tests req_capabilities, so once a single
+client has offered SMB2_GLOBAL_CAP_ENCRYPTION, every later session of
+that dialect is treated as having negotiated encryption, including
+sessions of clients that never offered it. An attacker can trigger this
+with one NEGOTIATE.
 
-Patch 1 gives each connection its own copy of its dialect's capability
-table. Patch 2 makes the request gate honour sess->sign_required. Patch
-3 refuses plaintext requests on sessions that were told to encrypt.
-Patch 4 fails SESSION_SETUP with STATUS_ACCESS_DENIED, as MS-SMB2
-3.3.5.5 requires, when encryption is mandatory and the connection
-cannot encrypt (SMB 2.x, or SMB 3.1.1 without a common cipher).
+In the default "smb3 encryption = auto" mode, such a later SMB 3.0
+client that offered no encryption gets sess->enc set and sess->sign
+cleared in SESSION_SETUP, but is not told to encrypt. With mandatory
+signing, its unsigned plaintext requests then pass __process_request(),
+which only checks sess->sign. That is the gap "ksmbd: require signing
+on sessions that negotiated encryption" closes for clients that do
+offer a cipher; here it opens for a client that never did.
 
-The series is based on ksmbd-for-next 3c31349456c5, because patch 2
-uses sess->sign_required from the session setup signing series queued
-there. On mainline it applies on top of that series' first three
-commits, 16ab0adace8f ("ksmbd: verify the signature of session binding
-requests"), 42a1d80e64a3 ("ksmbd: sign with the negotiated SMB 3.1.1
-signing algorithm") and ea472ddf7a9a ("ksmbd: use the channel signing
-key for session setup on a bound channel"). Patch 1 has no
-dependencies.
+Give each connection its own copy of its dialect's table and set the
+capability bits there.
 
-Changes in v2, following the review of v1:
+Found with AI-assisted code review and testing.
 
-- Order: the per-connection capability patch (v1 4/4) is now patch 1,
-  since it depends on nothing. Its changelog now says that in the
-  default "auto" mode the leaked capability gives a later SMB 3.0
-  client that offered no encryption sess->enc and clears sess->sign,
-  which is the gap patch 2 closes.
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Tested-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+Signed-off-by: RootSys GmbH Research <research@rootsys.at>
+---
+ fs/smb/server/connection.h |  2 ++
+ fs/smb/server/smb2ops.c    | 19 +++++++++++++++----
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-- Stable: patch 2 needs sess->sign_required, so its stable tags now
-  name the three commits above as prerequisites, in the format of
-  stable-kernel-rules.rst. The other patches keep a plain stable tag.
-
-- v1 3/4 ("refuse tree connect without a cipher when encryption is
-  mandatory") is replaced by patch 4, which follows MS-SMB2 3.3.5.5
-  and fails the SESSION_SETUP itself, so a relayed login is stopped
-  before authentication completes. On SMB 3.0 and 3.0.2,
-  init_smb3_0_server() and init_smb3_02_server() set
-  SMB2_GLOBAL_CAP_ENCRYPTION unconditionally under mandatory
-  encryption, so the check does not trigger there; such sessions are
-  told to encrypt, and patch 3 refuses their plaintext requests.
-
-- A signed plaintext SESSION_SETUP reauthentication on a session that
-  was told to encrypt is still accepted. In MS-SMB2, 3.3.5.2.9 applies
-  where a command section calls for it: 3.3.5.6 (LOGOFF) to 3.3.5.21
-  (SET_INFO) locate or verify the session "as specified in section
-  3.3.5.2.9". 3.3.5.5 looks the session up itself and does not refer to
-  3.3.5.2.9; its only encryption requirement is the dialect and
-  capability check at its start, and neither 3.3.5.5.2
-  (reauthentication) nor 3.3.5.5.3 asks whether the request was
-  encrypted. Signature verification (3.3.5.2.4) does apply, and ksmbd
-  does it.
-
-- CANCEL (thanks, Ian): patch 3 drops a plaintext SMB2 CANCEL on a
-  session that must encrypt without a response, where v1 answered it
-  with STATUS_ACCESS_DENIED:
-  MS-SMB2 3.3.5.16 never answers a CANCEL and verifies the session as
-  in 3.3.5.2.9 only for a signed one. The signing check in patch 2 still
-  answers an unsigned CANCEL on a session that requires signing with
-  STATUS_ACCESS_DENIED, as ksmbd already does when sess->sign is set:
-  3.3.5.16 exempts a CANCEL only from 3.3.5.2.3, and 3.3.5.2.4 fails an
-  unsigned request on a session that requires signing.
-
-- Sashiko's review of v1 2/4 (now patch 3) raised four points. We
-  checked each one on a KASAN kernel:
-
-  - Reauthentication: SESSION_SETUP is outside the new check on
-    purpose; smb2_sess_setup() checks the session it reauthenticates.
-    It refuses an unsigned plaintext reauthentication of a user session
-    that must encrypt with STATUS_ACCESS_DENIED at the first leg, and
-    the session stays usable. smb2_sess_needs_protection() is true for
-    every such session, since sess->enc_required implies sess->enc and
-    the global flag. A guest session is not checked there, so an
-    injected reauthentication can expire it, with or without this
-    series; its keys are derived from an all-zero session key, so an
-    attacker on the path could send the same request encrypted. No
-    change.
-
-  - Compounds: reproduced. After a plaintext SESSION_SETUP that
-    completes a session, a chained ECHO with SessionId 0 and a chained
-    SESSION_SETUP for a new session got STATUS_ACCESS_DENIED. The check
-    now leaves SESSION_SETUP to smb2_sess_setup() and skips an ECHO
-    with SessionId 0 (3.3.5.17); a related ECHO, which uses the new
-    session, is still refused.
-
-  - Order: reproduced for the tree connect. A plaintext request got
-    STATUS_NETWORK_NAME_DELETED for an invalid TreeId and
-    STATUS_ACCESS_DENIED for a valid one. The check now runs where the
-    session is verified, before the tree connect is looked up, so both
-    get STATUS_ACCESS_DENIED. A session whose Kerberos ticket has
-    expired still answers STATUS_NETWORK_SESSION_EXPIRED first, since
-    3.3.5.2.9 checks Session.State before EncryptData.
-
-  - Reauthentication response: reproduced, the response to an
-    encrypted NTLM reauthentication had SessionFlags 0. Patch 3 now
-    sets SMB2_SESSION_FLAG_ENCRYPT_DATA there, as 3.3.5.5.3 requires.
-    The Linux client is not affected either way: it sends a non-binding
-    SESSION_SETUP only with SessionId 0, so after a reconnect it sets up
-    a new session, and a vers=3.1.1 mount without "seal" under mandatory
-    encryption kept working across a server restart, with and without
-    the series.
-
-- Tested-by added to patches 1 and 2, whose code is unchanged from v1.
-  Patch 3 has changed (CANCEL and the points above) and patch 4 is new
-  code; they carry none.
-
-- The patches carry an in-body From: research@rootsys.at, so the author
-  matches Signed-off-by:. The mail itself goes out through the
-  team@rootsys.at mailbox, which research@rootsys.at is an alias of.
-
-v1: https://lore.kernel.org/linux-cifs/20261119103805.29514-1-research@rootsys.at/
-
-Testing: W=1 builds of fs/smb/server after each patch, with
-CONFIG_SMB_SERVER=y (and CONFIG_SMB_SERVER_KERBEROS5=y) and =m, give no
-warnings. checkpatch --strict reports no errors or warnings, only
-CamelCase checks for the MS-SMB2 field names SessionId and
-SessionFlags. On KASAN kernels built from
-ksmbd-for-next 3c31349456c5 and from mainline 8dac6df92a2e (with the
-three commits above), each with this series:
-
-- every unsigned or plaintext request that gets through on the
-  unpatched trees is refused with STATUS_ACCESS_DENIED: TREE_CONNECT
-  after an NTLM login over SMB 3.1.1 with a cipher offered (mandatory
-  signing, and mandatory encryption), and over SMB 3.0 after another
-  client offered SMB2_GLOBAL_CAP_ENCRYPTION;
-- under mandatory encryption, SMB 2.1 and SMB 3.1.1 clients that offer
-  no cipher fail the first SESSION_SETUP with STATUS_ACCESS_DENIED, and
-  an SMB 3.0 client without SMB2_GLOBAL_CAP_ENCRYPTION is told to
-  encrypt and its plaintext TREE_CONNECT is refused;
-- the next NEGOTIATE no longer advertises a capability another client
-  offered;
-- an unsigned plaintext CANCEL for a request that is not pending gets
-  no response on a session that must encrypt, as without the series; on
-  a session that requires signing it gets STATUS_ACCESS_DENIED, as it
-  did without the series when the client offered no cipher;
-- on a session that must encrypt, a plaintext request is refused with
-  STATUS_ACCESS_DENIED whether its TreeId is valid or not, an unsigned
-  plaintext reauthentication is refused and the session stays usable,
-  and the response to an encrypted reauthentication carries
-  SMB2_SESSION_FLAG_ENCRYPT_DATA;
-- in a plaintext compound, after the SESSION_SETUP that completes a
-  session, an ECHO with SessionId 0 and a SESSION_SETUP for a new
-  session are processed as without the series, and a related ECHO is
-  refused;
-- the in-kernel cifs client mounts, writes and reads under mandatory
-  signing with vers=2.1, 3.0, 3.0.2 and 3.1.1 using sign, and with
-  vers=3.0, 3.0.2 and 3.1.1 using seal; under mandatory encryption with
-  vers=3.0, 3.0.2 and 3.1.1, sign or seal. vers=2.1 under mandatory
-  encryption fails at SESSION_SETUP with STATUS_ACCESS_DENIED, as
-  intended. A vers=3.1.1 mount without "seal" under mandatory
-  encryption keeps working across a server restart.
-
-No KASAN, UBSAN or WARN reports. Not tested: Kerberos sessions
-(krb5_authenticate() gets the same change as ntlm_authenticate() in
-patch 3), SMB Direct, multichannel binding, and a signed plaintext
-CANCEL on a session that must encrypt.
-
-We found this with AI-assisted code review and testing; the reproducer
-and the fix were tested by us on current mainline.
-
-RootSys GmbH Research (4):
-  ksmbd: keep negotiated capabilities per connection
-  ksmbd: require signing on sessions that negotiated encryption
-  ksmbd: reject plaintext requests on sessions that must be encrypted
-  ksmbd: refuse session setup without encryption when it is mandatory
-
- fs/smb/server/connection.h        |  2 ++
- fs/smb/server/mgmt/user_session.h |  2 ++
- fs/smb/server/server.c            | 41 ++++++++++++++++++++++++++++---
- fs/smb/server/smb2ops.c           | 19 +++++++++++---
- fs/smb/server/smb2pdu.c           | 25 +++++++++++++++++--
- 5 files changed, 80 insertions(+), 9 deletions(-)
-
-
-base-commit: 3c31349456c5b71edc837270cf9075b28dc59ee3
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index 891612382d0f..adddcda735c6 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -55,6 +55,8 @@ struct ksmbd_transport;
+ 
+ struct ksmbd_conn {
+ 	struct smb_version_values	*vals;
++	/* this connection's copy of its dialect's values, see smb2ops.c */
++	struct smb_version_values	vals_copy;
+ 	struct smb_version_ops		*ops;
+ 	struct smb_version_cmds		*cmds;
+ 	unsigned int			max_cmds;
+diff --git a/fs/smb/server/smb2ops.c b/fs/smb/server/smb2ops.c
+index c5b3cf34494e..4a69c8832820 100644
+--- a/fs/smb/server/smb2ops.c
++++ b/fs/smb/server/smb2ops.c
+@@ -231,6 +231,17 @@ static struct smb_version_cmds smb2_0_server_cmds[NUMBER_OF_SMB2_COMMANDS] = {
+ 	[SMB2_CHANGE_NOTIFY_HE]	=	{ .proc = smb2_notify},
+ };
+ 
++/*
++ * The capability bits depend on the client and the configuration, so set
++ * them on a copy owned by the connection instead of on the shared table.
++ */
++static void ksmbd_conn_init_vals(struct ksmbd_conn *conn,
++				 const struct smb_version_values *vals)
++{
++	conn->vals_copy = *vals;
++	conn->vals = &conn->vals_copy;
++}
++
+ /**
+  * init_smb2_1_server() - initialize a smb server connection with smb2.1
+  *			command dispatcher
+@@ -238,7 +249,7 @@ static struct smb_version_cmds smb2_0_server_cmds[NUMBER_OF_SMB2_COMMANDS] = {
+  */
+ void init_smb2_1_server(struct ksmbd_conn *conn)
+ {
+-	conn->vals = &smb21_server_values;
++	ksmbd_conn_init_vals(conn, &smb21_server_values);
+ 	conn->ops = &smb2_0_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
+@@ -255,7 +266,7 @@ void init_smb2_1_server(struct ksmbd_conn *conn)
+  */
+ void init_smb3_0_server(struct ksmbd_conn *conn)
+ {
+-	conn->vals = &smb30_server_values;
++	ksmbd_conn_init_vals(conn, &smb30_server_values);
+ 	conn->ops = &smb3_0_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
+@@ -285,7 +296,7 @@ void init_smb3_0_server(struct ksmbd_conn *conn)
+  */
+ void init_smb3_02_server(struct ksmbd_conn *conn)
+ {
+-	conn->vals = &smb302_server_values;
++	ksmbd_conn_init_vals(conn, &smb302_server_values);
+ 	conn->ops = &smb3_0_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
+@@ -316,7 +327,7 @@ void init_smb3_02_server(struct ksmbd_conn *conn)
+  */
+ int init_smb3_11_server(struct ksmbd_conn *conn)
+ {
+-	conn->vals = &smb311_server_values;
++	ksmbd_conn_init_vals(conn, &smb311_server_values);
+ 	conn->ops = &smb3_11_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
 -- 
 2.43.0
 
