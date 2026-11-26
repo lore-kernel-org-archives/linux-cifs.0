@@ -1,61 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795695360;
-	b=aaToN7OCOf/AMrIqTKbsAJdnYWtQwQmCkQBYKrbzuhB6VmxT4bnavanT/RL3leMcQq41
-	 QRrdp8CVvSzdJHRhDAGlrczDykCGNhdKliNSWC/hXou6Tr4intWygPbkZ7dJtltPUUwzU
-	 2/mZIQ09Y3Dndg8+n+waRfvxWGz5smqW9WHJ+cXnJv/8qpBdiZTPQaoNgWHansuG00Zne
-	 KAqDyxTMRJPy+34GcHiB9xtNrJeNx7/S3fNz8u9W4LHY1aNTAiNE+uNThkLWhocMPUqNW
-	 PjLwFftBhUWzPLU8UbxNceSTJhtgoizEDvVYVJ/NlgdECU+m6rTZQ/tixIhcD7KkKrA==
+	t=1795695414;
+	b=ap8yhDn7Qd7r5+GaoRPx+80/OMVDtFk+hauQUaNfnFzuZCIfs8xdwZ0wTbX1XJbbFktq
+	 CmtbyK+ylwMxzMFKwDy+J8ZNFizq5kI+FjmtUDldlrvSp1YXqgOG1rvF9s1pVYDQ4ncml
+	 gvUAMhHr4xBCZPK3GVGelhHT+P2eFwKuN3aNmjzNuQNLru7FfRvOrbLHi1jD5SEgmAp52
+	 O8tITPAcxFtMp0QGHThXx1T8UIbroBLPnG8Iu2pALQo17ctwZux02a1J0FOKkjkAtySAU
+	 RcYVkQ9Od+r1zmZe1YwnuMtR938G8N1SOI0Fx5g9V4rUMiA9LABXY9C8N6CmsDOsntw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795695360;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795695414;
 	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=esLUzNLZ8YfwumW0p3uzWJnNmuwhFqgqkVnKoCY1xH8=;
-	b=MiV/KUv0TJko38pBOQDy9HrZ9DDyFnmvFfdQRZ4Yp2IeuLIhuo3J3+nDTzWovJ3Jv+H0
-	 uK8p42xRKZmpa/w8GiXs0FPyJKI3GPcwdN5f15Hm46tj73SFhhmc4z2g5fNDWnEv3P05c
-	 rF8QGcd4lTsdXJZpud0ByCXT4vg2p9rFcEypOS//8vk1rwtF2c1/derN3H/savhqg98b4
-	 o2rIJ62ZSQYw3A+Iavi6lBB07yAFgGez/+sSFivCEgf6+A3DEHlEUKxy1L0q9LtiamSAW
-	 YbEbmu4Ng/pn3nzFjGZC5SllAAFCLgk6duMwUWY7tkKJFZ6TkxKEww0gqjHBzY6BNsw==
+	bh=nY9kYR/xw/7wOiVhGg3uzbGjOgXyshW0del5pACziv4=;
+	b=Ll0KOzl+3AxtlgmZVXA3QM143F/E3kfjL5IvtDQKHjTSeBf3R/2M1VdpBwzKo8DgmHY6
+	 BwzPizoPsvmwo1rrce9HonFf/Y/DS9uHspznU+HtKnQjPOMbWPkvq26m0+rvNTpzxM0AR
+	 JM/ReCojkTpDZCBOvvhKWACAzlgMZA6ZHoqKtxO7i6PK/DtrKpyQo9hz8PvnfZHUFy/l+
+	 8sXNNBksu4KGHqTwhNNyjqypWj0u2Gjv2ZwfFn4LLY+RJlDDfGDOsxwO4iqlZFsH5yLN9
+	 XwJRgj5xPpMCkVdh5YvXair0etVU4ICky6AD8brz9wSBEDnVm2EWw6Tu29r7hWHTP7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=aN4uyNZc;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=trs+zPqO;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5D8606A327
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 12:16:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B5D8606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D364606A31C;
+	Thu, 26 Nov 2026 12:16:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3D364606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=aN4uyNZc
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=trs+zPqO
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
 	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=esLUzNLZ8YfwumW0p3uzWJnNmuwhFqgqkVnKoCY1xH8=; b=aN4uyNZcWZGJAG5Gcyr5MS5kXj
-	iyVW3NznplNTBbrfjsteT1B/BtTU68t2cyOrPVXinKfav6DcU8vNIe6VL5AvjoXySeDfXf8RMIICV
-	2IvnDRPG8CgBbOi1+6IC0ovmyHgvfOcnKUEoNAsDl2IJpjCKzkNjQv3whEFP26lpOqIGbdeOUbJwe
-	FFArxknGkWVOAVqiarAXb+EoGzVglUKBXZeHwoVr22z4Nf72pxA1qeKrG55NB6Fqtgp5AVPfrG/Ch
-	S0U5PpENbNkKhpBPIMI28ARREvwoyas22qfd4Fv92xeGzI1ZDD7yxbw0UYCrOHA2ByH4Y6uA/EOQb
-	toVNOSlA==;
+	bh=nY9kYR/xw/7wOiVhGg3uzbGjOgXyshW0del5pACziv4=; b=trs+zPqObBmbFuWzSje6cG8p/Z
+	XxLyFSTnTu6JZ/rtVxBIPyJ+VMpZ6KuyqMl9bTCV2CBiJKow0zqh+N1sd6nTS8eDbX3T1lr1Sb/40
+	0l6QBOGvmLI/5Il/fGqxwVgGTzOC9wtV+igWlmOPkyZXCSP31N7qbwH9WA1S7dsvkeysVhPO/Ih3J
+	0qjaqZLM/9tWwPn8EONQkcvLdJUxDYqH663Ru4Jts3hXlggsGtzx4bbAptqvRtaVhDAnhIR3XW/xr
+	/ICz5CSijAneM1KCKUpk/LHP3MbOfTo5SfGpLpB+qjI15PU2Cae+zgqxB1aaGcsixtfijAKxB/OMj
+	FW9nBgRw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xWYOM-00000000zpu-1gpP;
-	Thu, 26 Nov 2026 09:15:58 -0300
-Message-ID: <f992a3a76733536fe5458110a5f9bdaf@manguebit.org>
+	id 1xWYPD-00000000zqR-3EYd;
+	Thu, 26 Nov 2026 09:16:51 -0300
+Message-ID: <c9542b37c8edfdfa255cdfc2d5e3f9d2@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
-To: ZhangGuoDong <zhang.guodong@linux.dev>, linkinjeon@kernel.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, metze@samba.org
-Cc: linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>
-Subject: Re: [PATCH 0/2] smb/client: fix byte order issues on big-endian
- systems
-In-Reply-To: <20261124075927.469470-1-zhang.guodong@linux.dev>
-References: <20261124075927.469470-1-zhang.guodong@linux.dev>
-Date: Thu, 26 Nov 2026 09:15:58 -0300
+To: Elkin Cruz <elkin@google.com>, Namjae Jeon <linkinjeon@kernel.org>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
+ <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
+ <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, irogers@google.com, Elkin Cruz <elkin@google.com>,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] smb: client: unlock reconnect_mutex before putting
+ session on terminate
+In-Reply-To: <20261125210025.1277771-1-elkin@google.com>
+References: <20261125210025.1277771-1-elkin@google.com>
+Date: Thu, 26 Nov 2026 09:16:51 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -67,23 +70,18 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain
 
-ZhangGuoDong <zhang.guodong@linux.dev> writes:
+Elkin Cruz <elkin@google.com> writes:
 
-> From: ZhangGuoDong <zhangguodong@kylinos.cn>
+> In smb2_reconnect_server(), when server->terminate is set, the early
+> exit path calls cifs_put_tcp_session(server, true) while still holding
+> pserver->reconnect_mutex and unlocks pserver->reconnect_mutex
+> afterwards. Dropping the last session reference can free server (which
+> equals pserver for primary channels), causing mutex_unlock() to touch
+> freed memory; the normal done: label at the end of the same function
+> explicitly unlocks reconnect_mutex before calling cifs_put_tcp_session().
 >
-> ZhangGuoDong (2):
->   smb/client: fix little-endian values in diagnostic messages
->   smb/client: fix file name conversion on big-endian systems
->
->  fs/smb/client/cifs_unicode.c  | 6 +++---
->  fs/smb/client/cifsacl.c       | 3 ++-
->  fs/smb/client/sess.c          | 2 +-
->  fs/smb/client/smb1debug.c     | 5 +++--
->  fs/smb/client/smb1misc.c      | 4 ++--
->  fs/smb/client/smb2ops.c       | 5 +++--
->  fs/smb/client/smb2pdu.c       | 4 ++--
->  fs/smb/client/smb2transport.c | 6 +++---
->  fs/smb/client/transport.c     | 2 +-
->  9 files changed, 20 insertions(+), 17 deletions(-)
+> Unlock pserver->reconnect_mutex before calling cifs_put_tcp_session() in
+> the server->terminate branch as well.
+> ...
 
 Applied.
