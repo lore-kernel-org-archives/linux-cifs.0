@@ -1,55 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.217
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795696501;
-	b=pHZhaRnTqvvw3LnP6tBlcqK1bekGH34sVtKp9UoGqwJOTE+e8NIbiVTVXZglYrDI8yFQ
-	 qJCmDAGrFaertbC+YwFbNOcUmHxQm5HFDzsGoqVVNb5UL0Bw+3pOw0fTdJKTGF2sxOg+9
-	 Pxfl1YDB7M1ff9iv0wos7mbr2fd4s+o9pIErNctXA1ntAbX597XPug4IE/Rc/hAguAqgD
-	 v6bX89zKUb8swWxKZ5mHme1BOV+caewcYVkEIEK2z5Ev27BFyNfs+Bl53rTEGclBnWNIT
-	 /BVNehuq9kfccIvcABy9LH18K7mC5v8qKnc7JgtbPqGYm0Jkaw2yAxc40LdvgEAL5Hw==
+	t=1795699673;
+	b=1gKlcKlbH+JCJk2jPi4oXQQ3zb72vdBHvr8psUp/tGDYO25Nf+wE5e6xnpQei98GklmV
+	 VTWW2d04yxpT0uEAAWHZsz4JM6MNyCGw8t22TNF+M2iojjfHkXC+ziaRbtK7q+4SpPUno
+	 f8BDhpfn5qjW62FrK12Vu1yebWnbQmplbaXxa28zMi0l5DZ23cH/x2xX0gofxSDtO8pVj
+	 NtQ7MBQUe2kY6npZIIp9zTU94BT3n899/zWU7HfmLFhy4Kly0Zlcce5yL3yLZ/oV/7eyJ
+	 aaUxYU5nTsi7nalNsL3QnqDGJcqoMeEshwfoO8EWoBBDYqBLCXd5IqhOky1PhTEKzuQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795696501;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=VALflxZ7hqWpOU/Z5TDJPSQ00+BwIDKViXL2t24ctfA=;
-	b=jRqrP8M56D2slxTdDZ5I+aBFeeoHGwLWANdyWuEJ1r1m36fIYx5u0vR3T6tlKFgDcEEs
-	 E4wtGama5CulBqyVkJVLAgPianEoJEDJkWcc3WSXqsFwqK0KSpu8PHiHEZY7iiofinwhL
-	 OAxNJBgjAmSG38MTcSH+VALJe9hxGG0xhhyTMObDCx7EyBtnwK9tfTbNJvNqD5w1vVht/
-	 5EF7fVzPG+btYSEJ5ps614AGttlrqHXN+yXvGJnLAteniE+oIp0FJI0g5J3n4ixuqB5co
-	 Xo6vdHZ8v2L6xIeiltWYBApCr3I8eW6WpOYDuWvSlB7EzhEw9OYdGfhoIQLm3omaQxw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795699673;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
+	bh=gzzgXOgo3+SNm0ByCjOvIm/1n5ybZt8er0jBZ3680yc=;
+	b=eXdF9XV9OPiJgW1PhtOjNpnxNGH5pNtLUQ4L0OufmplxHKc9h38LgojsIOCyoVJrUqMM
+	 GIIdCdRnm/yT/p7Aw55oTMSpvio+Wt+Bbcg+GOwvmwjQ/jAJEhPJzbLHmJmTs4y/l+CmP
+	 9OcST+yVfgLhlxUYST7ttrqTpb5U51UVCvuilm9TXBUdkYprBVhJdJj1tMbOjKGCFaOeP
+	 ZMMok8in4HNHOwNtevIkjBgaNiUnUOy6FIzv6twHy/JHbyZA1LCF9L1n/9cb8SUBTqT87
+	 oMyv1sY9278/6EybPKiu+FiLE+DXcrIO6+c1nfYUoQ0K/YYRkOkY+s9IqPRvOsZ4WRw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WwAn1W3d;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=11fuKA0Q;
+	arc=none smtp.remote-ip=113.46.200.217
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D849606A32E
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 12:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDEA606A31C;
+	Thu, 26 Nov 2026 13:27:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EDEA606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WwAn1W3d
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3FFB1F000CF
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 12:35:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795696500;
-	bh=VALflxZ7hqWpOU/Z5TDJPSQ00+BwIDKViXL2t24ctfA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=WwAn1W3dV+TGwkIzfLv0lthCgW79mO/apWeqhWJDRaYrwBYA5inEQ8M5d+yZABYO3
-	 ReqjLymAQC5/vCzgJ09KMZyWADE35Jcc6B5wU4VPg89984mMnAlvv48BrBrX2gDPX/
-	 Aob351m4nYkOj0VofP5k6OcIpA5zyQWMazlA2xTkESloQNUHnzWx8cQDl+65Lk2y+0
-	 OX9M57exB1KpHviV4WDaH1Ym/kNMRkGbBSjDYtoyvi2lEkE91SgufIZFlQHy21Scbl
-	 ThnPtJOWS20bxqB2Exoh0linXR8MyfZhKFi2ivW2cNX7vc5Et5fnb+zDzZSU/UnsSw
-	 jlcomWNNABbSw==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c51a14bd405so285774466b.2
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 04:35:00 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErG4gMHG4CaYvLESs6Q5O0lnhiMFuM3zN4A9x7GCaLohzeEmTHHwq8vrsf+N6Xyur/mBHkfK65Rh0cds@vger.kernel.org
-X-Gm-Message-State: APuU4Z+HY7KIqp+s9A4hqkUrr9wrBsb51nVGglf1kTnyEbdG8tWq9aDC
-	g9COp0Nvnn6bcArWDOzKrDhntgZQaOiw8r+z4O2lkhOkDSE8qhWmq7J1Vpt/5sCE8w7ktZUM1gt
-	5HlM/3javGLxzbCW9933M6+op/szXAfM=
-X-Received: by 2002:a17:907:6091:b0:c51:51f7:c9e3 with SMTP id
- a640c23a62f3a-c5151f7fd77mr1338805766b.34.1795696499535; Thu, 26 Nov 2026
- 04:34:59 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=11fuKA0Q
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=gzzgXOgo3+SNm0ByCjOvIm/1n5ybZt8er0jBZ3680yc=;
+	b=11fuKA0QNmqBcJC+Z7+EDBDEdopqwlPjiHPaNdUAff+L4Rfg5ecopOB7c41g4dYkKVWnsOz+7
+	diR70qy0hMLD9NrzKzTwcexrrEJpSqnu718+skXXx/Va432+IohJ+HmaImsfXw3HGXjPhG8bwg/
+	N0Q+ahJUMGyTnAubGLSqDU0=
+Received: from mail.maildlp.com (unknown [172.19.163.104])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4jZy4b4NSrzcZxn;
+	Thu, 26 Nov 2026 21:26:39 +0800 (CST)
+Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2EF9B4058C;
+	Thu, 26 Nov 2026 21:27:47 +0800 (CST)
+Received: from [10.67.110.140] (10.67.110.140) by
+ whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.56; Thu, 26 Nov 2026 21:27:38 +0800
+Message-ID: <2e7397bb-14fa-4d29-bfb5-620495a40245@huawei.com>
+Date: Thu, 26 Nov 2026 21:27:37 +0800
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,72 +62,93 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261126000500.1375459-1-icb@fastmail.org>
-In-Reply-To: <20261126000500.1375459-1-icb@fastmail.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 26 Nov 2026 21:34:45 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd91uEkLWPtM=7s3y1wLmy6pqQiJOSrOC1GoV7X8QdAMhA@mail.gmail.com>
-X-Gm-Features: Aa3M54pmCI-9Njn8nA9I6ylrmwepvf5JIU4UdG8UfDorl6nayvBJGkKRir2Lpg0
-Message-ID: <CAKYAXd91uEkLWPtM=7s3y1wLmy6pqQiJOSrOC1GoV7X8QdAMhA@mail.gmail.com>
-Subject: Re: [PATCH 0/4] ksmbd: follow-ups to the security descriptor codec
-To: Ian Bridges <icb@fastmail.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH -next -v4 01/17] fs: pass struct path to notify_change()
+To: Al Viro <viro@zeniv.linux.org.uk>
+CC: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
+	<brauner@kernel.org>, <jack@suse.cz>, <amir73il@gmail.com>,
+	<andrii@kernel.org>, <apparmor@lists.ubuntu.com>, <ast@kernel.org>,
+	<axboe@kernel.dk>, <bpf@vger.kernel.org>, <casey@schaufler-ca.com>,
+	<cel@kernel.org>, <cem@kernel.org>, <chenxiaosong@chenxiaosong.com>,
+	<code@tyhicks.com>, <corbet@lwn.net>, <Dai.Ngo@oracle.com>,
+	<dakr@kernel.org>, <daniel@iogearbox.net>, <dhowells@redhat.com>,
+	<dlemoal@kernel.org>, <dmitry.kasatkin@gmail.com>,
+	<driver-core@lists.linux.dev>, <dsterba@suse.com>,
+	<ecryptfs@vger.kernel.org>, <eddyz87@gmail.com>, <emil@etsalapatis.com>,
+	<eric.snowberg@oracle.com>, <exfat@lists.linux.dev>,
+	<georgia.garcia@canonical.com>, <gregkh@linuxfoundation.org>, <hch@lst.de>,
+	<hirofumi@mail.parknet.co.jp>, <hyc.lee@gmail.com>,
+	<ihor.solodrai@linux.dev>, <jlayton@kernel.org>, <jmorris@namei.org>,
+	<johan@kernel.org>, <john.fastabend@gmail.com>,
+	<john.johansen@canonical.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
+	<linkinjeon@kernel.org>, <linux-api@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
+	<linux-cifs@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-nfs@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <linux-unionfs@vger.kernel.org>,
+	<linux-xfs@vger.kernel.org>, <liubaolin12138@163.com>,
+	<martin.lau@linux.dev>, <mason@kernel.org>, <mathieu.desnoyers@efficios.com>,
+	<matt@bobrowski.net>, <memxor@gmail.com>, <mhiramat@kernel.org>,
+	<miklos@szeredi.hu>, <neil@brown.name>, <netfs@lists.linux.dev>,
+	<ntfs@lists.linux.dev>, <okorniev@redhat.com>, <omosnacek@gmail.com>,
+	<penguin-kernel@i-love.sakura.ne.jp>, <rafael@kernel.org>,
+	<rdunlap@infradead.org>, <roberto.sassu@huawei.com>, <rostedt@goodmis.org>,
+	<selinux@vger.kernel.org>, <senozhatsky@chromium.org>, <serge@hallyn.com>,
+	<sj1557.seo@samsung.com>, <skhan@linuxfoundation.org>, <song@kernel.org>,
+	<stephen.smalley.work@gmail.com>, <takedakn@nttdata.co.jp>, <tom@talpey.com>,
+	<yonghong.song@linux.dev>, <yuezhang.mo@sony.com>, <zohar@linux.ibm.com>,
+	<utilityemal77@gmail.com>, <lujialin4@huawei.com>
+References: <20261117150542.1169451-1-caixinchen1@huawei.com>
+ <20261117150542.1169451-2-caixinchen1@huawei.com>
+ <20261117183059.GP989762@ZenIV>
+ <32b8d9c9-27d2-4da9-8618-ccfc44dee7a3@huawei.com>
+ <20261119052339.GT989762@ZenIV>
+Content-Language: en-US
+From: Cai Xinchen <caixinchen1@huawei.com>
+In-Reply-To: <20261119052339.GT989762@ZenIV>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ whupemk100010.china.huawei.com (7.152.184.41)
 
-On Thu, Nov 26, 2026 at 9:05=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
-e:
+oh, I get it.
+
+I think it would be better to use a new function, such as 
+notify_change_internal，
+to bypass this upperpath check, while retaining the inode check.
+
+ovl_do_notify_change
+->notify_change_internal(...)
+     ->do_notify_change(..., true)
+          ->security_inode_setattr
+              if (!internal)
+                  security_path_setattr
+
+But this leads me to possibly needing to split the inode LSM hooks and 
+the path
+LSM hooks.
+
+On 11/19/2026 1:23 PM, Al Viro wrote:
+> On Wed, Nov 18, 2026 at 05:13:31PM +0800, Cai Xinchen wrote:
+>> On whether we want the mount references at all: they are not for NTFS.
+>> The path-based LSM hooks need them - Landlock's check walks the hierarchy
+>> up from the object with path->mnt->mnt_root and follow_up(), for every
+>> layer, and the idmap we pass has to be the one of the mount the path was
+>> checked in.
+> Then it won't be happy with overlayfs ones:
+>          upper_mnt = clone_private_mount(upperpath);
+> ...
+>          upper_layer->mnt = upper_mnt;
+> in ovl_get_upper(),
+>                  err = ovl_get_upper(sb, ofs, &layers[0], &ctx->upper);
+> in ovl_fill_super_creds()
+> combined with
+> static inline struct vfsmount *ovl_upper_mnt(struct ovl_fs *ofs)
+> {
+>          return ofs->layers[0].mnt;
+> }
 >
-> The codec series [1] added a decoder and an encoder for security
-> descriptors (SDs) and replaced ksmbd's walks of raw SD bytes with them.
-> It changed as few of the callers' decisions as it could.
->
-> The issues in this series were found during the work on the codec.
-> They were held out of that series to reduce its changes in behavior.
-> Now that the codec is merged, they are submitted here as four hardening
-> changes. Each patch touches only smbacl.c, and its message describes
-> the change.
->
-> Tests
-> =3D=3D=3D=3D=3D
->
-> Tested on ksmbd-for-next f9208b7a4919, on x86_64 only.
->
-> - Each patch builds with W=3D1 and no warnings (GCC 14, with KASAN), and
->   sparse reports nothing in fs/smb/server.
-> - KUnit under UML passes at each patch with GCC 14, and on the base
->   and at the last patch with clang 22. The series adds no KUnit case.
-> - checkpatch --strict reports nothing.
-> - A script with a test for each patch was run over SMB under five
->   modules, the base and each patch, on a KASAN kernel booted with
->   kasan_multi_shot. Each test changed its result at its own patch and
->   at no other. The test of patch 3 writes the stored SD into the xattr,
->   since SET_INFO refuses the ACE that it needs.
-> - smbtorture smb2.acls, smb2.setinfo, smb2.getinfo, smb2.create,
->   smb2.sdread, smb2.maximum_allowed, smb2.winattr,
->   smb2.delete-on-close-perms, smb2.dosmode, and smb2.rename give the
->   same results on the base and with the series. There is no KASAN
->   report or warning, the kernel stays untainted, and kmemleak reports
->   nothing.
-> - Out of tree, the functions that patches 1 and 2 change were run in
->   userspace under ASan and UBSan against upstream's functions from
->   before the codec series, compiled verbatim. That was about 1.2
->   million comparisons over generated and hand-written SDs for the
->   QUERY_INFO reply, SET_INFO, and inheritance. Every difference is one
->   that this series or the codec series lists. The comparison does not
->   run the access check, and its store never fails, so patches 3 and 4
->   rest on the tests over SMB.
->
-> This series was developed with LLM assistance.
->
-> [1] https://lore.kernel.org/linux-cifs/20261125133430.1177754-1-icb@fastm=
-ail.org/
->
-> Ian Bridges (4):
->   ksmbd: match SIDs exactly when a DACL is mapped to POSIX
->   ksmbd: replace only the CREATOR SIDs in inheritance
->   ksmbd: skip SIDs with no sub-authority in the access check
->   ksmbd: build the SD from the inode if an inherited SD is not stored
-Applied them to #ksmbd-for-next.
-Thanks!
+> mean that the mount you get won't be attached to anything.  How (un)happy
+> would landlock be with that?
