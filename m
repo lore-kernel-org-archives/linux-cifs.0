@@ -1,59 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795706199;
-	b=S/yBBBhtBUivO52AsHYzzvP5MdhhXiHQ5TUUEJRDum2nmIoXDrQ0Yt0EzAJrJEqYqdU6
-	 eZwymGJ2QD2E90ZZmoak1Vogaz/gJGRrr4O34qcsO30jOFaj6r4eU/HLI3X9ybz/8Er6g
-	 Acp9Ze8eBGlc/bmyVJON/FL3jEeXaUqgNvJ99FXK/HHCKFCZiJbP5oCZUYOwEODTXtFBJ
-	 HO9hrjGcIFpWZD6vsYt13BbdkzgixWCcnWhpkryslYT5ktlxpDXrqxe2OsyGEKLBawZZb
-	 bxrwksm+jQhWhyJPVwzBEooTrdDdzA3iusfc65nJ3YMVu1WSvmh7wanXayiigMQ9hZw==
+	t=1795706255;
+	b=TBEXe3ZEmaqNgx7Q6vs/GFWVilhFo5ZE0MxalqgqFgnaNX/G8NmGASuyR/+EorLF10Oi
+	 U8+Q55HtHQKW1PqB9Pxre5dSuL4hvt0Sas4WyTc37UgJZ+vBTVIk9PgYBx40I12uLw6eJ
+	 tHUvQ7LY8L2NZ7IdjXJhHpqGXMj9enUHAz/y+Oqrtz9SLnTrW46mfIX1WEBCYqQvFVA62
+	 k6JwHrYYzU/B1sE3a7M1uCGOjdnB2fPDW/CTCnW5UbRz5+PZ7hniY1CzrpAoOVz16VWjG
+	 5hJp8KmZM2/aAuaRNeTYnC/YbqPsv/drr/y2kyyhFgvPIxo6wOa0fvZKE6K6W8frUnw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795706199;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795706255;
 	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=sixOopG3N+aAmp8tcYT7iqcVjx0ABnponMW1gxlEYf8=;
-	b=Zhj5u6933cKUsOC4ZbaA/Y5kxTZp3mD11L/T5hVOs9M4Mi5TsU8vxK5QfDZlwxvVU834
-	 m8dHBrXoMXkX40eWE5ZWQ97VRtCa5y6UX/jBvgYUmVjh69oKlmskdYdn2Ug7f4Pj9FGfP
-	 UGqWuRPcUD08fWeQ5V9ujDG5CNQHUCpA/WKQsRsndty85o5M0Po0nDzjGbi31120SJTI3
-	 3HBGw8rOzyN0XH8oXvqciFc6iLnkZgHFRAyg4FJ6HZFKbNanVY0PlM0JVMdHdr6l/U4Xb
-	 K8c7hIGtVh6XNbAfxJFXpALA6+ORjaPyluw757NK6nLMoIXslBSUEly881vsE9iaNog==
+	bh=6cNJYOTmZ5MbGA5Pko1tW8+2uGtwtwOR7s1crng2nX0=;
+	b=Jq9RmiIonO8MgXDteLxdmu9XyxaY+AM9Qvliio2sjJb5qhqiPRiXLH7akXGcc2shhd6Q
+	 8nz8TppGshvJlXE2OJR7Id7B5veI86VpZOLfdUyxw8+xM+MA1SQY6dAI5el4cTO+A5qbX
+	 hx0RO3is8viK9GWOSPtFwhzHBm+dp5e27KFjJUYuFhB4OP6V7bWFl6sgw0GmVb5SO5Q/x
+	 Ibss7Po9R68O/gCv4HR+pPZXpuJ1o9zg61j4pCFR0ZZiFG7R6fnsiT4mvOmMN9hwShs7M
+	 5TRXVZBAnthAbPa/nakwRCFJNneNJcYndGUrSUanDEk+JfISz4wqyIspwuv2kNLWmbw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=F5B9FH1G;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=3b+rqWAU;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CD2606A32C;
-	Thu, 26 Nov 2026 15:16:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B8CD2606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9D1606A321;
+	Thu, 26 Nov 2026 15:17:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD9D1606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=F5B9FH1G
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=3b+rqWAU
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
 	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=sixOopG3N+aAmp8tcYT7iqcVjx0ABnponMW1gxlEYf8=; b=F5B9FH1GFg3Zy4Y8kO0CCFXlsJ
-	5D5tMVOHwA5D9RsHtqz4XKlDf07Crnz4M1NXi90mLr0xsaPqdswhdqUPWKdRRfG78AZ4dmNB51Yy2
-	xECgi8K+6FVF5nVTmjha8KqDpNGc9OnA0YCIiFK26hNBeL/Gmoa1/H5kOGf8JsFbxQXFC4RZSnut3
-	Mz+hHRPOcQhwwEPwdZvqbz/ixTVoBcN+TPo+kpfQEQhhWfYMx/3RAkIbdcz1vDi+ZdUs7Ig/bjDof
-	VD3tKeDnxAQCJRLGHeAzXS/Bh/rmHnS9X4o5sPiyLX82wxBTLqYkgxnJLsE3SEekYgM9HeCdSSJvv
-	sQwRRFfw==;
+	bh=6cNJYOTmZ5MbGA5Pko1tW8+2uGtwtwOR7s1crng2nX0=; b=3b+rqWAUiW2+pRdAe5ditUXtJE
+	UWsJk8lxjGhGDoKAlDejpLmn4eMupKQQxb7gAcfLKMEZ3qHLGfSf9i9eCLMVlhF0VH/gH+FMn5uxX
+	Gurmm9jm2QQZR3koFzQtAL+xn4Tr62XXibVHXr27Fz4JA1DUwAxZvY73Afso3XrByfmB7fD0lEG4B
+	XnMr09H7eNzl0ae9kgteQaBvXayzkvm6cvMy7vdKvmDjFO7wE8rtpG4hba96J6ujfcUEHxGexjuMB
+	5r81Zzl2uSRqz/KgHC84AdklI2Z4bvdY18NUOu3iv8lh8Dk/WLTLaJ0t9u46GMHCHkiIrlV+Ip0PR
+	YSb67O3g==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xWbDA-000000010dJ-1p48;
-	Thu, 26 Nov 2026 12:16:36 -0300
-Message-ID: <f9ebe90b823ae3e92bd0baab2d0e997e@manguebit.org>
+	id 1xWbE4-000000010eB-1JxU;
+	Thu, 26 Nov 2026 12:17:32 -0300
+Message-ID: <0123330912f899e2f60ea647d767880d@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
 To: Abdifatah Suruur <suruurism@gmail.com>, Steve French <smfrench@gmail.com>
 Cc: linux-cifs@vger.kernel.org, Abdifatah Suruur <suruurism@gmail.com>,
  stable@vger.kernel.org
-Subject: Re: [PATCH] smb: client: reject oversized SET_INFO data
-In-Reply-To: <20261118122718.17236-1-suruurism@gmail.com>
-References: <20261118122718.17236-1-suruurism@gmail.com>
-Date: Thu, 26 Nov 2026 12:16:36 -0300
+Subject: Re: [PATCH] smb: client: reject oversized SMB1 SET_SECURITY_DESC data
+In-Reply-To: <20261118125249.25375-1-suruurism@gmail.com>
+References: <20261118125249.25375-1-suruurism@gmail.com>
+Date: Thu, 26 Nov 2026 12:17:31 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -67,32 +67,16 @@ Content-Type: text/plain
 
 Abdifatah Suruur <suruurism@gmail.com> writes:
 
-> SMB2_set_info_init() copies the variable-length set-info data into the
-> SMB2 request object without checking that it fits.  The object is
-> CIFSMaxBufSize + MAX_SMB2_HDR_SIZE bytes and the data starts at
-> sizeof(struct smb2_set_info_req), leaving 16492 bytes with the default
-> CIFSMaxBufSize.  A malicious server can return a nearly maximum-size
-> security descriptor; id_mode_to_cifs_acl() retains its ACEs and adds up
-> to five new ones, producing a rewritten ACL around 16.8 KB.  A chmod()
-> or chown() on a cifsacl mount then makes the memcpy() write up to 336
-> bytes past the cifs_request object, and the overrun is also read back
-> and sent to the server.
+> CIFSSMBSetCIFSACL() copies acllen bytes into the single cifs_buf_get()
+> request buffer at data_offset without checking that the data fits.  The
+> buffer is CIFSMaxBufSize + MAX_SMB2_HDR_SIZE bytes, while acllen comes
+> from the rewritten security descriptor produced by id_mode_to_cifs_acl().
+> A malicious server can return a descriptor whose rewritten ACL is larger
+> than the buffer, so a chmod()/chown() on a cifsacl mount over SMB1 writes
+> past the cifs_request object.
 >
-> The worst case is much larger: if the server returns a security
-> descriptor whose owner and group SIDs map to 15 subauths, the rewritten
-> ACL keeps the original ACEs and replaces both SIDs.  With 817 ACEs the
-> resulting SET_INFO data is 62256 bytes; KASAN reports a slab-out-of-bounds
-> write of 45764 bytes past the 16588-byte cifs_request object on v7.4-rc2
-> (where the earlier undersized-allocation issue is already fixed):
->
->   BUG: KASAN: slab-out-of-bounds in SMB2_set_info_init+0x47c/0x6d0 [cifs]
->   Write of size 62256 at addr ffff88800ee28060 by task python3/86
->   The buggy address is located 96 bytes inside of
->   allocated 16588-byte region
->
-> Reject data that cannot fit before the copy.  This covers SMB2_set_acl(),
-> SMB2_set_ea() and the other SMB2_SET_INFO callers.
+> Reject data that cannot fit before the memcpy(), as the SMB2 path now does.
 
 Please check sashiko's review
 
-        https://sashiko.dev/#/patchset/20261118122718.17236-1-suruurism%40gmail.com
+        https://sashiko.dev/#/patchset/20261118125249.25375-1-suruurism%40gmail.com
