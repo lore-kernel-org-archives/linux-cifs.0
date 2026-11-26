@@ -1,64 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795695414;
-	b=ap8yhDn7Qd7r5+GaoRPx+80/OMVDtFk+hauQUaNfnFzuZCIfs8xdwZ0wTbX1XJbbFktq
-	 CmtbyK+ylwMxzMFKwDy+J8ZNFizq5kI+FjmtUDldlrvSp1YXqgOG1rvF9s1pVYDQ4ncml
-	 gvUAMhHr4xBCZPK3GVGelhHT+P2eFwKuN3aNmjzNuQNLru7FfRvOrbLHi1jD5SEgmAp52
-	 O8tITPAcxFtMp0QGHThXx1T8UIbroBLPnG8Iu2pALQo17ctwZux02a1J0FOKkjkAtySAU
-	 RcYVkQ9Od+r1zmZe1YwnuMtR938G8N1SOI0Fx5g9V4rUMiA9LABXY9C8N6CmsDOsntw==
+	t=1795696501;
+	b=pHZhaRnTqvvw3LnP6tBlcqK1bekGH34sVtKp9UoGqwJOTE+e8NIbiVTVXZglYrDI8yFQ
+	 qJCmDAGrFaertbC+YwFbNOcUmHxQm5HFDzsGoqVVNb5UL0Bw+3pOw0fTdJKTGF2sxOg+9
+	 Pxfl1YDB7M1ff9iv0wos7mbr2fd4s+o9pIErNctXA1ntAbX597XPug4IE/Rc/hAguAqgD
+	 v6bX89zKUb8swWxKZ5mHme1BOV+caewcYVkEIEK2z5Ev27BFyNfs+Bl53rTEGclBnWNIT
+	 /BVNehuq9kfccIvcABy9LH18K7mC5v8qKnc7JgtbPqGYm0Jkaw2yAxc40LdvgEAL5Hw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795695414;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=nY9kYR/xw/7wOiVhGg3uzbGjOgXyshW0del5pACziv4=;
-	b=Ll0KOzl+3AxtlgmZVXA3QM143F/E3kfjL5IvtDQKHjTSeBf3R/2M1VdpBwzKo8DgmHY6
-	 BwzPizoPsvmwo1rrce9HonFf/Y/DS9uHspznU+HtKnQjPOMbWPkvq26m0+rvNTpzxM0AR
-	 JM/ReCojkTpDZCBOvvhKWACAzlgMZA6ZHoqKtxO7i6PK/DtrKpyQo9hz8PvnfZHUFy/l+
-	 8sXNNBksu4KGHqTwhNNyjqypWj0u2Gjv2ZwfFn4LLY+RJlDDfGDOsxwO4iqlZFsH5yLN9
-	 XwJRgj5xPpMCkVdh5YvXair0etVU4ICky6AD8brz9wSBEDnVm2EWw6Tu29r7hWHTP7w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795696501;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=VALflxZ7hqWpOU/Z5TDJPSQ00+BwIDKViXL2t24ctfA=;
+	b=jRqrP8M56D2slxTdDZ5I+aBFeeoHGwLWANdyWuEJ1r1m36fIYx5u0vR3T6tlKFgDcEEs
+	 E4wtGama5CulBqyVkJVLAgPianEoJEDJkWcc3WSXqsFwqK0KSpu8PHiHEZY7iiofinwhL
+	 OAxNJBgjAmSG38MTcSH+VALJe9hxGG0xhhyTMObDCx7EyBtnwK9tfTbNJvNqD5w1vVht/
+	 5EF7fVzPG+btYSEJ5ps614AGttlrqHXN+yXvGJnLAteniE+oIp0FJI0g5J3n4ixuqB5co
+	 Xo6vdHZ8v2L6xIeiltWYBApCr3I8eW6WpOYDuWvSlB7EzhEw9OYdGfhoIQLm3omaQxw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=trs+zPqO;
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WwAn1W3d;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D364606A31C;
-	Thu, 26 Nov 2026 12:16:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3D364606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D849606A32E
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 12:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=trs+zPqO
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=nY9kYR/xw/7wOiVhGg3uzbGjOgXyshW0del5pACziv4=; b=trs+zPqObBmbFuWzSje6cG8p/Z
-	XxLyFSTnTu6JZ/rtVxBIPyJ+VMpZ6KuyqMl9bTCV2CBiJKow0zqh+N1sd6nTS8eDbX3T1lr1Sb/40
-	0l6QBOGvmLI/5Il/fGqxwVgGTzOC9wtV+igWlmOPkyZXCSP31N7qbwH9WA1S7dsvkeysVhPO/Ih3J
-	0qjaqZLM/9tWwPn8EONQkcvLdJUxDYqH663Ru4Jts3hXlggsGtzx4bbAptqvRtaVhDAnhIR3XW/xr
-	/ICz5CSijAneM1KCKUpk/LHP3MbOfTo5SfGpLpB+qjI15PU2Cae+zgqxB1aaGcsixtfijAKxB/OMj
-	FW9nBgRw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xWYPD-00000000zqR-3EYd;
-	Thu, 26 Nov 2026 09:16:51 -0300
-Message-ID: <c9542b37c8edfdfa255cdfc2d5e3f9d2@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Elkin Cruz <elkin@google.com>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
- <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
- <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, irogers@google.com, Elkin Cruz <elkin@google.com>,
- stable@vger.kernel.org
-Subject: Re: [PATCH] smb: client: unlock reconnect_mutex before putting
- session on terminate
-In-Reply-To: <20261125210025.1277771-1-elkin@google.com>
-References: <20261125210025.1277771-1-elkin@google.com>
-Date: Thu, 26 Nov 2026 09:16:51 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WwAn1W3d
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3FFB1F000CF
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 12:35:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795696500;
+	bh=VALflxZ7hqWpOU/Z5TDJPSQ00+BwIDKViXL2t24ctfA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=WwAn1W3dV+TGwkIzfLv0lthCgW79mO/apWeqhWJDRaYrwBYA5inEQ8M5d+yZABYO3
+	 ReqjLymAQC5/vCzgJ09KMZyWADE35Jcc6B5wU4VPg89984mMnAlvv48BrBrX2gDPX/
+	 Aob351m4nYkOj0VofP5k6OcIpA5zyQWMazlA2xTkESloQNUHnzWx8cQDl+65Lk2y+0
+	 OX9M57exB1KpHviV4WDaH1Ym/kNMRkGbBSjDYtoyvi2lEkE91SgufIZFlQHy21Scbl
+	 ThnPtJOWS20bxqB2Exoh0linXR8MyfZhKFi2ivW2cNX7vc5Et5fnb+zDzZSU/UnsSw
+	 jlcomWNNABbSw==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c51a14bd405so285774466b.2
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 04:35:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErG4gMHG4CaYvLESs6Q5O0lnhiMFuM3zN4A9x7GCaLohzeEmTHHwq8vrsf+N6Xyur/mBHkfK65Rh0cds@vger.kernel.org
+X-Gm-Message-State: APuU4Z+HY7KIqp+s9A4hqkUrr9wrBsb51nVGglf1kTnyEbdG8tWq9aDC
+	g9COp0Nvnn6bcArWDOzKrDhntgZQaOiw8r+z4O2lkhOkDSE8qhWmq7J1Vpt/5sCE8w7ktZUM1gt
+	5HlM/3javGLxzbCW9933M6+op/szXAfM=
+X-Received: by 2002:a17:907:6091:b0:c51:51f7:c9e3 with SMTP id
+ a640c23a62f3a-c5151f7fd77mr1338805766b.34.1795696499535; Thu, 26 Nov 2026
+ 04:34:59 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -68,20 +59,72 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20261126000500.1375459-1-icb@fastmail.org>
+In-Reply-To: <20261126000500.1375459-1-icb@fastmail.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 26 Nov 2026 21:34:45 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd91uEkLWPtM=7s3y1wLmy6pqQiJOSrOC1GoV7X8QdAMhA@mail.gmail.com>
+X-Gm-Features: Aa3M54pmCI-9Njn8nA9I6ylrmwepvf5JIU4UdG8UfDorl6nayvBJGkKRir2Lpg0
+Message-ID: <CAKYAXd91uEkLWPtM=7s3y1wLmy6pqQiJOSrOC1GoV7X8QdAMhA@mail.gmail.com>
+Subject: Re: [PATCH 0/4] ksmbd: follow-ups to the security descriptor codec
+To: Ian Bridges <icb@fastmail.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Elkin Cruz <elkin@google.com> writes:
-
-> In smb2_reconnect_server(), when server->terminate is set, the early
-> exit path calls cifs_put_tcp_session(server, true) while still holding
-> pserver->reconnect_mutex and unlocks pserver->reconnect_mutex
-> afterwards. Dropping the last session reference can free server (which
-> equals pserver for primary channels), causing mutex_unlock() to touch
-> freed memory; the normal done: label at the end of the same function
-> explicitly unlocks reconnect_mutex before calling cifs_put_tcp_session().
+On Thu, Nov 26, 2026 at 9:05=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
+e:
 >
-> Unlock pserver->reconnect_mutex before calling cifs_put_tcp_session() in
-> the server->terminate branch as well.
-> ...
-
-Applied.
+> The codec series [1] added a decoder and an encoder for security
+> descriptors (SDs) and replaced ksmbd's walks of raw SD bytes with them.
+> It changed as few of the callers' decisions as it could.
+>
+> The issues in this series were found during the work on the codec.
+> They were held out of that series to reduce its changes in behavior.
+> Now that the codec is merged, they are submitted here as four hardening
+> changes. Each patch touches only smbacl.c, and its message describes
+> the change.
+>
+> Tests
+> =3D=3D=3D=3D=3D
+>
+> Tested on ksmbd-for-next f9208b7a4919, on x86_64 only.
+>
+> - Each patch builds with W=3D1 and no warnings (GCC 14, with KASAN), and
+>   sparse reports nothing in fs/smb/server.
+> - KUnit under UML passes at each patch with GCC 14, and on the base
+>   and at the last patch with clang 22. The series adds no KUnit case.
+> - checkpatch --strict reports nothing.
+> - A script with a test for each patch was run over SMB under five
+>   modules, the base and each patch, on a KASAN kernel booted with
+>   kasan_multi_shot. Each test changed its result at its own patch and
+>   at no other. The test of patch 3 writes the stored SD into the xattr,
+>   since SET_INFO refuses the ACE that it needs.
+> - smbtorture smb2.acls, smb2.setinfo, smb2.getinfo, smb2.create,
+>   smb2.sdread, smb2.maximum_allowed, smb2.winattr,
+>   smb2.delete-on-close-perms, smb2.dosmode, and smb2.rename give the
+>   same results on the base and with the series. There is no KASAN
+>   report or warning, the kernel stays untainted, and kmemleak reports
+>   nothing.
+> - Out of tree, the functions that patches 1 and 2 change were run in
+>   userspace under ASan and UBSan against upstream's functions from
+>   before the codec series, compiled verbatim. That was about 1.2
+>   million comparisons over generated and hand-written SDs for the
+>   QUERY_INFO reply, SET_INFO, and inheritance. Every difference is one
+>   that this series or the codec series lists. The comparison does not
+>   run the access check, and its store never fails, so patches 3 and 4
+>   rest on the tests over SMB.
+>
+> This series was developed with LLM assistance.
+>
+> [1] https://lore.kernel.org/linux-cifs/20261125133430.1177754-1-icb@fastm=
+ail.org/
+>
+> Ian Bridges (4):
+>   ksmbd: match SIDs exactly when a DACL is mapped to POSIX
+>   ksmbd: replace only the CREATOR SIDs in inheritance
+>   ksmbd: skip SIDs with no sub-authority in the access check
+>   ksmbd: build the SD from the inode if an inherited SD is not stored
+Applied them to #ksmbd-for-next.
+Thanks!
