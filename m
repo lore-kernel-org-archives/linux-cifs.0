@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795758274;
-	b=q/zbi2f5Z7ivw8h1/qpyBVcZ6PeMVMSta1TVeptglzQ7MVW4LbCo8OnyTUCiF7o2LYpB
-	 tU58d3hxFvVtZSeIuxJyvhW/ukzBYOXvVHgvoScZlurOKXCxhlWn8K+Y34CsBUZS7vAEb
-	 EMmIsooh01xY+fcW/0GHpd3kZtUQAyb3yva1HPpSQqWDjN4sGrJx5WFkoVl79UCQiHxDX
-	 dxfnm2K75MynJN3jLY+F2/16JtBDl0s+ihNqE4rtdzKpd3zL2WyiVImCF4GPJF+RglT/w
-	 tTqruBheTcB/HtC5RCPmPQBhJ5QSJUN7CuoPQF2Wqw9+3t31g+VNpms6bL5QeqjvAbA==
+	t=1795761091;
+	b=Wz624mM6ka7VQzpAlcNrvCWswO9wl6t3wqJvVLsEtRrMVTeZXG1od+Jc0EPzkAYuP40R
+	 ObgQ18fvA+BMX9BF2ujx78mjusRrN4EczQn89ULMNbkcsanZtil6WcAVWkVMZGMvCbvZc
+	 P/Y60jcXddJqIqsZBOipa4A96v4JROIVAPfp36Uo4A/8z2/9HOnaomNwveIriypOF70ws
+	 XuFFsjDjBBzg3q8FDDyN6LaUnhzOII0MwLtvopMB0E3FjbW9uV9n9/4TQHWZtRkcTTL+Y
+	 QkxIHB5W2YWUh1HhOvYTkzDZNAv5Lp7Pu6Vu8jo6kE5w3X8/BSoRHjd1BK5Uin2SdvA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795758274;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795761091;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=BX1eyM7k6tbC4BgpQxYOnwqhZ8IL4aMrB7su+PfCurw=;
-	b=21ctJ0ovP/zmEq/pE3s1ivOGzUX5+4hXBFto1x3WUWfzQuMmOVm0X9+wN6gj1KYKZ7mT
-	 WJjrPvWJNDrR1TTPCwTtqo3A8t/QAQnZ8NaDUmQRTsHikMvF7nmMlqNsoY2tLeF73UMW6
-	 ETJ73DsV/cQx3ivwe0H7B1NfGX3oNRLQVyXUDJUbxigw/qLD/Gl8QgsPDCuoQFi/9osPu
-	 5OwTHS1XeANq/JlXKk6+J07pXZXoZp7ZgMUBx8/nkTF9YfmlQPKTg3puW0D0NM7m9mD6+
-	 il1B32mKid1A0asZI5JuwWDaOtuxsvm5u8YVPMx3fK1t4HtiH4WsLDJ8Xs+Y3GBIlMA==
+	bh=BeRsL6AzbZ36nw/0drQ4YnJsfDPR0a/ZUPY7k/qg89E=;
+	b=GUvLb+8kWH5MM0oLOTTcsiRg/NdFXA7oDcnT362bvIAocK5MyLLW+Yox412lqA2hVqUz
+	 ZoSHjqp/w4f8f3Ek5aAobsH1rmXfKvSdq7v1dGsqKmGxfj57jqoUbS54atx43H6ZpF5LG
+	 gO3/+BMshdanVUCLMH5O+EPJoHQC7uBj8FaI524kqxHaqydUTsfq5xLLNHkK6qvzyPi5Z
+	 zr3GMoE0ajV2AJedD9WFCQQv12DXmPvGJ7gvxefjXybfHAy566qRvJNQlnEXiX5Cp2zkk
+	 g+mRLKuPm3B8I8HCmNChZXws/4C5PEELV6YzGuP0XIsFGcL9OVbCP/0MTa9HDn5a+Ww==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Kb+XraTy;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Uyh1xXMc;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C866606A31C
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 05:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D26606A321
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 06:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Kb+XraTy
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC2B81F00899
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 05:44:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Uyh1xXMc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5885D1F00893
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 06:31:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795758273;
-	bh=BX1eyM7k6tbC4BgpQxYOnwqhZ8IL4aMrB7su+PfCurw=;
+	s=k20260515; t=1795761090;
+	bh=BeRsL6AzbZ36nw/0drQ4YnJsfDPR0a/ZUPY7k/qg89E=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Kb+XraTyOA6F+DCpI8lYAF9r2S40tvfmKkeB48w2r8BBsmw6Z6brrcKNHyh8HW8pf
-	 GSoQpRFVYICgFTcBP8CJlrHxQ4ExJ3+378e9XQgvz8pAQ8fMhcwBVzZgp/TWSRCwhj
-	 QDzB8keR8pc3GsWyccK+2YYTSJgxoSZOGEQ4n8+OAyRXA9EW+Rf0zUL/EX6o+r2/b6
-	 6gwumtX989YxeZdYileiggUlyBeCAMC0ULh5tuSbljSj2/MoaoXAMV4rDfmltFKvb9
-	 bqImt+ZcuYWmSojaOBOqTwg8DwUbtNhstKD7Q+HiPDxbFGwDufRI/1WZm2APhoQEXP
-	 jZ0VNMd7SqhFg==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6ba380cd8dbso10363260a12.3
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 21:44:33 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFgUktRQAlLdepreDoQYbxYakVyofRJEEFkk73YO2x/JwIpmgxVKExkYW32P6QQsEz1fa3PL4QwiUyM@vger.kernel.org
-X-Gm-Message-State: APuU4Z96WgwocpcsUJeluuowtUglhwMnFIG6bLdutGGHKVe2145QYZet
-	ywsOm2LfzUViqFXAGTDtiCJ/SqfacI61JNR37y6Xe52coQNG+7+UMYuaU67H3hvpCWGHi3iizfd
-	FdxbXKYYBFhjUqI9qmk94nf42lHO4LCM=
-X-Received: by 2002:a05:6402:e05:b0:6b4:9919:b54 with SMTP id
- 4fb4d7f45d1cf-6ba37f04a34mr17014468a12.42.1795758272309; Thu, 26 Nov 2026
- 21:44:32 -0800 (PST)
+	b=Uyh1xXMc4tvO4uJvheK7e8oyPbdceXFlKWU33lnj9cZaygBOc79itESkYNAcq6SVL
+	 52zqFZr4qbItylRre3fr40YcvihZWQZbE1W67WQxjqqfwnn/TBkH5UJPZOeJ3tERL8
+	 P3XaEHgrbLWVP37XgXVRyPcNX9lu4rkE8KsbT8+d6WHNge9m/0J0lWvyUEMze1aywz
+	 g6/BFYXgAs6F67mHXFOwDfxptV4SCtHSz4PzBIbsJBmjoljCXMBHJi2AqHWFgmvOvX
+	 05+pbWPT25xgW8fURewi6gqmSMv7AoRcJe0wwEGxfGJYPg/Wa2tiwrPagefbkbfTsA
+	 w7vgGYaRF4DUQ==
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6b87a1a2babso15196042a12.0
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 22:31:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErFKzVi6cJ2VdVb/LZAZu4s2273AN1Qp2E0fKSYOnlvUkjk+p631QG8xb52WxbYIrGrlGEOGwIGzszgI@vger.kernel.org
+X-Gm-Message-State: APuU4Z+OJNyuRkpk0wCbbEeH9zGSiu0qblFaBjvrTjxNuMFDcxlMqIE/
+	yoayxP6q1N400sdbRAbVCKwZrbovXYVSKVMsxOVPomRfw+d8LHIvFVmuLQHmK5q3iEYD8hIEYTV
+	q9okG5MBjRMWrSEVD1DG9Cdi+D9TNTLI=
+X-Received: by 2002:a17:906:f47:b0:c3e:2224:1b86 with SMTP id
+ a640c23a62f3a-c513a3a5357mr1479793166b.2.1795761089023; Thu, 26 Nov 2026
+ 22:31:29 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -60,15 +60,15 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 References: <20261119103805.29514-1-research@rootsys.at> <cover.1795701726.git.research@rootsys.at>
- <77bf8917c216359ba7fa0d837688b98d3e1a798b.1795701726.git.research@rootsys.at>
-In-Reply-To: <77bf8917c216359ba7fa0d837688b98d3e1a798b.1795701726.git.research@rootsys.at>
+ <f2f8d65edd82bfe84b80335ef0992e7726af3d7b.1795701726.git.research@rootsys.at>
+In-Reply-To: <f2f8d65edd82bfe84b80335ef0992e7726af3d7b.1795701726.git.research@rootsys.at>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 27 Nov 2026 14:44:20 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_3xM8VrYeFJo4oLdaR4OOxFCNNdoyGrwSbBho-RCgVhw@mail.gmail.com>
-X-Gm-Features: Aa3M54p9LgI3OLKzYcevEbGHvjKCij4zOgZ4wWompEzUlfhXGEXQV7vdxleohPQ
-Message-ID: <CAKYAXd_3xM8VrYeFJo4oLdaR4OOxFCNNdoyGrwSbBho-RCgVhw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] ksmbd: refuse session setup without encryption
- when it is mandatory
+Date: Fri, 27 Nov 2026 15:31:17 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_1Xoywi4+8sovA27_aTqzQtVYv7P0UzyX9cM6mniO1eA@mail.gmail.com>
+X-Gm-Features: Aa3M54oywPNqAbJJIbTDxAmjNd6K5FPMP3khxJFVtVXEhI7Kj3txhpNP71kFt5s
+Message-ID: <CAKYAXd_1Xoywi4+8sovA27_aTqzQtVYv7P0UzyX9cM6mniO1eA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] ksmbd: reject plaintext requests on sessions that
+ must be encrypted
 To: RootSys GmbH Research <team@rootsys.at>
 Cc: Michail Andreas Michalopoulos <mike.michalo@gmail.com>, Ian Bridges <icb@fastmail.org>, 
 	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
@@ -77,36 +77,107 @@ Cc: Michail Andreas Michalopoulos <mike.michalo@gmail.com>, Ian Bridges <icb@fas
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> @@ -2658,6 +2658,17 @@ int smb2_sess_setup(struct ksmbd_work *work)
->         rsp->SecurityBufferLength =3D 0;
->
->         ksmbd_conn_lock(conn);
-> +       /*
-> +        * MS-SMB2 3.3.5.5: when encryption is mandatory, a connection th=
-at
-> +        * cannot encrypt gets no session. SMB 3.0 and 3.0.2 connections =
-always
-> +        * negotiate encryption then, see init_smb3_0_server().
-> +        */
-> +       if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION &&
-> +           !smb3_encryption_negotiated(conn)) {
-I think this still lets clients through when they don=E2=80=99t support
-encryption. The above comment says SMB 3.0/3.0.2 always negotiate it,
-but that=E2=80=99s just the server advertising the capability. it doesn=E2=
-=80=99t mean
-the client offered it. In mandatory mode, smb3_encryption_negotiated()
-still returns true when conn->cli_cap lacks the bit. Could we check
-conn->cli_cap for these dialects? For SMB 3.1.1, the selected cipher
-should be enough.
+> @@ -371,7 +387,22 @@ static void __handle_ksmbd_work(struct ksmbd_work *w=
+ork,
+>                                                 rsp_hdr->Flags |=3D SMB2_=
+FLAGS_SIGNED;
+>                                 }
+>                                 goto send;
+> -                       } else if (rc > 0) {
+> +                       }
+> +                       /*
+> +                        * Before the tree connect is looked up, so that =
+a
+> +                        * plaintext request learns nothing about its Tre=
+eId.
+> +                        * A CANCEL is never answered (MS-SMB2 3.3.5.16).
+> +                        */
+> +                       command =3D conn->ops->get_cmd_val(work);
+> +                       if (ksmbd_plaintext_refused(work, command)) {
+> +                               if (command =3D=3D SMB2_CANCEL_HE)
+> +                                       work->send_no_response =3D 1;
+> +                               else
+> +                                       conn->ops->set_rsp_status(work,
+> +                                               STATUS_ACCESS_DENIED);
+For the response path, this jumps to send before __process_request()
+validates the message, so the MessageId is left unconsumed. It also
+skips credit settlement. If this ends a compound, credits from earlier
+commands may not be returned. Could we validate the request and call
+ksmbd_set_failed_rsp_credits() before sending the error response?
 
-> +               rc =3D -EKEYREJECTED;
-> +               goto out_err;
-> +       }
-> +
->         if (!req->hdr.SessionId) {
->                 /* Bound abandoned SessionId-zero authentication exchange=
-s. */
->                 if (ksmbd_too_many_session_setups(conn)) {
+> +                               goto send;
+> +                       }
+> +                       if (rc > 0) {
+>                                 rc =3D conn->ops->get_ksmbd_tcon(work);
+>                                 if (rc < 0) {
+>                                         if (rc =3D=3D -EINVAL)
+> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> index 5a7842264b98..a133437b94ab 100644
+> --- a/fs/smb/server/smb2pdu.c
+> +++ b/fs/smb/server/smb2pdu.c
+> @@ -2419,8 +2419,10 @@ static int ntlm_authenticate(struct ksmbd_work *wo=
+rk,
+>                         !(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
+>                 conn->ops->generate_encryptionkey(conn, sess);
+>                 sess->enc =3D true;
+> -               if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION=
+)
+> +               if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION=
+) {
+>                         rsp->SessionFlags =3D SMB2_SESSION_FLAG_ENCRYPT_D=
+ATA_LE;
+> +                       sess->enc_required =3D true;
+The guest path above sets SMB2_SESSION_FLAG_IS_GUEST_LE and skips NTLM
+session-key setup, but still reaches this block. In mandatory mode,
+the existing assignment overwrites it with
+SMB2_SESSION_FLAG_ENCRYPT_DATA_LE. The new enc_required flag also
+marks a guest session.
+
+> +               }
+>                 /*
+>                  * signing is disable if encryption is enable
+>                  * on this session
+> @@ -2525,8 +2527,10 @@ static int krb5_authenticate(struct ksmbd_work *wo=
+rk,
+>             !(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
+>                 conn->ops->generate_encryptionkey(conn, sess);
+>                 sess->enc =3D true;
+> -               if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION=
+)
+> +               if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION=
+) {
+>                         rsp->SessionFlags =3D SMB2_SESSION_FLAG_ENCRYPT_D=
+ATA_LE;
+> +                       sess->enc_required =3D true;
+smb2_sess_setup() treats SessionId =3D=3D 0 as a new session and clears
+conn->binding, but this condition still uses the request=E2=80=99s BINDING =
+bit
+directly. With SessionId =3D=3D 0 and BINDING set, the new session can
+skip encryption setup and leave enc_required clear. Could we validate
+this flag/SessionId combination before authentication and use
+conn->binding in both auth paths?
+
+> +               }
+>                 sess->sign =3D false;
+>         }
+>
+> @@ -3052,6 +3056,12 @@ int smb2_sess_setup(struct ksmbd_work *work)
+>         }
+>
+>         if (authenticated) {
+> +               /*
+> +                * MS-SMB2 3.3.5.5.3: the response to a reauthentication =
+tells
+> +                * the client to keep encrypting, too.
+> +                */
+> +               if (sess->enc_required && !work->session_setup_binding)
+> +                       rsp->SessionFlags =3D SMB2_SESSION_FLAG_ENCRYPT_D=
+ATA_LE;
+>                 /*
+>                  * Draining the previous session drops srv_mutex. Finish =
+using the
+>                  * connection's authentication state and free mechToken f=
+irst, and
 > --
 > 2.43.0
 >
