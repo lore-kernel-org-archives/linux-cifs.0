@@ -1,111 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.147
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795812595;
-	b=aULMgBo3SxabN++GCjRsm5eF/+0SdXER600c8taOktH6uqQU/R3W5R0ks/sYhdt+k0QT
-	 UQ9oT71bcSaE+jOnGE3qvzGjB6yRaRipNc6ZI/Xh3u4E+mYK7Y//dh9h0d2OT1/wzfcnw
-	 vYXOinYYYNBnp3HLkeQTrH4esBqKZXbo1i3OiA42MoHbPPv6DwZyC/laihPwFPV2uUjAA
-	 MK0pHZmGWhKaUmgY59w7y2H2aLcVGdRjiCOO6kaTkTNuZLuNTmG4yGyCLypcwxF9C9gBg
-	 Mj85WD7WVWxOlJdeoY4AU3sipRRVE1BKC8LSWWeIfj4FkMpBj46wa4cxq6enXTM+HrA==
+	t=1795812682;
+	b=3YRhRsh2BCQ9bfikGi1Zl2yeWg0371dyMuFGzkd45VQ1sMrggJQT5XUkI5FB1gv4hzy8
+	 SMjw3ODcor+jujmaOeQVXmSMoYQTjRPZFid6c6eM0Lt9ThLinheWIwRi5EecBNrlATVrs
+	 2Q2DQmeUJkNJZ6qTv2485/+5t9ts4UR3Yl0PatXxDKa61PjpkhISEAGAtj96F4HDPtc5Y
+	 PdztgxmGJMUwGsODEkEEQMYqWgBIoVqI14R6RW0X1obAeI3mVsZFqCP9CfQt9msEPT+VI
+	 1YYgeJfVRDmYtZ0ziXTWC9RWqq/M3S3N17ga9nTYHs7TJJz6UIFeXSqRxkAFOcHoizw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795812595;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795812682;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
 	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
 	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=4ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=;
-	b=KnCGNr+l698DWS5Pe3tEy6FcaN5cup8VdgcisMMDhVvjW0ZyMd4wTIiW+7tc11SE0PAK
-	 7pZFn/KYOL5lwmNjBs/hK1dbYeQ2M3XL+OI0j8Po2mdoqX9uycDO7cxirPdMHQvpUqAOr
-	 QMgEnxSlWM9+I+S2eW8p3NUDRC8gMCIW6o+t67PQvGFnhluruewkBDYROxJhQgc1MdWJH
-	 2lIM47IakJfZY0GUcPouoxxcVH0o14txDAgvCN3Rrk2qGITSKbp+HEKi6+8aPX66tHgow
-	 QG6zyryWTz/ioApTDDHi45MeepDYxZ7kldt3TT5jv/eonxp41e6c91KdkkAeU5ZlIyw==
+	bh=ptgUzi4jgya+J+0tEEGFtNkDJCO63O4I1/NxjncAur0=;
+	b=eYujOvcjkalV020IWvBddYVBe01vrq/3VbkNMwakjgFLnSKapzzU47a5jOjqaRbIXran
+	 /ztIghXOrywtBM94cq8J2AJu40yHB6ii1WJwp7G8thrlXrr7cYLkGHkmwT+vcY4WgZloo
+	 9jPuWx2CLKET5yd5fR9EXX91PkbB4RgIll0Hh8siTch6ZJtvzQvFFsmpiJ7h+DndGdm+Z
+	 rabd1UEZI6ZtaFGcY+5X1XtVGWGCiaA/86v+iNFgmqZfN1z/rVP0g8lJ/Dv5jNyxP9AK2
+	 FhhXId62W6o0PmkNwv1iDAVZQFg9q6MxGaDBCxFy4dXSGHZTqf8bBY94ymadcTOvizA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=fastmail.org;
 	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=0xuc4Js8;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=RDHh5nCc;
-	arc=none smtp.remote-ip=202.12.124.156
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=ci0nzTXe;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=ESBlOQOX;
+	arc=none smtp.remote-ip=202.12.124.147
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03C3606A31C
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 20:49:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C03C3606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E4F606A31C
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 20:51:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E5E4F606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=0xuc4Js8;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=RDHh5nCc
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 256257A035C
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 15:49:54 -0500 (EST)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=ci0nzTXe;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=ESBlOQOX
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id 43B011D00392
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 15:51:21 -0500 (EST)
 Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Fri, 27 Nov 2026 15:49:54 -0500
+  by phl-compute-03.internal (MEProxy); Fri, 27 Nov 2026 15:51:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1795812593; x=
-	1795898993; bh=4ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=; b=0
-	xuc4Js8mtRODy38DqcB1PViDfpwHQ9lbNXVI3iGFVwInrAUQr57rv7rrS+YYt878
-	r1ztDJDsxPxhZirpNgIHpzcZUzogaFkO0ts2dxK8iJhn/toIIiiqdT1bkeAVkyYq
-	sKAG86foBWDyc4e+4qDF4kky4A7TihytIdcDvByzyikQUBdOEsTZjJfa35P/vpoU
-	d9U0i5fz0yGJJEy4jcZkz2IQxKW1vKAc9xopUrEG8cGW5f0LKM8LgIP9vftpHNfX
-	cjr33lr+gfTCozNnNOiHSzu/gdlavX15vaEwnGqpfdbDIgRQbYl0/AnmXgYlghfK
-	CA3XxMqIu5/a4cDBTVGWg==
+	:reply-to:subject:subject:to:to; s=fm3; t=1795812680; x=
+	1795899080; bh=ptgUzi4jgya+J+0tEEGFtNkDJCO63O4I1/NxjncAur0=; b=c
+	i0nzTXepiUd9yly9h/WMwro84ENHZsBzawnFgdmtjcH+SOR5gx1EeajOaowq52+3
+	fBmA9QAOIMj1gnTn+m1961vRKMOzR8uUE8IPW0EqVui19D0DSW9lh7QgyKHXwUIm
+	Hw2aj08+NRFJO3iT6bbqdf04o57i0ov5bhZA40K9WBcNgDe8NwHDZx51Ww891Nq+
+	mr6O1oP3nQochBAjHDgjdRPBxi95VSNXtfEgTxcWWf97lPnjYCoI0POXVtlUbq0A
+	6FcfeFaEfUcWz6KBfr9+37c7ugv65E9Ablxwg9qqHECMtueeV0cjjJPNktlnIa2h
+	vRqTrpnjUAsXC7xnPRQpA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1795812593; x=1795898993; bh=4
-	ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=; b=RDHh5nCcSA2d5qFrU
-	mVLXrqGuyQhuU1MD9kgJ/kq/QD97K43q2pPTyzTQ56ImPqHE2xMeZkpqNFW7uwEZ
-	To2aTCL97/gQUuXyCQBUZaXAUKMSPWYcTAGCBZDQyRICFXYLAZyWakIaGDPz91sW
-	VCb+nk1QtEM8iaZDxlPn/hg83YFp+26mi3oI2vqs4E1qCFDLuTl2qqMzdA8CU48U
-	PhQgc8xMIo+WCJ/jX5X607O4Slm+0nXdzHTwGBhdjBbxP3npOO71W2WLUUJF3+zD
-	lw2wUKhwZkf/xkUad8+0HYN/VIlz2Qeg/eJegw+bcQXwAbotnb3S7YTaGRT3koiT
-	oKJ8Q==
+	:x-me-sender:x-sasl-enc; s=fm3; t=1795812680; x=1795899080; bh=p
+	tgUzi4jgya+J+0tEEGFtNkDJCO63O4I1/NxjncAur0=; b=ESBlOQOXJhjCWE0CS
+	wPn/1lIcPAd9MkwBGna0XVeEG66gGIDghAopySjX2xStVJI66jZ/134p6VXyZNHh
+	eVUlOB6DuHHhF1xmcZ4I/UMZLdrLS3VlS+OZ6QCmaQvrJfXb2kghiJNG/fp/mFBJ
+	7awcrVi6BPh6GPil6yCNGULRv0nle5fRuESwzX/n6QiCZN8twepLucJOTeWXwlAC
+	vHsEYL3BHhGn8nIXfpSObTEyMMD4p3sE4ah6953y/lgaEscPW3Aui+NbOzyPL7n9
+	XmBXcFzgOGZBFgvSt4EmhgvSEAv4ggWsGTgpxWQsFy1yMIuBu1pUMDMSenmIG6Yt
+	faR9A==
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1795812593; d=fastmail.org;
+DKIM2-Signature: i=1; m=1; t=1795812680; d=fastmail.org;
 	mf=PGljYkBmYXN0bWFpbC5vcmc+;
 	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:HN9wNNut/akr26oII06l0JPRkCCzwCqHrmI47uApvg3nTrT
-	3RdsOSiRLmG33Q70DDqUawCSes3qtb4RwJlxOYB29IUigBL8VqGkZnl14OmYoyGR
-	ltevBaUAy9VBZ2iDZWcbDTgpho1a5HH1VxlvaI/z1zT8AtXOju5IK7BzmD3Nt9Er
-	SNONz3P0QHPcL2+HTv5L9r9YwWOmhq2KqeeLXp8R1rJXsALSFByfcrHUKmZR11D4
-	JDpkxBd1FpD7lL49f5V0VrZVFRq62SMM7NfBVtJGnYnikIeDjPT0NcqpwqL8PESP
-	RgSPh7xTUyxBuPNxqCnMZPVLLpXt0IUrYxAVcmQ==;
+	s=fm3:rsa-sha256:MMaj/9CuTAs5xHP9y7JOwODa4iPPvPi9ACfheFEYWtpFZoG
+	E7ADe0vDdquYi08cmy4MyU8p19yEnN7g55alttgVgZ9pLCBq/oxrs9O3BneZkKj7
+	WpRWpWfL+5iT0L/EFKMOlMpP4Al8m5eEo/pzMfOjiPnEgUDysaTBIRyuZCdEO/1Q
+	GeoCN8RLyhqa0bmydQ++LlI6g2dI1XTQkAG8iIPJLmJPdz0cJZMPwb8c39ANsI09
+	3/XwL8DE8kWMA6o/eQdnVqZEh+zXIKtQPqU6gubmd4TYuBGCXIVfbVZN880p0i50
+	Sa8KHq4Be1POQON/ROOxzVOzHIPPI1AbTrAWUOw==;
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=mi-m=1; hc=11;
 	hn=cc,content-transfer-encoding,date,feedback-id,from,
 	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:R4aeRE9ELHRQ16OjjeltUwcnYeISWOQKmqZx+Rvh6uE=:4ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=;
-X-ME-Sender: <xms:8OwJa1Oe1qRjniwv4UZklENgTl1KKTDhrghy1mSdZE6enleeuaCE2A>
-    <xme:8OwJa4axxQG46HjEJE3Z0tMn5j9VB0fXcUvxYhBgssMFPx4zu1lJkj6qKP1dsSAMv
-    mSKhCseHkkKFdK6jmY0IFVUGkWuWtYPSwAiidfsBcqiq2h_nezsghoj>
-X-ME-Received: <xmr:8OwJa0_2OQN2ElgcvZwMSNtGx5bRtCa98yVw7WZdUPSdSM4WfHsPtKbQ_bkHhOFA>
-X-ME-Proxy-Cause: dmFkZTG1Iy+qbUXSh44khR3NSIn6qa8D2E9QegCcrg7sn8eNpHvztzohVSB6sG++kXcbRQ
-    RtJ4Kj2ZH6NAJIFRqlmEVQCVv9/GEhinLMW9NxsvDMwCkSErEYnSBlOJ5Gqzn4BXU8CkRr
-    LV2Lz1Oum6Dqyis2Rig86RNcW141d7MX5PyqQYqTa44wFP6+g7qXr/LT4nKiY08aHUKJDj
-    dwoWYWyYvWOGGXZkOB03T90xQiQZSS4QfHQArzQ6fcfS1mpZMgEd60Qhj4J9QblJ7PQmox
-    Fy38gOZxciXkrIQfNNouC6JfmyBNbVVkCdfiZiQA9MQ9v6Z1QLe7/Mgz7obluH2sWttCN5
-    APH3eU1dADZ/8r8b5/SMzi0ZXfzalcRDC4k1vnCbrk60r8LQLIHkDeyR1b0yvo7diEwYhf
-    cdEJotgMCcL8tF5hdlpPQTF059RChVx3iWSyczYuRphRxlZMgAGcD6Arbp7cE2Saq/tNuW
-    EezzPKZjTrujyzl49/1zmPERKu0oZgtbvW39wHEXMh0I7ACbrPeP/RypgzCxW+LIkBZ8Kc
-    2KibzI1Q2vivzp1o2NO5fCUBhoJlX0d/bgZVwZU0q5uN4rC5FFlhjbuYnDV0ANK8ULUtjf
-    ywG40S3el+/OlILgTT4Wb87xtUwi4GDvcKH0ByQaBN5cDvxxbqUVyanw949A
-X-ME-Proxy: <xmx:8OwJa5TAmH3_3BabMBu2itFGBVxNG1NnbckNGNH7hAvIWKG_HHUY5g>
-    <xmx:8OwJa-cvJQvFg0rFTJJJPG3BfvIY94kD_KL5B-EnSsI4sEU9LCjX3g>
-    <xmx:8OwJa7TwR9NFHdLbgvl6V_X-0hpEiwmVtUAQsNdiz2UyzFSx58zFqQ>
-    <xmx:8OwJa6IM8fH3vcObnCZ5YA-43wWUX6_m9NKZJYd3XbxlfitbqEMgJQ>
-    <xmx:8ewJa9pCCkRNe08AIR0P51TjeyP1-Sl4jdd4hcoUXb_Qo_9w3Q_4Jl7G>
+Message-Instance: m=1; h=sha256:76SFrT/pWRiC6tG4+HJ7jETtMBnNWjG3ZVK8PX/Odyo=:ptgUzi4jgya+J+0tEEGFtNkDJCO63O4I1/NxjncAur0=;
+X-ME-Sender: <xms:SO0Ja6O6emd2jakPpC4WkGPtZzUKtK-kWNi_4fqQPZTmC4p0yJ_HSg>
+    <xme:SO0Ja-9gNpT4uO5sRQYsrJ9Nmgk6-7JXAS_fEnMof458QsjB5sX8XvfS_e9QFrLxQ
+    qpFZObBMgTqZMHEtVC6azmGRwh-pnAkoDtznuz3HgISSi6g1QdasOxi>
+X-ME-Received: <xmr:SO0Ja8FoUijM58jvSNp_zDFgNnCHAAPycPVGIs1rsrVcF5jvlEnwBw6xaExnUgvQ>
+X-ME-Proxy-Cause: dmFkZTFS2sA51r7CNgZ0B6rBGyBSQ7gw7paxpu7V4h1MN/INak9SnqCAjwoGcb3vTOuWIw
+    2JAf25VwmGuZPXuSAQL2RlRvt6egqYcoUjCKghOlKrpkkfOC9+mTuxdc90oVtN2VkXNYpI
+    zbta5qozwmokZEPpwWFX15e3rDE7b0t8khm/t5PITtvcwOSxQY87Nu5CMc8vCffVgeOlv0
+    b2jUFsWzT9xFU6wKRsp4542GFMDaeu/be4B+BCz4ZzCJU5hk4L46c8r8sIZ5smGevRexGk
+    6wM6XqNS+WvOm9YsYqV5vfImO7G3IKcX8vTYQmTrdYI00GKQveOW/wbYzvsx+3ooc5wLWQ
+    WKGoh6mkulWd8ErPZGVDR2oSWAaqXPAsrstf5BiTciz0Ya8SW9Kebx9RiTrMneszhyC45P
+    TqiyvbEsZOftchxZ2cRS/lPx3Ka8B5xx1MZ2b/2RO7juTsq9959n8NGvo/KQt/JvzfLz2Z
+    ylRPnsUTHgTyV8cmbd4XKkt6gWhSM34DDOLgRZUQYSSw+iUfFC+J0jeo8Ty7xLc3RZ/TEm
+    NlA0wtW1A4KXWtguDaQknGmHRHy4LInqghhNDusuOULFzpXZk4PIb/cVwyGyV4L/49yzX1
+    sf1zrfcFMhbVcMF9lg8NzD5vvq3UiOJRCExXwoaXkNAWUAdSGaMP+9/dk+dQ
+X-ME-Proxy: <xmx:SO0Ja9gQkudw8QcFaikBGy-ciJnYVlx0hJl-pZcqbWyGBzKKC1WusA>
+    <xmx:SO0Jaxv-7TSB7ByvQPPCNLynytMeq3eD0MSKYm0jmxNH398Am75MWA>
+    <xmx:SO0Ja4v5_WhnbGY0Qn291wXAwuYzzsE3XuzhshiDrVSTX1Z_aQMnHw>
+    <xmx:SO0Ja-FlyG_s96iQwj41bHL2rBOJeZMmmo_dXuwkuFDBnZSrhJiCaQ>
+    <xmx:SO0Ja4ZcQXCfE_Fc_ucHAWHvHxTv-1KJ2xhuCYc356lzHA6lOgryf1id>
 Feedback-ID: ib53e4b78:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 27 Nov 2026 15:49:52 -0500 (EST)
+ 27 Nov 2026 15:51:19 -0500 (EST)
 From: Ian Bridges <icb@fastmail.org>
 To: metze@samba.org
 Cc: linux-cifs@vger.kernel.org,
@@ -115,13 +115,14 @@ Cc: linux-cifs@vger.kernel.org,
 	senozhatsky@chromium.org,
 	tom@talpey.com,
 	chenxiaosong@chenxiaosong.com,
+	sashiko-bot@kernel.org,
 	Ian Bridges <icb@fastmail.org>
-Subject: Re: [PATCH 1/2] smb: server: use a counter for the nonce of encrypted responses
-Date: Fri, 27 Nov 2026 14:49:45 -0600
-Message-ID: <20261127204945.1646186-1-icb@fastmail.org>
+Subject: Re: [PATCH 2/2] smb: server: don't leak the smbdirect listener socket on errors
+Date: Fri, 27 Nov 2026 14:51:15 -0600
+Message-ID: <20261127205115.1646407-1-icb@fastmail.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <f8e60e33c424c1efe397e94bee170a45823e3d95.1795797772.git.metze@samba.org>
-References: <cover.1795797772.git.metze@samba.org> <f8e60e33c424c1efe397e94bee170a45823e3d95.1795797772.git.metze@samba.org>
+In-Reply-To: <17d7f96be20a7eb039cbb3833598f634d786a487.1795797772.git.metze@samba.org>
+References: <cover.1795797772.git.metze@samba.org> <17d7f96be20a7eb039cbb3833598f634d786a487.1795797772.git.metze@samba.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -133,32 +134,14 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I tested this patch on ksmbd-for-next 3dcffd93d4da over TCP, with
-KASAN. A raw client used SMB 3.1.1 with AES-128-CCM, AES-128-GCM,
-AES-256-CCM and AES-256-GCM, and SMB 3.0 and 3.0.2. It ran two sessions
-on one connection and one on another, including interim responses.
-Every encrypted response decrypted. In each session the counter started
-at 1 and the random bytes stayed the same. The random bytes differed
-between sessions, and no nonce repeated. Sealed Linux client mounts
-over SMB 3.0, 3.0.2 and 3.1.1, one of them multichannel, read and wrote
-data correctly. A capture of that traffic showed no repeated nonce.
-Encrypted smbtorture runs gave the same results as without the patch,
-and KASAN reported nothing. A Linux client mount over SMB Direct with
-soft-RoCE also read and wrote data correctly. That client does not
-negotiate the RDMA encryption transform, so I only reviewed the
-encrypted RDMA read part.
-
-The counter also shows a pre-existing waste, which this patch does not
-cause. ksmbd encrypts some responses that it never sends.
-__handle_ksmbd_work() encrypts the response at its send label without
-checking work->send_no_response, and __ksmbd_conn_write() then drops
-it. An encrypted CANCEL takes this path. So does a cancelled
-CHANGE_NOTIFY. smb2_notify() sends its STATUS_CANCELLED reply through
-smb2_send_interim_resp() and then sets send_no_response, so the send
-label encrypts its response once more. In my test each cancelled
-notify used two counter values that never reached the client. The
-nonces stay unique, so the only cost is an encryption for each unsent
-response.
+I tested this patch on ksmbd-for-next 3dcffd93d4da with KASAN and
+kmemleak, using soft-RoCE. I started ksmbd ten times while another RDMA
+CM listener held port 445, and ten times while one held port 5445. Each
+start logged the failed bind. Without the patch, kmemleak reported the
+listener socket and its rdma_cm id allocated in smb_direct_listen() as
+leaked. With the patch it reported none. After the other listener was
+gone, ksmbd listened again, and a Linux client mount over SMB Direct
+read and wrote data correctly. KASAN reported nothing.
 
 Reviewed-by: Ian Bridges <icb@fastmail.org>
 Tested-by: Ian Bridges <icb@fastmail.org>
