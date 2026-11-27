@@ -1,107 +1,122 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.151
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795714699;
-	b=ZFhcFwHRea6ZwlooUL9U6Tcxiy9/+uPYodzQGKoCBpHoPdGmLTU1Bu73ECStsDNqcHVb
-	 X0Xdknp8JO/es9dFTs9bv9S0H6onnExg7II4U31Y99NIezTgtfgtbbb9GUqX8GcS1hyak
-	 WG0PjAeoEcP7Ou6iHG6kdlVhB3rmtDqzgAqxJQUy+i5oNtPOom10+M+Gw8814zU3Be9Zf
-	 es4zm8gG98SO/k7XXqZIY/hz32fuwxk8NOVGrZyaGfJsexR8fx+YRHKpXquVgiLBWHgi1
-	 ZdUkFoz+WXq0aDLYgJXtAuXaA79uFEUCB+Xyj+Qa2GSPsf8+fk7q4vPVQR5vEqdgDzA==
+	t=1795749351;
+	b=5ccQ9TpbLjbwZrxLtM5Dz6geZwH8brt3GWd79I6O6JL9qjJ95elaii4j6DDkb1Al84ov
+	 kBj6CCSNy1NUhA3Tm2pNOHHzyfZPsS5Q2aWCQhUoFqfyL0IJ1rDT+my3UnPGMY7PjGfSP
+	 ekivuN1tw1q/Eg895LwE8FcpdpLT4WO/rfopw1k9/9FCoVL2Y1VIDYD4Dg72ZrO3C60EL
+	 6sNtk6SqKOTEFCo4ll77Jj4C7T1b7FUmJth5gA5lUwYIPeooce+2ahMWGhubEX21wmbAX
+	 sLc+k8drTu3uBgHMq9M5vv6xQ376mlmgDRUUu8lgUGFAp6Md8K2WhUXDY5sybWymzSA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795714699;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:X-Spamd-Result:
-	 X-Rspamd-Server:X-Rspamd-Action:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
-	 X-Rspamd-Queue-Id;
-	bh=GgNH8huiywuV/ATseZ+D8jh3PPCbaNCwkIwoUJwmRtM=;
-	b=L0Ddfk948pAzWRoYvVkURULtnLuvB6VKvaOPO3bZgPd3CMfCPA7jtsS76wUHGZkrjIX/
-	 8JKFrEh9b2d+5fe4pw54gpZEIrdut18KxgwLtR78M/x3nKiNxf4DQz9p8p14RUn174Mqj
-	 Ipqk13qmtRAkbhBzm1nHICLQb7pcREDdiZBjuNBsPAZZaJLF4tqU+TBu/7mAa+h9Es6Mr
-	 qJrZFSxvAGa92+NXIRdjZaMJA3RY8XOLFCPonh+XnjH+B++7PPWGxRqs8I3NaMB6GzLGw
-	 jAb1dKoaegOmVbEHyoTXJ25x07GPA3w7qije/GHWdQhMJW1EIjYb530rnqyoKBx9TJA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795749351;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=axAdrv+zRsPNCPdePNYoKf8dQmnv2l67HHhbrEvN3mM=;
+	b=jMW1tulyUDd6zcvMQu2aNwIqrKtsm4kmmbFIyR88bc56docv2a19fT0aA89WlMVjAjV2
+	 mzH77mgCW2uGbrOibdNQIokpjgAoVhFX+RieUe8yfiFndLYrh9DnZ91TjqWzFAj0VMou2
+	 S8E25shfm0U+wOo1yIsyCvwpls1rRmFxTa3fixb0HE0IbydJETmRPZL3bYTIA8TesSuf3
+	 n77y2lhMrMzxL5VMIcfcGa6I42Eo5++oeWdfZ6EgeXtoDV+Li1D8+3Azwlq59kxdZVoeV
+	 /x9MGOnhvG0OsMh32pJ8JSMi+6yMyMihRC3k5awwV9+0KvRNiCl04lYcqsef105K+SA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=tZNb6NSA;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dRgQeLkT;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=tZNb6NSA;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dRgQeLkT;
-	arc=none smtp.remote-ip=195.135.223.130
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=pZvvh0v5;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=c3r4C1mC;
+	arc=none smtp.remote-ip=103.168.172.151
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F288D606A31C
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 17:38:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F288D606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AF1606A321
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 03:15:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B3AF1606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=tZNb6NSA;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dRgQeLkT;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=tZNb6NSA;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dRgQeLkT
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 13A5E227C5;
-	Thu, 26 Nov 2026 17:38:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1795714697; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=GgNH8huiywuV/ATseZ+D8jh3PPCbaNCwkIwoUJwmRtM=;
-	b=tZNb6NSA8Bs3KWRsxQoaMGMAyApacui62Ablafg+RWEFWNdX+GI4puX5+OWn2bYnMwwp6+
-	2dKRWEwEC+c+06lwLJ8Q3uc/nN3KdQznFSeGDDs0Wzudz+oeBvAISDXMCbZ0GcD8nlPNbP
-	FaTGTEIdYIasXRHr0//T8FP4wB6G8Yk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1795714697;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=GgNH8huiywuV/ATseZ+D8jh3PPCbaNCwkIwoUJwmRtM=;
-	b=dRgQeLkTnDaLLo3JqFVwNAN3mar+NJjVk3gvSsV7vf/OX6so6d+5Tl/d46j9em/kqCI/nS
-	ea8stcM1IBFdK2CQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=tZNb6NSA;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=dRgQeLkT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1795714697; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=GgNH8huiywuV/ATseZ+D8jh3PPCbaNCwkIwoUJwmRtM=;
-	b=tZNb6NSA8Bs3KWRsxQoaMGMAyApacui62Ablafg+RWEFWNdX+GI4puX5+OWn2bYnMwwp6+
-	2dKRWEwEC+c+06lwLJ8Q3uc/nN3KdQznFSeGDDs0Wzudz+oeBvAISDXMCbZ0GcD8nlPNbP
-	FaTGTEIdYIasXRHr0//T8FP4wB6G8Yk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1795714697;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=GgNH8huiywuV/ATseZ+D8jh3PPCbaNCwkIwoUJwmRtM=;
-	b=dRgQeLkTnDaLLo3JqFVwNAN3mar+NJjVk3gvSsV7vf/OX6so6d+5Tl/d46j9em/kqCI/nS
-	ea8stcM1IBFdK2CQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 737AB13432;
-	Thu, 26 Nov 2026 17:38:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oZw4AohuCGvhagAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Thu, 26 Nov 2026 17:38:16 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: pc@manguebit.org,
-	linkinjeon@kernel.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=pZvvh0v5;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=c3r4C1mC
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id AF2B7EC0975
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Nov 2026 22:15:49 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Thu, 26 Nov 2026 22:15:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1795749349; x=1795835749; bh=axAdrv+zRsPNCPdePNYoK
+	f8dQmnv2l67HHhbrEvN3mM=; b=pZvvh0v5wlIEE8WSOqu1zuSsGUyzYxSQ3Gakd
+	65St5hijB1u7tvx7AEpBsVsVLJlgN5k7ZQq98qRx/i8o/EZvA859wxBJBXk8p9R5
+	RW/GNSXtC8poA1uFDz4dZA89H2lQv/e6JNK5guAk5znzytusoZKE52eyjAsTqZY+
+	T0CsEGT5M8M4gxFiARPgNiyE3txaqcN5ka1Yypz4tTszdAuesuPpAjlzYy25AOAP
+	2HC//q6/BXs7eWpw0BdfY64HZC+Ciw/QTk71UF/vsljtYFsklKNzCGKXzj43OlF0
+	arahmARCHVegWIqXETmk4UB1d2Xv1ZlKXGdTP4jWDicU1P26Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1795749349; x=1795835749; bh=axAdrv+zRsPNCPdePNYoKf8dQmnv2l67HHh
+	brEvN3mM=; b=c3r4C1mCBAMRBzwnsGgqop5oSfSTTcWY1nhH23f3uuBvjnOgffA
+	KNn/GKUnoj4c4r+QpgRTguznEV2tNKssScfEVyIj0e7scY2+xEmCzkX3Ur81hOpi
+	mBC0hIbUzoMAiPlRtHpfQ40FSqnKZwO+XBpKl5VCHpLpJmMRglDCpKkHawcugTj7
+	hAWyvIg79Tt47B9JRP0DCghdRrO+t3oFPFrSikTJvNZlF1nwQgjsDtPLjSJfwPnX
+	UWZgP7Bkfz9sURF70xOehCfKQbrjGVwt7wZchnP0yh5jZylZZkoAkvfVPBo9RQ+5
+	hijyK81XwwukBRfKc/GrM3DPDZ5ddl3FS2w==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1795749349; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:OV8s/1gh0hfG9CfroMK0T+KM5Or8ogYWjPuM9S2lVOZs0wl
+	Bs0NyXGoLesX+7+j4ovWe+tVUrossT3rH2ADSlFSG1degEc31YjD+OGBdqJBhonL
+	btVES7Hic9UszJRjzT9pTGcP/WXGWJMd9Q3qO7OO0FYjSjko/wWSzOPng+lfJSnN
+	OvOrpM+fGaG3XyuKpmJkHiOZTK3hKafiM34HwDtVjgG+o3f5Dng0/OWC1FBBDK2m
+	wrt5BN+e/PUEXXmcH+JT3Sgi4fetOKN/tI11zhAlLvX8dEYA9gE5i0BkJT/FAStB
+	6pMbXEwYgXQDwZ8zEB9dOhKcMYTAh08cCLw0Uqw==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:gPvjH358mXvk557ugfhpaXM9XwLdOdXeLOwXO5ByvJw=:BN6oi1N/O/sumQ9WlAlspdBJzHbYFwJt7MF/04zsLDg=;
+X-ME-Sender: <xms:5fUIa5GdJ1x41kWkIjeumVnZ3DuoUrgX0Am6aDAl6rMBAhySTG36BA>
+    <xme:5fUIa6Va0rQbrwP98ez-g6ijQLluGabD9R_fojfhXHZfnu4r1M2R92yUhBjdLZtR3
+    5GQoImmM1APRswavsYwHvIAD0Rj61YeRX2wzwA0ZgZSRCCgThFMoolU>
+X-ME-Received: <xmr:5fUIa9Um4CM2gLiAVc0oqaOeGp45Wa-LPj9cJIRR78C_5W60EEAHcpWYdnSZ-KHT>
+X-ME-Proxy-Cause: dmFkZTEVB1K5zqo6vBiwbt1cra3FHQdcsEgfwD7yL4qEf5MM0e6IZAuLjLR3O7T6DsAPX2
+    Q0R6c2EJQ4T30hUpoqihRcRTvadrkO5tJ/9tJ6yqlkNTJpGY6a+xRgvC05556UwzMF1WOr
+    oKK6DuYPtFF50oPn8lvBN00JhQ3LxpykOvUEaNWOQDK14fH55184OzYc341RMlFZGM+0Ax
+    DB2gFABtHYcfLoIeaxrxEx1L4BTXbO2h7HPEesRRklG2fOPx+bVOmNZN46y+Ahg2An3EpJ
+    9F7ygFEW/WTIHoLWgXbsTg9tC66OZ1BsO+52huz7h18aOnY/WsDUba9uO1rDJ3HkXd+cM+
+    iRQIoBAbGt8kb5GHeMWcR614oEHgkwT4GivW2dg3ya4YN5mQqAoqlPHS/nHdf3MLXpxjgH
+    dF0cwYgHKcDNFDFcdt6aTwp1TMrokwOA6fSRJtmETcfpY4sT/afduUAcryqpLk8c/NUT8H
+    hUZkHXiX90krVODho5OxfkSweawhPyzbuC7Fs+MI52GBEZSe2/4Ai8iEW0v6ReqL7qQhtb
+    aqfcLY2Hg6JWFjIqqIvRfN2LB1CMguV+52sTh0gd14SKvb8cBd2TTGBxUqA3/WdsZKbGgo
+    pX3RJ5SKciuZ+fhlhH4tcdgRpY6HQLMjPYbNCEam2RhemjueVnc23dvFBwYw
+X-ME-Proxy: <xmx:5fUIawLHY15Y3ELPA961hsPryfX4rE8ZduFdIb-r-1YY-U9GQUS_xg>
+    <xmx:5fUIa9BcPY4zL-vdbBPTghTDDKTGArFOsI13_pARU_eI_3Ej3ibKbw>
+    <xmx:5fUIawca0K6gXCCdNnWUEOxgXFUua8AHu7j4hg-_g3fljYfNfOvCwQ>
+    <xmx:5fUIa82O8feP9iBGYHNJXG3hzbDNAVe6tGty-IRl_O1VTcvJIlrYCg>
+    <xmx:5fUIaxOB6cHjyhBFFN9ZrF-7zanf-xnm0Op-8EVWvlAGyroM8tdqeu89>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 26 Nov 2026 22:15:48 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
 	tom@talpey.com,
-	bharathsm@microsoft.com,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	Michael Brunner <michael.brunner@noel.gv.at>
-Subject: [PATCH] smb: client: fix -EACCES when creating read-only file without O_EXCL
-Date: Thu, 26 Nov 2026 14:38:06 -0300
-Message-ID: <20261126173806.1051181-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.55.0
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: fail a non-directory delete-on-close open of a directory
+Date: Thu, 26 Nov 2026 21:15:42 -0600
+Message-ID: <20261127031542.1542831-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -112,219 +127,57 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-13.01 / 50.00];
-	SUSE_INTERNAL_BYPASS(-9.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	DWL_DNSWL_LOW(-1.00)[suse.de:dkim];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FREEMAIL_CC(0.00)[manguebit.org,kernel.org,gmail.com,microsoft.com,talpey.com,suse.de,noel.gv.at];
-	DKIM_TRACE(0.00)[suse.de:+];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:dkim];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -13.01
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 13A5E227C5
 
-Non-root users get -EACCES when trying to create a read-only file,
-without O_EXCL set.  An empty file still gets created on the server.
+smb2_open() fails an open with FILE_NON_DIRECTORY_FILE when the target
+is a directory, unless FILE_DELETE_ON_CLOSE is also set. With both
+options the directory opens and is marked delete-on-close. An empty
+directory is then removed at close, although the client asked for a
+non-directory. A directory that is not empty stays, and the close
+still succeeds.
 
-Fix this by setting FMODE_CREATED based on server CreateAction response,
-not on open flags.
+MS-FSA requires STATUS_FILE_IS_A_DIRECTORY for a non-directory open of
+the unnamed data stream of a directory, and delete-on-close makes no
+difference. Fail that open whatever the other options are. A
+delete-on-close open of a named stream of a directory still succeeds
+and removes the stream at close.
 
-Reproducer:
-  # mount.cifs -o ...,uid=1000 //srv/share /mnt
-
-As UID=1000:
-  $ (umask 0222; echo test > /mnt/file.txt)
-  -bash: /mnt/file.txt: Permission denied
-  $ ls -l /mnt
-  total 0
-  -r-xr-xr-x 1 enzo root 0 Nov 26 13:18 file.txt
-
-Tested-by: Michael Brunner <michael.brunner@noel.gv.at>
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ian Bridges <icb@fastmail.org>
 ---
- fs/smb/client/dir.c     | 45 +++++++++++++++++++++++++++++------------
- fs/smb/client/smb2pdu.c |  8 ++++++++
- 2 files changed, 40 insertions(+), 13 deletions(-)
 
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index 2f6d769a9c83..519909ad089d 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -199,7 +199,7 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
- 			    struct tcon_link *tlink, unsigned int oflags,
- 			    umode_t mode, __u32 *oplock, struct cifs_fid *fid,
- 			    struct cifs_open_info_data *buf,
--			    struct inode **inode, bool *opened)
-+			    struct inode **inode, int *opened)
- {
- 	int rc = -ENOENT;
- 	int create_options = CREATE_NOT_DIR;
-@@ -216,7 +216,7 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
- 	__le32 lease_flags = 0;
+Tested on ksmbd-for-next 3c31349456c5 with KASAN. An open of a
+directory with FILE_NON_DIRECTORY_FILE and FILE_DELETE_ON_CLOSE now
+fails with STATUS_FILE_IS_A_DIRECTORY, and the directory stays. Before,
+an empty directory was removed at close. A directory that was not empty
+stayed, and the close returned STATUS_SUCCESS. A delete-on-close open
+of a named stream of a directory still removes the stream.
+
+smbtorture first tries to remove a test directory with such an open. On
+the base that open succeeded, so later tests in the same run found the
+old directory and failed. Those tests now pass, and each of them gives
+the same result on the base when run alone. The other smbtorture
+results are the same as on the base.
+
+This patch was developed with LLM assistance.
+
+ fs/smb/server/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 5a7842264b98..28fb77bcd3dc 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4976,7 +4976,8 @@ int smb2_open(struct ksmbd_work *work)
  
- 	*inode = NULL;
--	*opened = false;
-+	*opened = 0;
- 	*oplock = 0;
- 	if (tcon->ses->server->oplocks)
- 		*oplock = REQ_OPLOCK;
-@@ -233,7 +233,10 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
- 				     oflags, oplock, &fid->netfid, xid);
- 		switch (rc) {
- 		case 0:
--			*opened = true;
-+			*opened = FILE_OPEN;
-+			if (*oplock & CIFS_CREATE_ACTION)
-+				*opened = FILE_CREATE;
-+
- 			if (newinode == NULL) {
- 				/* query inode info */
- 				goto cifs_create_get_file_info;
-@@ -384,7 +387,12 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
- 		}
- 		return rc;
- 	}
--	*opened = true;
-+
-+	*opened = FILE_OPEN;
-+	if (oparms.disposition == FILE_CREATE ||
-+	    (*oplock & CIFS_CREATE_ACTION)) /* SMB1 */
-+		*opened = FILE_CREATE;
-+
- 	if (rdwr_for_fscache == 2)
- 		cifs_invalidate_cache(dir, FSCACHE_INVAL_DIO_WRITE);
- 
-@@ -487,7 +495,7 @@ static int cifs_do_create(struct inode *dir, struct dentry *direntry,
- 			  unsigned int oflags, umode_t mode,
- 			  __u32 *oplock, struct cifs_fid *fid,
- 			  struct cifs_open_info_data *buf,
--			  struct inode **inode, bool *opened)
-+			  struct inode **inode, int *opened)
- {
- 	void *page = alloc_dentry_path();
- 	const char *full_path;
-@@ -496,7 +504,7 @@ static int cifs_do_create(struct inode *dir, struct dentry *direntry,
- 	full_path = build_path_from_dentry(direntry, page);
- 	if (IS_ERR(full_path)) {
- 		rc = PTR_ERR(full_path);
--		*opened = false;
-+		*opened = 0;
- 	} else {
- 		rc = __cifs_do_create(dir, direntry, full_path, xid,
- 				      tlink, oflags, mode, oplock,
-@@ -529,10 +537,9 @@ int cifs_atomic_open(struct inode *dir, struct dentry *direntry,
- 	struct dentry *alias;
- 	struct inode *inode;
- 	unsigned int xid;
--	__u32 oplock;
- 	bool is_regular;
--	bool opened;
--	int rc;
-+	int opened, rc;
-+	u32 oplock;
- 
- 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
- 		return smb_EIO(smb_eio_trace_forced_shutdown);
-@@ -612,9 +619,21 @@ int cifs_atomic_open(struct inode *dir, struct dentry *direntry,
- 		d_instantiate(direntry, inode);
- 	}
- 
--	if (is_regular && opened &&
--	    (oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-+	/*
-+	 * @oflags is only meaningful before cifs_do_create().  At this point,
-+	 * only the server response can tell us whether the file was opened or
-+	 * created.
-+	 */
-+	if (is_regular && opened == FILE_CREATE)
- 		file->f_mode |= FMODE_CREATED;
-+	else if (WARN_ON_ONCE(opened == FILE_OPEN && (oflags & O_EXCL))) {
-+		 /* Bug in server->ops->open() */
-+		rc = -EEXIST;
-+		if (server->ops->close)
-+			server->ops->close(xid, tcon, &fid);
-+		cifs_del_pending_open(&open);
-+		goto out;
-+	}
- 
- 	if (!is_regular || !opened) {
- 		rc = finish_no_open(file, NULL);
-@@ -683,7 +702,7 @@ int cifs_create(const struct mnt_idmap *idmap, struct inode *dir,
- 	struct inode *inode;
- 	struct cifs_fid fid;
- 	__u32 oplock;
--	bool opened;
-+	int opened;
- 	struct cifs_open_info_data buf = {};
- 
- 	cifs_dbg(FYI, "cifs_create parent inode = 0x%p name is: %pd and dentry = 0x%p\n",
-@@ -1102,8 +1121,8 @@ int cifs_tmpfile(const struct mnt_idmap *idmap, struct inode *dir,
- 	struct inode *inode;
- 	unsigned int xid;
- 	__u32 oplock;
--	bool opened;
- 	int namelen;
-+	int opened;
- 	int rc;
- 
- 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 7b7d25364e20..e2f77e0bdeee 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3373,6 +3373,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	struct kvec iov[SMB2_CREATE_IOV_SIZE];
- 	struct kvec rsp_iov = {NULL, 0};
- 	int resp_buftype = CIFS_NO_BUFFER;
-+	int disp = oparms->disposition;
- 	int rc = 0;
- 	int flags = 0;
- 	int retries = 0, cur_sleep = 0;
-@@ -3392,6 +3393,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	flags = 0;
- 	server = cifs_pick_channel(ses);
- 	/* reissue the same create: a durable reconnect clears ->reconnect */
-+	oparms->disposition = disp;
- 	oparms->reconnect = reconnect;
- 	/* with no_replay the caller owns oparms->replay */
- 	if (!oparms->no_replay)
-@@ -3455,6 +3457,12 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	oparms->fid->persistent_fid = rsp->PersistentFileId;
- 	oparms->fid->volatile_fid = rsp->VolatileFileId;
- 	oparms->fid->access = oparms->desired_access;
-+	/*
-+	 * Reuse oparms->disposition to let callers know whether the file was
-+	 * opened or created.
-+	 * Currently, this is only checked post-open by cifs_atomic_open().
-+	 */
-+	oparms->disposition = le32_to_cpu(rsp->CreateAction);
- #ifdef CONFIG_CIFS_DEBUG2
- 	oparms->fid->mid = le64_to_cpu(rsp->hdr.MessageId);
- #endif /* CIFS_DEBUG2 */
+ 	if (file_present && req->CreateOptions & FILE_NON_DIRECTORY_FILE_LE &&
+ 	    S_ISDIR(d_inode(path.dentry)->i_mode) &&
+-	    !(req->CreateOptions & FILE_DELETE_ON_CLOSE_LE)) {
++	    (!stream_name ||
++	     !(req->CreateOptions & FILE_DELETE_ON_CLOSE_LE))) {
+ 		ksmbd_debug(SMB, "open() argument is a directory: %s, %x\n",
+ 			    name, le32_to_cpu(req->CreateOptions));
+ 		rsp->hdr.Status = STATUS_FILE_IS_A_DIRECTORY;
 -- 
-2.55.0
+2.47.3
 
