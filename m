@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=144.76.82.148
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795797713;
-	b=HOa5OVxajBa2u83aHvPpNrKL5inB0+txHoMtfYPHa+PBHWvt11t+h/sQ8iacAvRz/A9g
-	 ctbZ1aEthdz5rfIjDL3fe+RqjCoc06FKggved0mB2/JzGCLlV98ai9CJEHM9c8iDPrwHC
-	 /MnPQdhXYWsRyzgk5LyhmRMKGs+AkVeQT7BsW8h4vrpBaIOA7/7nFHi+EYuOylMql3WnM
-	 /y+cUGaaOjcM+6OFoaOX7RqLFFQda/fZmusjOAa73is87XvTw3gX8gVmxFrO7veKkAfI5
-	 mSGr0a3unVJYGRGKNnNGwU8k1+7GEkPFI2YL4hB6imWc5R4O5Gl6noaxl3ebMsodhag==
+	t=1795797721;
+	b=LMW5c/XmFu62+YiZlo/aijJ+AqCPn45FDv2e3DdukMeenP/b7Gm0u6Kj60WzFpfGyhAO
+	 05fX6oI/RsAOGeePEFb8637X0Eab2qdL/5twnkOsToUnb5k85FRtjuCYofgasL0w1u1R1
+	 NAEnwB6zPdJ8vV3tUdn6+3pCWpVLT7TxHrtWlTc8VNWdqf/03LmgvCITMcrEEa58CVTf8
+	 icW9KJra/LQWwXXOw/1A962m2qdTBcH7xQaHBmySMAmvpBKtEuXDJNEH6IWQubK5+Fq4R
+	 FGfgYbQJrcG31VAy5PpDUj1F1jAALYtc0XYtKOQOJHZxIrQpxt+EWs1o35KIxtkou3w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795797713;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795797721;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=5YgTulolvOxwdu/mLeuXKTSqxBI7iZQ1WSaSrr9wFwM=;
-	b=l2UHhpkRivgpNy3RWOKz7fXBvhy2awXihu1ccHwx/zUZnbVNevQLncI+2SxZELjyLOnI
-	 CE3yubXy6Ytw+04okprYBbMh6FpiSqqKZnCEKyN0Rf9c/98rK+Ob33ZHJvVSy/PDdJcLP
-	 7RZgwkuIhV4aDxdV8H7JwXEX51eWs/5VjvHF3YnhzRmVb6NRq9BdlqiuxhxLRDEAZgD/t
-	 M3w0LPQftPiEmQhGJANRRzTQnZGC4fOqBWoXYa4PVm7ImDrhmRRj0IJ7gWzi6FHy6KgoH
-	 8/tKwGvSmHWxgYKSjA/+sq3KyoDH4KqGHoI2TfMHaw2NP85BaB6Fd1NgH0c6BzhF4gw==
+	bh=ncQQlWeM4VgWwcnSMChsXbUpUMCE8+ZfA4Ko9AgAfIU=;
+	b=flxdu6Pw55D7sRFDaibtMZB/SpWFvHp+YMA+GujL7ydXTrYtpRNyB8DQFr4kRX8cCAfy
+	 xhMS3yJpNohZIOwlMV+fI4900h7dl+JFP5sds2Oxkexw99GyiIvAtuzQLFZHMXHUUPk4q
+	 Hnfq+OAE/sMUo9n36F+DbRHoaWDsAQfVc5BbJMBRZkjeJTFY9aqXcGsCliGD8TYKqHACy
+	 rZ2BeW01noKAi6rKZ9ML1i4M1/DJSGpBCvrPcWYzlWnY7MooG2HKG2GkwO6rkMBqlznir
+	 VPhDJmeaEfTdiOkV3D46zPpIUAN+DzvlWPM3r1TfN0nLHYdjxBx1MU6IRhEWvgD+nRg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=samba.org;
 	spf=pass smtp.mailfrom=samba.org;
-	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=OujbDebL;
+	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=ycc5iojd;
 	arc=none smtp.remote-ip=144.76.82.148
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.3 with cipher TLS_CHACHA20_POLY1305_SHA256 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF95606A339;
-	Fri, 27 Nov 2026 16:41:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ACF95606A339
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1627C606A31C;
+	Fri, 27 Nov 2026 16:41:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1627C606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=OujbDebL
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=ycc5iojd
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=5YgTulolvOxwdu/mLeuXKTSqxBI7iZQ1WSaSrr9wFwM=; b=OujbDebLyDVVzxuQS7WawKc6hO
-	21qxh0dA+82jrF2BWndw+viXoz5cqirXsSqYxTXGmc8aKFfw0ZS2Tsv0lJN102ZfdXAeawJM6RzJ9
-	VtR6K2AysLUUP+j2cniXW1D4+iry4Ww8rBzClCoNymFMOMMs3vQq0kb/V1MlDNM2oKu/aO02YD48u
-	nt252GN1H0wwBpqzAcUoWhj7xgppQ7E3kXvDH2Q9DoFGBiRdnbMF9eNWkgaDuMvaH4e/Slmeuyk69
-	w6pNpMr/eHzv2HFxpQCdIrFDSYp3I0Umihe7xxNX0rFlTA67ZfTi7/L98/4QWsRHKjR+rW4Ukb1/u
-	Mhz9hTtCAHooGKr9n0d9T77jmpX6pEQ3kloBf4XWYwD7KsW4jtXo2yt4PZKsb+f0GX8IagqwjzB+8
-	gZOq2QjxgASCRkAGxT0HdMF01YVbk4HpZCCelsZSqiYKcUckTNkbBRiJgTGG0qs3PU9M8s9MnynJi
-	lICTXrGNuBB/ZPDWd5WkHKKC;
+	bh=ncQQlWeM4VgWwcnSMChsXbUpUMCE8+ZfA4Ko9AgAfIU=; b=ycc5iojdzoP0oTo19OTNUy8UF+
+	jFcdl7vBAo/fO5lHvjyXYtFK01MU79qARBmT9O0Ftu05eCEMQoXMQCI08gbe/KEbkR6oV6CRQCk9f
+	VdpP9Tdrg4zpVTRYg3W4axSHVlmU4rwEruYdiZWnlKHdkrHcSYRhJ80DPVnMnb6y1xi6PJ1hAvfdV
+	cu4rdWBxcvO3/B4wjX+/MJsMWxnMPiA2BwkRydSknZ7EfSfX506JP++9+BE2GxHZJGIUGPse4/CD1
+	3ch74+sTbn/U9QppiD+L1ijEZiR9St4/50ljy60RjVvkzvGc2bopspfRzi/crN1yIH7TI0J1o0Elv
+	fmt4QIV8H+3HKWczt/oFuTJ27T4W/OnwufRPG8zh5IPygcR+umrb0syvNxpb1G4fBpj0zu9iTWJWt
+	UqIrhYMdg7HmL/t3c6uBFHp67dUU/g2K+gXYQDuIiISgBtcsKAG033GbLRWcCTA26tv+SkODkzjNz
+	4Kose5Aj5Q0ZUSlhyqY+jNpy;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1xWz1B-00000001Q5P-1K8o;
-	Fri, 27 Nov 2026 16:41:49 +0000
+	id 1xWz1H-00000001Q6l-0OQl;
+	Fri, 27 Nov 2026 16:41:55 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -57,9 +57,9 @@ Cc: metze@samba.org,
 	Paulo Alcantara <pc@manguebit.org>,
 	Tom Talpey <tom@talpey.com>,
 	Sashiko <sashiko-bot@kernel.org>
-Subject: [PATCH v2 12/13] smb: smbdirect: wake up the credit waiters after a failed send
-Date: Fri, 27 Nov 2026 17:40:31 +0100
-Message-ID: <aa9b2a1849ac734ae9f9c9603f6dbaf981e96d48.1795794871.git.metze@samba.org>
+Subject: [PATCH v2 13/13] smb: smbdirect: give back granted receive credits if a send fails
+Date: Fri, 27 Nov 2026 17:40:32 +0100
+Message-ID: <af8c6ad7af50aa5c166b7906cc2f5653a53964e2.1795794871.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1795794871.git.metze@samba.org>
 References: <cover.1795794871.git.metze@samba.org>
@@ -74,22 +74,14 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The error paths of smbdirect_connection_send_single_iter() give back
-the send, local and batch credits without waking up the waiters on
-sc->send_io.{credits,lcredits,bcredits}.wait_queue, so other senders
-and the immediate send work can sleep while credits are available,
-until something else wakes them up.
+smbdirect_connection_send_single_iter() moves the receive credits it
+grants in the message from sc->recv_io.credits.available to
+sc->recv_io.credits.count before the message is allocated, mapped and
+posted. If that fails, the peer never gets the message, but the
+credits stay accounted as granted, which permanently shrinks the
+receive credit window of the connection.
 
-It also gives back the batch credit of a batch of the caller and
-clears batch->credit, so smbdirect_connection_send_batch_abort()
-doesn't see it and doesn't wake up the waiters either, and the credit
-can be used for another PDU while the aborted one is still in the
-batch.
-
-Wake up the waiters, like smbdirect_connection_send_batch_abort()
-does, and leave the batch credit of a batch of the caller to
-smbdirect_connection_send_batch_abort() or
-smbdirect_connection_send_batch_flush().
+Give them back to sc->recv_io.credits.available on the error paths.
 
 Fixes: 54abc694ebb8 ("smb: smbdirect: introduce smbdirect_connection_send_iter() and related functions")
 Cc: stable@vger.kernel.org
@@ -99,40 +91,30 @@ Cc: Tom Talpey <tom@talpey.com>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://sashiko.dev/#/bug/linux-a2180487-c0d3-4f9a-92d7-208e032dd966
+Closes: https://sashiko.dev/#/bug/linux-27f04b17-0356-40b9-94be-b0b865fde826
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/smbdirect/connection.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ fs/smb/smbdirect/connection.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/fs/smb/smbdirect/connection.c b/fs/smb/smbdirect/connection.c
-index e84f488b83a3..837de712db65 100644
+index 837de712db65..9d054eb81d81 100644
 --- a/fs/smb/smbdirect/connection.c
 +++ b/fs/smb/smbdirect/connection.c
-@@ -1353,11 +1353,21 @@ int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
+@@ -1352,6 +1352,13 @@ int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
+ 	smbdirect_connection_free_send_io(msg);
  flush_failed:
  alloc_failed:
- 	atomic_inc(&sc->send_io.credits.count);
-+	wake_up(&sc->send_io.credits.wait_queue);
- credit_failed:
- 	atomic_inc(&sc->send_io.lcredits.count);
-+	wake_up(&sc->send_io.lcredits.wait_queue);
- lcredit_failed:
--	atomic_add(batch->credit, &sc->send_io.bcredits.count);
--	batch->credit = 0;
 +	/*
-+	 * The batch credit of a batch of the caller is given back by
-+	 * smbdirect_connection_send_batch_abort() or
-+	 * smbdirect_connection_send_batch_flush().
++	 * The peer never got the credits we granted in this message.
 +	 */
-+	if (batch == &_batch && batch->credit) {
-+		atomic_add(batch->credit, &sc->send_io.bcredits.count);
-+		batch->credit = 0;
-+		wake_up(&sc->send_io.bcredits.wait_queue);
++	if (new_credits) {
++		atomic_sub(new_credits, &sc->recv_io.credits.count);
++		atomic_add(new_credits, &sc->recv_io.credits.available);
 +	}
- bcredit_failed:
- 	return ret;
- }
+ 	atomic_inc(&sc->send_io.credits.count);
+ 	wake_up(&sc->send_io.credits.wait_queue);
+ credit_failed:
 -- 
 2.43.0
 
