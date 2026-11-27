@@ -1,64 +1,69 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=144.76.82.148
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795798153;
-	b=GYk6+qkKRzWNclOd7QnpVEHBm51AyDrVNv40ZEeguvN1ddS72FD5TayMhDwr5X1Q6ziR
-	 GnLSCXLDd4WQTPhHi88lR+uL8RAfawPLOr/pyaTBWf6yRmquplxvzXBR1OdpkwIgd/ZFp
-	 K2nOFGYhWhl+ttCD0UIgwvFAmgVA05UG30tj/3BsFZ3+FFG9s1pPqIMIUHPwfZ1v5epCe
-	 kBO+dMY+yVVVBD7DLlQ9y7ZzkOPrYVgA7S1BJXYMI9B3UhJOGTyasKVNr6raHuixvWxIc
-	 GFn+hr7gCNA8jXwaxj8T0CqEhUi0UQxGmX8vTqS0IrnudKDHUYP3NEILI2nW4aeoBcA==
+	t=1795798157;
+	b=xQGc5HjwSsRY2KmCdJimdggB0oFhuyAdyuYPAWu3OhvwXWLFW6etoBDiir2sG73dbs/5
+	 ggrlpEVsYVDT9uWNthtf4d9UTEeGpctWGj238l2NRRdJELNWDVITKfvg4rHgD04wi5pjI
+	 ipyzAc/ZGXlmDxLVVMqR19B0jAJHMj7xQM1HlA2zM2f6YSUL3g7T5c7oj2lMHgwUXRZKn
+	 UYBM6SB8OJz2PjVsIbCN9BlI1R5+o21pRwaNIcw9xt8fhNgOGdC2g0E8vdVBgsXFlU4uO
+	 sZVIELPA/J4LCE/SS0O7Jt4b5WW9NGKakfp9oi80hI6AK3JzoJD2Rz2fA7kopjuvqSg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795798153;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795798157;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=xxmjMLFGczpztLIHHwj+zdCeTxrOhpZy88DtzWtf9fA=;
-	b=c7x+s6uDpvFQm1wr7xr5QTbA+VwfmW9+l/gQCLhD8UBZPNSleB0vxEREfsKKLmZXBVuM
-	 8niaUSoU78wM1FrZkYOIxFpvpf5ucfX2xyoNVBLKaaNAyXqg1BT5n4EYVWTsZ18zsLBEj
-	 /3J+xQIgU8pDbQNkn8/e5fAqArxH5++uy8TSGOUYplNBMP9EhD5oVx0DYvkflht7AVG8l
-	 JxKo/EbOEaMJMdJuohKNyUjpythXmYw/SRNf8dHxF909gBqro4iZyzMnhIkZM+W7TOwLQ
-	 I98ukL1iWkT7+xCuMf0gKzeIFdEflgn/fUwtqXgs4YMU+pgBVxZJ2EshKRhBzXF/iug==
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=KMwYeapWiodhxqWdI6xZqU4JLeaoB+JEzzs7Bsry0CQ=;
+	b=bNCM9BQfs9LnPWpbOEIhDc2ExkEngo3WdMTwZquzWjmQWHT43TcHJlBQBuZYEp45sVOU
+	 SB+UWQKpZ1UHa0AwsFAFDuDl3HDweAShLpb0WoiMiUdpM37Xuv/tVABECOd+fMpPRF1a4
+	 UxNkld2PCV+OOBhLmrwFNUKcP8NXwjeO7Xn+InBjBwolVVBwK47mSokE12lD7XPyCBXWH
+	 OVTrc8gA8xDZEVU1GTJQDl+RrxCjNEzmULBvnUuL18zaa9dOiWqxQPp0TFU0mucARFFpB
+	 ZS+97WyT219uvYXwi1Dw5OD4YCpTPrFfIODuh9e4yhIddXAnMu0BhI5XZ1MsVpAKMkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=samba.org;
 	spf=pass smtp.mailfrom=samba.org;
-	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=y1RUha5Y;
+	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=Du8zWnQw;
 	arc=none smtp.remote-ip=144.76.82.148
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.3 with cipher TLS_CHACHA20_POLY1305_SHA256 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9AE606A31C;
-	Fri, 27 Nov 2026 16:49:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D9AE606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD39606A31C;
+	Fri, 27 Nov 2026 16:49:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FD39606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=y1RUha5Y
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=Du8zWnQw
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=xxmjMLFGczpztLIHHwj+zdCeTxrOhpZy88DtzWtf9fA=; b=y1RUha5YKnFsgwN8EqZU+0BeL2
-	Cdr4rAM5bQkkNW0+uWjxFl4fPnj8oASK8EfIC4rm8tttB9r9p4vGKhDuT5yjusuENCazzFB5KatAI
-	dtQZGyJbXm46U7IiLDmZSasr6LB6fizB+lhM/gN9VESpu4S52yPskTK6EjP6yvK9D8whQXeyADZhr
-	7IsIcx9c+ytLza1LgLcujRKjAcmIVj9/6pFmVx/pIBuJcuDgX3L2Xqr67hO37vyYW0W81l9iN2RSJ
-	pP2VuufKyxrW+qp99UlVCGuU2/pNy9+qyl0qpPfcHp8NvaGqXLNEZfG2xpvI1/xbx9Vk96vJJ+CFr
-	vlDFziTZlj6QFv2tB5/4KaVZ1COr7BQ+eXCEoSV7yrOd8rEHyg1eddknbSIljqcOrP5E+AJtQ0aWk
-	/lwcMTCIBuJ+98yEWpZFvMO9caRTku/IlsKkX8LLbKgS5z3xFtksmaXPxSkckQkmihj4GPzI4ZpG5
-	phpJA1H/PULcBtBw6Ymy4n4c;
+	bh=KMwYeapWiodhxqWdI6xZqU4JLeaoB+JEzzs7Bsry0CQ=; b=Du8zWnQw4GDLBtgK2REAV9OcYH
+	w9Lih9AhvDQIrFRMgjBYlTTgNtVxsxMFF9v8upxczfmiO18W2dgCEXIR6HoXHR1M6hUkzVLlld4w1
+	mfCIzh12XTcXWgLqg4YEMF7ZlEpeW1BI+e2pHExoZXpm/lfGBvmb+JHxk/FeoPrS06V4at+SluW1o
+	EaEFszeV/750mrgIqs63Mzv5rQHgwB59Ta91JfwOrQc6JDUw4kJEYQwj5gMNud78hRR5ufQDEdVP3
+	8/g/2MBEVe5PmD3yL0PHwBr3pMsGh6fm8ZlChTJhKc7eWcWqZokqSu/Neo5vDrWbbQrgGAlAfPuxV
+	0Dv6pJ0uQl641Ge+0vObCmmumJCnmuKACfkfDAsYzavhO0tUDyh6R0ZkLrWg1BeW1UeWWuJQBGFtb
+	AD8QtCKcomUu/xKSPMojSwSVHFP5mg+fnL5Ys79rQBqTUCPb3EG2qnD3NoVD+AvUKugcHM/wv7WZ4
+	Iv5eDD/e/B7Xn3bvxfpxEQ9d;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1xWz8B-00000001QXk-2PGu;
-	Fri, 27 Nov 2026 16:49:03 +0000
+	id 1xWz8M-00000001QY7-2eEC;
+	Fri, 27 Nov 2026 16:49:14 +0000
 From: Stefan Metzmacher <metze@samba.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
 Cc: metze@samba.org,
+	stable@vger.kernel.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	linux-cifs@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH 0/2] smb: server: fix the nonce of encrypted responses and a listener leak
-Date: Fri, 27 Nov 2026 17:48:57 +0100
-Message-ID: <cover.1795797772.git.metze@samba.org>
+	Sashiko <sashiko-bot@kernel.org>
+Subject: [PATCH 2/2] smb: server: don't leak the smbdirect listener socket on errors
+Date: Fri, 27 Nov 2026 17:48:59 +0100
+Message-ID: <17d7f96be20a7eb039cbb3833598f634d786a487.1795797772.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1795797772.git.metze@samba.org>
+References: <cover.1795797772.git.metze@samba.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -70,60 +75,49 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Namjae,
+smb_direct_listen() only assigned listener->socket after
+smbdirect_socket_listen() succeeded. If setting the parameters,
+binding (e.g. -EADDRINUSE) or listening failed, the error path called
+smb_direct_listener_destroy() with listener->socket still NULL, so the
+socket and its rdma cm id were never released.
 
-these are fixes for ksmbd:
+Assign listener->socket right after the socket is created, so
+smb_direct_listener_destroy() releases it on all error paths.
 
-  - The nonce of encrypted responses and of the payload of encrypted
-    RDMA reads is a 64-bit counter of the session followed by random
-    bits of the session, like Samba does, instead of random bytes,
-    which only made a reuse unlikely. With AES-GCM a reused nonce
-    reveals the authentication key.
+Fixes: 2eff5e51f976 ("smb: server: make use of smbdirect_socket_{listen,accept}()")
+Cc: stable@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: linux-cifs@vger.kernel.org
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Closes: https://sashiko.dev/#/bug/linux-983b1ca6-9d6c-4aab-bcc6-2909770bdced
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ fs/smb/server/transport_rdma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  - smb_direct_listen() leaked the smbdirect socket if binding or
-    listening failed, e.g. with -EADDRINUSE (reported by Sashiko).
-
-The client got the same nonce fix in the urgent client series, the
-urgent smbdirect fixes are posted separately as well, they are all
-independent of each other.
-
-These patches were developed with the help of Claude (Anthropic),
-which was used for code analysis, writing parts of the code and the
-commit messages. I reviewed all changes and take full responsibility
-for them.
-
-Testing: on real hardware, client and server running the urgent
-client, smbdirect and ksmbd series together:
-
-  - encrypted (seal) mounts over TCP and over RDMA (RoCE with mlx5
-    and irdma) with AES128-GCM and data verification
-  - ksmbd started while the RDMA port 445 is already in use,
-    smbdirect_socket_bind() fails, no warnings and ksmbd starts again
-    afterwards
-  - the RDMA tests of the urgent smbdirect series, including 10 ksmbd
-    restarts per device while I/O is running
-
-As we are already late in the 7.4 cycle, I leave it up to you to
-decide if they should still go into 7.4 or into the next merge
-window, both are marked for stable.
-
-Base: v7.4-rc4, like the other smb series. The patches also apply
-cleanly (git am) on cifs-next (61c581ea62ee), on ksmbd-for-next
-(3c31349456c5) and on both merged, with or without the urgent client
-and smbdirect series, and build on both merged.
-
-Stefan Metzmacher (2):
-  smb: server: use a counter for the nonce of encrypted responses
-  smb: server: don't leak the smbdirect listener socket on errors
-
- fs/smb/server/auth.c              | 43 +++++++++++++++++++++++++++++++
- fs/smb/server/auth.h              |  4 +++
- fs/smb/server/mgmt/user_session.c |  1 +
- fs/smb/server/mgmt/user_session.h |  3 +++
- fs/smb/server/smb2pdu.c           | 25 +++++++++++-------
- fs/smb/server/transport_rdma.c    |  2 +-
- 6 files changed, 67 insertions(+), 11 deletions(-)
-
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index ee28a4d1cc86..8f44e5c3c373 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -418,6 +418,7 @@ static int smb_direct_listen(struct smb_direct_listener *listener,
+ 		       ret, ERR_PTR(ret));
+ 		return ret;
+ 	}
++	listener->socket = sc;
+ 
+ 	/*
+ 	 * Create the initial parameters
+@@ -467,7 +468,6 @@ static int smb_direct_listen(struct smb_direct_listener *listener,
+ 	}
+ 
+ 	listener->port = port;
+-	listener->socket = sc;
+ 
+ 	kthread = kthread_run(smb_direct_listener_kthread_fn,
+ 			      listener,
 -- 
 2.43.0
 
