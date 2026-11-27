@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=144.76.82.148
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795782596;
-	b=KCdjlTd4VI1OMpy7Svf7P9N8c/wcbVw91cK8M5+nCKndF/iOaWvv/LF85NsnxjbTeCbZ
-	 /u6p5RanpevZofxKDiHexCWIVEhe4r9KmTGMWDR3+JO5hM4T+aKrUrWLYT7pYI7OAxIlg
-	 AhQFHS4HAlJr+jzB8D9+25XvHkQaA6UdVXriaPQDdKSHSw/BJD/pzsj1/m1ttIY+9hUpF
-	 xxCTBfQbn6LzFE9DQA7CKD8PcANPWjmmG6PkX6S1/H2F4ABgx074Un06quiqXcKOCI8fj
-	 lB6gy1JAIzPNHDv7slXSwyX8Fv2NZ+mphl4lhtmQsWlKYP3Is1iqUbBru+0UlhZs8Tw==
+	t=1795782598;
+	b=zxOo3H0LKpOg00FPSR8XcoUL86VGpWeZeEozVaaygf3ZF6OAhWxEd95vDkDJ+fdjIkwx
+	 ff6D5cWdIOApgLD3D2ijani3tq7fsJeNRBkyx6M/aM7uRYomfVsjFoTjFowOZ+D7n1ElW
+	 7r62gW+cgeqquh6m2/2bJaXIRXAQO0maBIyiGh3foCl8XHumNq9q5h8eD+YytNjF1xn5n
+	 Ziy4qwL0sUSbzCuMwaN9tCjT84jStxFJmvFCKwX+GYRW0XQgkEst6kLJJtJjDFDN6wjGQ
+	 wUqULBIhYd3aiR4AIuZ0X45zQHXxwC9swZuA6+LCurKTnGAeqmB8UjRiHF5zULw9QtA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795782596;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795782598;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=uuTZ+xT7/OX3wJ5mUNtdwe827wVJ1UalULCywQdXd2U=;
-	b=EL+hS7sbF2586osOalK7MKRTXI2pzuw8/1QmBMe/04tNk5oaVSHJOwuAId6hUg07kmPf
-	 LApsYcmJbnpzpdutAONgCDdQjFEGBzG75mX+ThpDwvBWyqWIA2WYYaGp40QyjxOIeYEm+
-	 hrj+ehQ0klgPasYx2fV11J5KuBIC99jLUzIoPR54DVgu1RIg4JNe3kN7ECleiNF//tV8l
-	 KxkZBfnbW+EZaRpw10Bw1CQKP1qsKR3MYRJPF/SL+w3xEPlkqaryfj22t00TSEXF6qJi9
-	 N4MIiqceHpMWX72ntrUwnn4SOsieJEkFkVFuEny7X7XcrIUsM4yxZsS86XFogEqQdAA==
+	bh=11ZRGd5SnGHaTQgS8bJ+qnXN5aIRj84AwpMDkgkGhi0=;
+	b=S/lQDgQiDqZUtk0TFWCFHX49JaRYX5f3YdfWh6f7SxHZ5KLy21TRUv9vWwnkVta9PBiS
+	 FzsLAsg8+xMtGUJl8ST2m7dZUAIZ7nUlASgew/XyQ5EHkEtZy/DVxmznI+ATku7a+6NkG
+	 BmkgBC3qGpkG8tgVCj3bNPn1Qxy4QuHXBq3IjJWzEMBondCVCE/o9PQnTQ6jLUT/PEGcZ
+	 LFILBVJf76dBkZ7t/wp1gqfTKrNROsRVgflqWKiMclMcPZfEvPV6wfS4NFdoXLGQ/mBvC
+	 qmWolbYMCYHBy2gDNcnE6NOOGbCr6eErqijtGLfJ2vNR83AR/ccWS9CampTfojrjr/Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=samba.org;
 	spf=pass smtp.mailfrom=samba.org;
-	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=rhKVCwvs;
+	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b="rWKuXX/2";
 	arc=none smtp.remote-ip=144.76.82.148
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.3 with cipher TLS_CHACHA20_POLY1305_SHA256 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DF9606A327;
-	Fri, 27 Nov 2026 12:29:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39DF9606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C509D606A32F;
+	Fri, 27 Nov 2026 12:29:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C509D606A32F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=rhKVCwvs
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=rWKuXX/2
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=uuTZ+xT7/OX3wJ5mUNtdwe827wVJ1UalULCywQdXd2U=; b=rhKVCwvsNhLPv0X+kHa3Ji+V+a
-	DsKv/9JH7CK+bqC0x9piO+DpunSQY08//AZwV0ZylY6sT7sD2EAd2aq6F2y3C9da2s/BEYbnJXptx
-	xKduwV7hMfhIxK2reHZ3f6QHaYlKW8uv5zPcVoREgncz8bLc+7xfrzmABFHAGpeCP5gP258olmSnU
-	OT8HWmHoJ/ham3hvJ86k+U8PkjV+qOtFWoLlxRUCQpyk19HVtgBr8cnGCvNu2VR6wTowbrU0pl106
-	7WKPVCEpwhf7txLKG+p7Xg3tmrwLhdbQOdTF3w5JXHypVr2pv599fc/S8ZHdyHt8aDE6bRnw1jvB3
-	H5XKGDmh00ZFKi1Ym5W0QF6i7T/WywUNTwGLdEgwx/c17WvAGa9s2eokcMcphmVyoPi1RxNOG4gps
-	u0Wxpg7bKfhufmyUoPHQGLQDBbY3reBA7k97bwq/0daEzRGWA1Dod0nj40Ggj03e/bqUFUiRbdQyo
-	dSuVRcyfSIsZ+9ETkL9jwib7;
+	bh=11ZRGd5SnGHaTQgS8bJ+qnXN5aIRj84AwpMDkgkGhi0=; b=rWKuXX/2ge7oA9qb3fPauVlhw1
+	T/Zj6mbUjSiuAPAwRQAwo9nYfD61og3JAtza3RD/26KRsH0ssWUzY8C6sqp4LRsNFSqv5m0W3bKb8
+	Lzh67NbqdvwVEjswwzAGdw0GPdGDxC0bExoaQru4/ANfwIN3hPwkwD2BdrT7Ee2cpXshCwn8oSIPl
+	s2Ra3rsHci0LhCqkafCf8M4npU7cTD6FWMKK0ZvGvcZp97Sg0rQ7186JQvrIryw+EGUARTLEQodJZ
+	Yro/g7DWkLBqmZE0AKje2W1ToKbU/u9amMmUxWkcQLfRO1uayu6qxt1A4V3Lb7/jn0HGjxFTW+EYi
+	T1vWZNJ25mvgTx1eCnTThEjd97aviPMuHBLTLQtYB1E1qtWrcnW+skj68pQTfDfwjDu1/s7T4Hlda
+	eth3slyYf1QgA71l2iXg9WJqIJqiPDHYVPxyfwKGVLnhrxpofFE/RPDfMONoFkeLV1GQLQWZhNNID
+	jZ6HbopcnkiyAzgaFmqMsmGZ;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1xWv5I-00000001Lbh-3XsG;
-	Fri, 27 Nov 2026 12:29:48 +0000
+	id 1xWv5O-00000001Lcg-2EwL;
+	Fri, 27 Nov 2026 12:29:54 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -56,12 +56,10 @@ Cc: metze@samba.org,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Paulo Alcantara <pc@manguebit.org>,
 	Tom Talpey <tom@talpey.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH 05/10] smb: smbdirect: don't post a partial PDU after a send error
-Date: Fri, 27 Nov 2026 13:29:02 +0100
-Message-ID: <fb5cdee4de5adcfae25a7eeadb607836651d07d0.1795781300.git.metze@samba.org>
+	Long Li <longli@microsoft.com>
+Subject: [PATCH 06/10] smb: smbdirect: introduce smbdirect_connection_invalidate_rkey() and its logic
+Date: Fri, 27 Nov 2026 13:29:03 +0100
+Message-ID: <c170bca1e09f6ed8068e66e4b510adc770e2cb62.1795781300.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1795781300.git.metze@samba.org>
 References: <cover.1795781300.git.metze@samba.org>
@@ -76,205 +74,338 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-All fragments of a PDU are built into the same smbdirect_send_batch
-by smbdirect_connection_send_single_iter(). If building a fragment
-failed, e.g. because a credit wait was interrupted by a fatal signal
-or a DMA mapping failed, smbdirect_connection_send_iter() and the
-smbd_send() of the client still flushed the batch with is_last=true.
+We remember all smbdirect_mr_io structures with their base_tag
+in a per connection xarray to find them again.
 
-That posts the fragments built so far, the last of them with a
-remaining_data_length that is never satisfied, fragments may also
-have been posted already by a flush with is_last=false. The peer
-then appends the next PDU to the incomplete one: cifs reconnects
-asynchronously, ksmbd keeps the connection and its next response
-continues the truncated one.
+This keeps track of remote invalidations done by the peer
+and skips the IB_WR_LOCAL_INV in such a case.
 
-Add smbdirect_connection_send_batch_abort() and use it instead of
-the final flush after an error: if nothing of the PDU was built yet,
-it only gives back the batch credit, otherwise it frees the messages
-not posted yet and tears down the connection, as the peer can no
-longer get a consistent stream.
+Note we now ignore the 'need_invalidate' argument
+of smbdirect_connection_register_mr_io(), it will
+be removed in a follow up commit.
 
-Fixes: 2c1ac39ce9cd ("smb: client: use smbdirect_send_batch processing")
-Fixes: 54abc694ebb8 ("smb: smbdirect: introduce smbdirect_connection_send_iter() and related functions")
+The logic to let the caller decide and pass in
+'need_invalidate' is wrong as there can be errors
+in the server, so that it may skip the remote invalidation.
+
+Now we explicitly track remote invalidations by
+looking at the IB_WC_WITH_INVALIDATE flag in
+smbdirect_connection_recv_io_done().
+
+Remote invalidations we can't match are only logged at the info
+level: they are races with our own deregistration or keys we don't
+track, the MR is then invalidated locally as before, and as error
+messages a peer could flood the log with them.
+
+Fixes: c7398583340a ("CIFS: SMBD: Implement RDMA memory registration")
 Cc: stable@vger.kernel.org
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Paulo Alcantara <pc@manguebit.org>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Cc: Bharath SM <bharathsm@microsoft.com>
+Cc: Long Li <longli@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/client/smbdirect.c     | 14 ++++++-
- fs/smb/smbdirect/connection.c | 71 +++++++++++++++++++++++++++++++++--
- fs/smb/smbdirect/socket.h     |  7 ++++
- include/linux/smbdirect.h     |  3 ++
- 4 files changed, 90 insertions(+), 5 deletions(-)
+ fs/smb/smbdirect/connection.c |  12 ++--
+ fs/smb/smbdirect/internal.h   |   2 +
+ fs/smb/smbdirect/mr.c         | 110 ++++++++++++++++++++++++++++++++--
+ fs/smb/smbdirect/socket.h     |   3 +
+ include/linux/smbdirect.h     |   2 +-
+ 5 files changed, 120 insertions(+), 9 deletions(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 563ef488a225..64d27d00079d 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -485,9 +485,19 @@ int smbd_send(struct TCP_Server_Info *server,
- 
- 	} while (++rqst_idx < num_rqst);
- 
--	rc = smbdirect_connection_send_batch_flush(sc, batch, true);
--	if (unlikely(!rc && error))
-+	if (unlikely(error)) {
-+		/*
-+		 * Don't post a partial PDU, if some of it was
-+		 * already built, this tears down the connection.
-+		 * Fragments may have been posted already, so we
-+		 * still wait for them below, they may use the
-+		 * pages of the request.
-+		 */
-+		smbdirect_connection_send_batch_abort(sc, batch);
- 		rc = error;
-+	} else {
-+		rc = smbdirect_connection_send_batch_flush(sc, batch, true);
-+	}
- 
- 	/*
- 	 * As an optimization, we don't wait for individual I/O to finish
 diff --git a/fs/smb/smbdirect/connection.c b/fs/smb/smbdirect/connection.c
-index c50096e605ee..3494189f41ee 100644
+index 3494189f41ee..8a5ab059c005 100644
 --- a/fs/smb/smbdirect/connection.c
 +++ b/fs/smb/smbdirect/connection.c
-@@ -925,6 +925,7 @@ static void smbdirect_connection_send_batch_init(struct smbdirect_send_batch *ba
- 	batch->need_invalidate_rkey = need_invalidate_rkey;
- 	batch->remote_key = remote_key;
- 	batch->credit = 0;
-+	batch->msg_cnt = 0;
- }
- 
- int smbdirect_connection_send_batch_flush(struct smbdirect_socket *sc,
-@@ -988,6 +989,58 @@ int smbdirect_connection_send_batch_flush(struct smbdirect_socket *sc,
- }
- EXPORT_SYMBOL_GPL(smbdirect_connection_send_batch_flush);
- 
-+/*
-+ * Abort the PDU of a batch after an error, instead of flushing it with
-+ * is_last=true.
-+ *
-+ * All fragments of a PDU use the same batch. If some of them were
-+ * already added to the batch, possibly posted by a flush with
-+ * is_last=false, the peer can no longer get a complete PDU, its
-+ * remaining_data_length would just continue with the next PDU. So the
-+ * messages not posted yet are freed and the connection is torn down.
-+ *
-+ * If nothing of the PDU was built yet, e.g. the wait for the first
-+ * credit failed, only the batch credit is given back.
-+ */
-+void smbdirect_connection_send_batch_abort(struct smbdirect_socket *sc,
-+					   struct smbdirect_send_batch *batch)
-+{
-+	struct smbdirect_send_io *msg, *next;
-+	u32 freed = 0;
-+
-+	list_for_each_entry_safe(msg, next, &batch->msg_list, sibling_list) {
-+		list_del_init(&msg->sibling_list);
-+		smbdirect_connection_free_send_io(msg);
-+		freed++;
-+	}
-+	batch->wr_cnt = 0;
-+
-+	/*
-+	 * Each message took a local and a send credit,
-+	 * see smbdirect_connection_send_single_iter().
-+	 */
-+	if (freed) {
-+		atomic_add(freed, &sc->send_io.credits.count);
-+		wake_up(&sc->send_io.credits.wait_queue);
-+		atomic_add(freed, &sc->send_io.lcredits.count);
-+		wake_up(&sc->send_io.lcredits.wait_queue);
-+	}
-+
-+	if (batch->credit) {
-+		atomic_add(batch->credit, &sc->send_io.bcredits.count);
-+		batch->credit = 0;
-+		wake_up(&sc->send_io.bcredits.wait_queue);
-+	}
-+
-+	if (batch->msg_cnt) {
-+		smbdirect_log_write(sc, SMBDIRECT_LOG_ERR,
-+			"aborting a partial PDU after %u message(s)\n",
-+			batch->msg_cnt);
-+		smbdirect_socket_schedule_cleanup(sc, -ECONNABORTED);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(smbdirect_connection_send_batch_abort);
-+
- struct smbdirect_send_batch *
- smbdirect_init_send_batch_storage(struct smbdirect_send_batch_storage *storage,
- 				  bool need_invalidate_rkey,
-@@ -1097,6 +1150,7 @@ static int smbdirect_connection_post_send_io(struct smbdirect_socket *sc,
- 		}
- 		list_add_tail(&msg->sibling_list, &batch->msg_list);
- 		batch->wr_cnt++;
-+		batch->msg_cnt++;
- 		return 0;
+@@ -1640,10 +1640,14 @@ void smbdirect_connection_recv_io_done(struct ib_cq *cq, struct ib_wc *wc)
  	}
  
-@@ -1382,9 +1436,20 @@ int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
- 		}
- 	}
- 
--	ret = smbdirect_connection_send_batch_flush(sc, &batch, true);
--	if (unlikely(ret && !error))
--		error = ret;
-+	if (unlikely(error)) {
-+		/*
-+		 * Don't post a partial PDU, see
-+		 * smbdirect_connection_send_batch_abort().
-+		 * Fragments may have been posted already, so we
-+		 * still wait for them below, they may use the
-+		 * pages of the caller.
-+		 */
-+		smbdirect_connection_send_batch_abort(sc, &batch);
-+	} else {
-+		ret = smbdirect_connection_send_batch_flush(sc, &batch, true);
-+		if (unlikely(ret))
-+			error = ret;
-+	}
+ 	smbdirect_log_rdma_recv(sc, SMBDIRECT_LOG_INFO,
+-		"recv_io=0x%p type=%d wc status=%s wc opcode %d byte_len=%d pkey_index=%u\n",
+-		recv_io, sc->recv_io.expected,
+-		ib_wc_status_msg(wc->status), wc->opcode,
+-		wc->byte_len, wc->pkey_index);
++		"recv_io=0x%p status=%s opcode %d byte_len=%d wc_flags=0x%x inv_rkey=0x%x\n",
++		recv_io, ib_wc_status_msg(wc->status), wc->opcode,
++		wc->byte_len, wc->wc_flags,
++		(wc->wc_flags & IB_WC_WITH_INVALIDATE) ?
++		wc->ex.invalidate_rkey : 0);
++
++	if (wc->wc_flags & IB_WC_WITH_INVALIDATE)
++		smbdirect_connection_invalidate_rkey(sc, wc->ex.invalidate_rkey);
  
  	/*
- 	 * As an optimization, we don't wait for individual I/O to finish
-diff --git a/fs/smb/smbdirect/socket.h b/fs/smb/smbdirect/socket.h
-index 14114a2567a2..dc1e906316ff 100644
---- a/fs/smb/smbdirect/socket.h
-+++ b/fs/smb/smbdirect/socket.h
-@@ -783,6 +783,13 @@ struct smbdirect_send_batch {
- 	u32 remote_key;
+ 	 * Reset timer to the keepalive interval in
+diff --git a/fs/smb/smbdirect/internal.h b/fs/smb/smbdirect/internal.h
+index 69d0c9f899de..fec71278421a 100644
+--- a/fs/smb/smbdirect/internal.h
++++ b/fs/smb/smbdirect/internal.h
+@@ -128,6 +128,8 @@ void smbdirect_connection_recv_io_done(struct ib_cq *cq, struct ib_wc *wc);
  
- 	int credit;
+ int smbdirect_connection_recv_io_refill(struct smbdirect_socket *sc);
+ 
++void smbdirect_connection_invalidate_rkey(struct smbdirect_socket *sc, u32 rkey);
++
+ int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc);
+ 
+ void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc);
+diff --git a/fs/smb/smbdirect/mr.c b/fs/smb/smbdirect/mr.c
+index fa2f7c19e7ee..54c53d0b2d64 100644
+--- a/fs/smb/smbdirect/mr.c
++++ b/fs/smb/smbdirect/mr.c
+@@ -60,6 +60,25 @@ int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc)
+ 		mr->socket = sc;
+ 
+ 		list_add_tail(&mr->list, &sc->mr_io.all.list);
++
++		mr->base_tag = mr->mr->rkey & ~U8_MAX;
++		ret = xa_insert_irq(&sc->mr_io.all.tags,
++				    mr->base_tag,
++				    mr,
++				    GFP_KERNEL);
++		if (ret) {
++			smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
++				"xa_insert_irq() for base_tag=0x%x failed: ret=%d (%1pe)\n",
++				mr->base_tag,
++				ret, SMBDIRECT_DEBUG_ERR_PTR(ret));
++			/*
++			 * Already added to sc->mr_io.all.list,
++			 * so below we can just call
++			 * smbdirect_connection_destroy_mr_list()
++			 */
++			goto xa_insert_failed;
++		}
++
+ 		atomic_inc(&sc->mr_io.ready.count);
+ 	}
+ 
+@@ -71,6 +90,7 @@ int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc)
+ 	mutex_destroy(&mr->mutex);
+ 	kfree(mr);
+ kzalloc_mr_failed:
++xa_insert_failed:
+ 	smbdirect_connection_destroy_mr_list(sc);
+ 	return ret;
+ }
+@@ -78,6 +98,7 @@ int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc)
+ static void smbdirect_mr_io_disable_locked(struct smbdirect_mr_io *mr)
+ {
+ 	struct smbdirect_socket *sc = mr->socket;
++	unsigned long flags;
+ 
+ 	lockdep_assert_held(&mr->mutex);
+ 
+@@ -94,7 +115,10 @@ static void smbdirect_mr_io_disable_locked(struct smbdirect_mr_io *mr)
+ 	mr->sgt.sgl = NULL;
+ 	mr->sgt.nents = 0;
+ 
++	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
+ 	mr->state = SMBDIRECT_MR_DISABLED;
++	mr->need_invalidate = false;
++	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
+ }
+ 
+ static void smbdirect_mr_io_free_locked(struct kref *kref)
+@@ -121,6 +145,11 @@ void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc)
+ 	LIST_HEAD(all_list);
+ 	unsigned long flags;
+ 
++	/*
++	 * This means we don't need explicit
++	 * xa_erase() calls below.
++	 */
++	xa_destroy(&sc->mr_io.all.tags);
+ 	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
+ 	list_splice_tail_init(&sc->mr_io.all.list, &all_list);
+ 	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
+@@ -265,12 +294,13 @@ struct smbdirect_mr_io *
+ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
+ 				    struct iov_iter *iter,
+ 				    bool writing,
+-				    bool need_invalidate)
++				    bool _ignored_need_invalidate)
+ {
+ 	const struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	struct smbdirect_mr_io *mr;
+ 	int ret, num_pages, num_mapped;
+ 	struct ib_reg_wr *reg_wr;
++	unsigned long flags;
+ 
+ 	num_pages = iov_iter_npages(iter, sp->max_frmr_depth + 1);
+ 	if (num_pages > sp->max_frmr_depth) {
+@@ -291,7 +321,6 @@ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
+ 	mutex_lock(&mr->mutex);
+ 
+ 	mr->dir = writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+-	mr->need_invalidate = need_invalidate;
+ 	mr->sgt.nents = 0;
+ 	mr->sgt.orig_nents = 0;
+ 
+@@ -345,6 +374,8 @@ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
+ 	}
+ 
+ 	ib_update_fast_reg_key(mr->mr, ib_inc_rkey(mr->mr->rkey));
++	if (mr->mr->rkey == mr->base_tag)
++		ib_update_fast_reg_key(mr->mr, ib_inc_rkey(mr->mr->rkey));
+ 	reg_wr = &mr->wr;
+ 	reg_wr->wr.opcode = IB_WR_REG_MR;
+ 	mr->cqe.done = smbdirect_connection_mr_io_register_done;
+@@ -357,6 +388,10 @@ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
+ 			IB_ACCESS_REMOTE_WRITE | IB_ACCESS_LOCAL_WRITE :
+ 			IB_ACCESS_REMOTE_READ;
+ 
++	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
++	mr->need_invalidate = true;
++	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
++
+ 	/*
+ 	 * There is no need for waiting for complemtion on ib_post_send
+ 	 * on IB_WR_REG_MR. Hardware enforces a barrier and order of execution
+@@ -374,6 +409,10 @@ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
+ 		return mr;
+ 	}
+ 
++	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
++	mr->need_invalidate = false;
++	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
++
+ 	smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
+ 		"ib_post_send failed ret=%d (%1pe) reg_wr->key=0x%x\n",
+ 		ret, SMBDIRECT_DEBUG_ERR_PTR(ret), reg_wr->key);
+@@ -436,6 +475,8 @@ EXPORT_SYMBOL_GPL(smbdirect_mr_io_fill_buffer_descriptor);
+ void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
+ {
+ 	struct smbdirect_socket *sc = mr->socket;
++	bool need_invalidate;
++	unsigned long flags;
+ 	int ret = 0;
+ 
+ lock_again:
+@@ -448,7 +489,12 @@ void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
+ 		goto put_kref;
+ 	}
+ 
+-	if (mr->need_invalidate) {
++	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
++	need_invalidate = mr->need_invalidate;
++	mr->need_invalidate = false;
++	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
++
++	if (need_invalidate) {
+ 		struct ib_send_wr *wr = &mr->inv_wr;
+ 
+ 		/* Need to finish local invalidation before returning */
+@@ -476,7 +522,6 @@ void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
+ 		 */
+ 		mutex_unlock(&mr->mutex);
+ 		wait_for_completion(&mr->invalidate_done);
+-		mr->need_invalidate = false;
+ 		goto lock_again;
+ 	} else
+ 		/*
+@@ -519,3 +564,60 @@ void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
+ 		mutex_unlock(&mr->mutex);
+ }
+ EXPORT_SYMBOL_GPL(smbdirect_connection_deregister_mr_io);
++
++void smbdirect_connection_invalidate_rkey(struct smbdirect_socket *sc, u32 rkey)
++{
++	u32 base_tag = rkey & ~U8_MAX;
++	struct smbdirect_mr_io *mr;
++	unsigned long flags;
 +
 +	/*
-+	 * Number of messages added to the batch,
-+	 * unlike wr_cnt not reset by a flush, see
-+	 * smbdirect_connection_send_batch_abort().
++	 * This might be called from an interrupt context,
++	 * so we can't call mutex_lock(&mr->mutex); here.
++	 *
++	 * We run under the sc->mr_io.all.lock spin_lock
 +	 */
-+	u32 msg_cnt;
- };
++	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
++
++	mr = xa_load(&sc->mr_io.all.tags, base_tag);
++	if (!mr) {
++		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_INFO,
++			"xa_load() for base_tag=0x%x rkey=0x%x failed\n",
++			base_tag, rkey);
++		goto done;
++	}
++
++	if (!mr->need_invalidate) {
++		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_INFO,
++			"invalidate rkey=0x%x for base_tag=0x%x not registered\n",
++			rkey, base_tag);
++		goto done;
++	}
++
++	if (WARN_ON_ONCE(mr->base_tag != base_tag))
++		goto done; /* internal error */
++
++	if (WARN_ON_ONCE(!mr->mr))
++		goto done; /* internal error */
++
++	if (mr->mr->rkey != rkey) {
++		/*
++		 * Maybe a local invalidate was faster
++		 * than the remote invalidate
++		 */
++		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_INFO,
++			"invalidate rkey=0x%x for base_tag=0x%x stale rkey=0x%x\n",
++			rkey, base_tag, mr->mr->rkey);
++		goto done;
++	}
++
++	/*
++	 * We can skip IB_WR_LOCAL_INV in
++	 * smbdirect_connection_deregister_mr_io()
++	 */
++	mr->state = SMBDIRECT_MR_INVALIDATED;
++	mr->need_invalidate = false;
++
++done:
++	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
++}
+diff --git a/fs/smb/smbdirect/socket.h b/fs/smb/smbdirect/socket.h
+index dc1e906316ff..4dcbd9c86aaf 100644
+--- a/fs/smb/smbdirect/socket.h
++++ b/fs/smb/smbdirect/socket.h
+@@ -411,6 +411,7 @@ struct smbdirect_socket {
+ 		 */
+ 		struct {
+ 			struct list_head list;
++			struct xarray tags;
+ 			spinlock_t lock;
+ 		} all;
  
- struct smbdirect_recv_io {
+@@ -671,6 +672,7 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
+ 
+ 	spin_lock_init(&sc->mr_io.all.lock);
+ 	INIT_LIST_HEAD(&sc->mr_io.all.list);
++	xa_init_flags(&sc->mr_io.all.tags, XA_FLAGS_LOCK_IRQ);
+ 	atomic_set(&sc->mr_io.ready.count, 0);
+ 	init_waitqueue_head(&sc->mr_io.ready.wait_queue);
+ 	atomic_set(&sc->mr_io.used.count, 0);
+@@ -837,6 +839,7 @@ struct smbdirect_mr_io {
+ 	struct list_head list;
+ 
+ 	enum smbdirect_mr_state state;
++	u32 base_tag;
+ 	struct ib_mr *mr;
+ 	struct sg_table sgt;
+ 	enum dma_data_direction dir;
 diff --git a/include/linux/smbdirect.h b/include/linux/smbdirect.h
-index 97f5ba730fa7..74fff00cdf88 100644
+index 74fff00cdf88..f797cba849cd 100644
 --- a/include/linux/smbdirect.h
 +++ b/include/linux/smbdirect.h
-@@ -115,6 +115,9 @@ int smbdirect_connection_send_batch_flush(struct smbdirect_socket *sc,
- 					  struct smbdirect_send_batch *batch,
- 					  bool is_last);
+@@ -175,7 +175,7 @@ struct smbdirect_mr_io *
+ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
+ 				    struct iov_iter *iter,
+ 				    bool writing,
+-				    bool need_invalidate);
++				    bool _ignored_need_invalidate);
  
-+void smbdirect_connection_send_batch_abort(struct smbdirect_socket *sc,
-+					   struct smbdirect_send_batch *batch);
-+
- /*
-  * This is only temporary and only needed
-  * as long as the client still requires
+ void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
+ 					    struct smbdirect_buffer_descriptor_v1 *v1);
 -- 
 2.43.0
 
