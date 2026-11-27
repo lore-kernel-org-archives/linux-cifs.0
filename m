@@ -1,100 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.46
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795796335;
-	b=w9way9UzbikUBgRvScX1GH08Em9P3llPke0aUD1WLQoZgeRaLdgP68AqjO/ZUFB30AWD
-	 2X6thlkImRQX0yDwsIT8LAwNS/rmmvx3gCcgzLH5wPtm0nlTlE7AuTJS9MARlc3Aw+jgT
-	 yBz1fu6WlI7MLhKmfOK1WFYdGY290U80ARCo2vPPMojnryUOh65104JHnhW0t4xYMy+zB
-	 emQ5W4EFF98SY7yrlPQi23v2E+ZMgB2v5QFngNvYACwMwp3RpY68ba+lns5N/vBt4N6do
-	 z/dB8ACaUA/U7uUr+qSo/EB6G59gMv1brzk4e708s+8R1TL2MZQs7RqkaV0ffuzx7YQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795796335;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=WcqK/TokdPrpJ1SyssRoGlfCD57QN3XIIcFf/99tphc=;
-	b=YgMFbdTCqiWsUvzscmXG+RU0vklnjeUZtQDys2eOiNFLse3dDKDCcIRq5UPohsuRiICb
-	 8tJ5le+WZGiRSObUXyXVl3DctmDWurLKLW5vPi/D5tyUc/DfmyHMCQfGF+ckt1LtA4g5Q
-	 6mz1GVzk5T9dHqRPYX0RVN3oBCBNsr72vCqpw44079UJNC6uqIy0FLCgvgAR39OeV8T8q
-	 elvZ3JVMWEoTErb/x1S9iVuizK4kFWnq48Zt2WT0ZLOheuUsb1PQKq2BPEG735wCMbgnj
-	 kaJQa3937eOFvIwMO6o3s0Uq851HfiYFB+ohz6zEERKcWz1SxK/dWA9527JooKvqdPQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="naloy12/";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.46
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=144.76.82.148
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795797643;
+	b=DEFHb86MBSYOTEcHBrzQoZW69REcVI3Rf3ZGVb/L6qIIpZPRDQTqzJzrWG0Gx2Pb5HD+
+	 5inLwp9fKChNr9agu1u3PMufwoErMGGvWXwiMgfrhddq+e0pgBEdB/uzpGksQbINLJpml
+	 SJn636TeN4FNoZBxx4HYOzPW7D1VbHxbxh5Y339Rt8ZnlpbQ/Y/vWE3dqu/HJnyWTi7k8
+	 ZVgkfKjeZdewGp14xGKE7tu3l9yRXjvd9E/UYV4HJ6ngWYOEuPNE+dPkhZS3+pceX1EgS
+	 6ARoWUuO8y1FibDecXaq3QYAc2nLwgG2USMgLR0OzuVTa9mURBOU1Okd90vNGTJYW/Q==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795797643;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=bspoc2uAgDK7oKPJbbSrF7iTD2JLGkntkGxQGP05lds=;
+	b=dGVknxx8gLKZf50MTCX+mmBNDipp20kns78EnUV771HtCk11HyIO/DKMhqnDHShF7PoS
+	 xNND3wJNCZDEvl4YcAxEVb3o7QnqdzTb8dFK1pEkMD+Yn8tpW48twUEb15dcR4qFueu37
+	 D4LNPuOJnyyalU7+oVOSt/CC213O5Ca0QL7l4VNU4m4a7RZQWsU7PcAHqnsnDRnYPjE/z
+	 LUTy+nGURB+v9gtpY18UhuutCe9tQ2xf6cWKkBBUNhMMse2tICj2DV1xMXpxzt/x/Scev
+	 EoFj4c9OcFy7XfQz2sqgAINxBeN7kMz1XrXSFLOMFKx/QpJknhAk2giMs6eqJ+4MyAA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=samba.org;
+	spf=pass smtp.mailfrom=samba.org;
+	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=jkmxA5zm;
+	arc=none smtp.remote-ip=144.76.82.148
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.3 with cipher TLS_CHACHA20_POLY1305_SHA256 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08941606A324
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 16:18:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 08941606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7E3606A69B;
+	Fri, 27 Nov 2026 16:40:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED7E3606A69B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=naloy12/
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6b8a52db5f9so10101804a12.3
-        for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 08:18:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795796333; cv=none;
-        d=google.com; s=arc-20260327;
-        b=hDDtPcqpQBU7gxMelTDxbSPCdvelAz6FktFmnkYsmo2hqFgqPA5L6ZwfbYlqgLiQaa
-         kzzIgK1x6+ujCFUPYOvB+vWHj+u6AvcisiT6/V9kZnT2OJ8nIjHeKv+FuCgAXgPhIFzS
-         +pvBbpVxENxNcE1ThVtn3Q0mvlLfqte10FoxEVh+frM+8JkAurrUx4kC6W6QSiM2isbe
-         RNm2+GwZdtevNIHpX2+GqILbt9FH7uKAQ76MbVNAzqpyT2ekKpSgQ9WX4DMqynxBdBy8
-         hVJR0S081AEkvGZSnTD4P9Deh79GjkKLJX5RWKPvhiNlhbU6+gqwP2pynCHNazm7Q041
-         Bt5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WcqK/TokdPrpJ1SyssRoGlfCD57QN3XIIcFf/99tphc=;
-        fh=Z69LtB3z179akMT+EoAIvFDdtEKNsncf/J8hbWuhu7w=;
-        b=TvOwpprH1PHoxrUzmDaeo8vslTv129+qD3MZRVmO+5HtVQ4hcT/9RKGV8EqD0joG7P
-         EAGMT4+Lolrk5UQvRVLj6IRCWHBrTL1H8yQB/8OoEsZvkOVLBBd/OkjXj2Lbgal7Sf7o
-         1elkAqAHK9Gsfk1mY7N0UP9AcZmNIGjXoh4oVlCk8O4jjfZhA5GLrUsJ7I7CGwSpEL4S
-         dEnpMdSotTw+gw1We4eMNQf2NTJlJ1miqtIHjQpoQEWbdbuCkO9b145ss+L1iGoLdlHh
-         mDZ/y7UXUS24Iu44jnCpA9RphzlY2+vKHavoQHbUez2SPDMxPWEFvoRQ098cJlYy/T/9
-         HBsQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795796333; x=1796401133; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=WcqK/TokdPrpJ1SyssRoGlfCD57QN3XIIcFf/99tphc=;
-        b=naloy12//Z/JEicfOBVG7/emu8n6hsVyuTwhG/APX5YJILPJ+Ejhpn8jBE4NDP7/lK
-         g0UksYAE6Bdao6mTsS9kfqJqJTBy4iSLcQUfz2p6ydY9idCCIBNNnumqk9ahTewMQrhJ
-         T08f33nweDrOyw3pKSkr1Qkrkked0vr7ZHwRDHta+TN6WG0oGzqsuhDrEOx72fBh5WU0
-         oYgUXVXd1tU/mzTeQ0mzsTJviZuAX74N/jPwzeSjBiwxnyK0h0TealYMchARBmDUZIOX
-         ViMp+AC7Q+jtL9fE4jDvp/Jor7sArB0DX5YSBPvQ3+fL8nmRlQu5cAOGwV0tlnPOhQ6L
-         rUvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795796333; x=1796401133;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WcqK/TokdPrpJ1SyssRoGlfCD57QN3XIIcFf/99tphc=;
-        b=gsvD+cNop39g52Xb5fl9qyin0jFILc3Gf8yrlhSze5yf+29ZLP0i1RuWA6xf1X6jaf
-         F9jryvgNWyyKY1kjX58WxIZlNdsq5Pd4H1jFTrUu6lumFA+JEeH7Vxa4h7/sszKIihct
-         Yk3tMUFdMxZelbD3R2Av6MrH6ZtYPntkRkcu9518HR1fYWdwtroeEcJ1zTcGy2es1q1o
-         oAKPteN82W/+CFh4GjfBwP2/sV0xt+72YmXPgP1Uza2biKuTgheSGi1wHqDAYnxVJZCm
-         9yGKV3RE5YfUJnFCMysTmICI6LCqjs1bUtrTTzITmUN+P0utn9dbDaCi/P4985HmP1pG
-         xG8Q==
-X-Forwarded-Encrypted: i=1; AL+hErEProRPmMgC5SDXZog1WKrKin+oiPD34bUgCY29QH7xwwmZLx3N3f17SZoIy4biDAscm5ZgrJeaE4e4@vger.kernel.org
-X-Gm-Message-State: APuU4Z9NwVfuU34KbMXw0F/alcsIgfLc52tFaL6tu5AlsTIRjvBq7B/K
-	BZ83Jvrtw6HCHpzijvJcIQ7QfbaJBoPhjC5T1x1HvTM+MageMaVHPmuq9kPRSxTkjlVoT54ucjl
-	MFcDgmqAljwSTJM0VCg8R1+6pSboXNDk=
-X-Gm-Gg: AZFdTZebVRcSAQZX3u6Md3nHDzZKGj7MpUwV7jcjgVPeOqDY7cxT/tiEhZfJ4Yyiwb1
-	DkZH3bVV8PRf3XD4M20n4EOt88Acv3yJ5BY7AkNrBIlc1mwbe2FKjgB6zDeRjm3FX9wLA+m3RO5
-	AYB8iETWXlfLA6cBLhYoOhnxsv48NRqjO6qkFJMaJpQ2F0ZHvrFUcbCgJDE6x6zbUXUFmHHMAhg
-	S46wuMfo/oHotOKC1vjqLqZl6OrtWkWz9LOduCdDPXE1rrO3Oo54zifDODp8qAawmDRiKw2P8lg
-	+CyVw09Ph0YuvENt/lFvkLvbB5aTmQWfZ9Oi6KgDnHVM7NCRa/TrnowC1jUai8MbzObRRub5IeP
-	0v1ZWv1dDUqRQZbzcy3lZJoUw7UNjP0C4+/MaSsoCDVQhYbKZ+y0J0IwV9us6WHRv7d690w==
-X-Received: by 2002:a05:6402:e05:b0:6af:80c4:8981 with SMTP id
- 4fb4d7f45d1cf-6ba37e890fcmr19985269a12.26.1795796332918; Fri, 27 Nov 2026
- 08:18:52 -0800 (PST)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=jkmxA5zm
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=bspoc2uAgDK7oKPJbbSrF7iTD2JLGkntkGxQGP05lds=; b=jkmxA5zmPcCX2QagKDiGH4Jvc+
+	jmac0VMw/7bntLq0m8B253k8z6E3S+eS5sn8xiLEx+jPxoBttgTPsjwnWo3rASeVLhzyszMAb27Ds
+	hGW9hT3uiyjbkRqh9zF0X/Ps0nohWPWLz1mEtdnc1Lyw0MvVKfhFpQi3+09FosiZG6o0f4sNzlNig
+	+HXLicUW6XYMsjeJEecX/1aLXYvVMMfVfX2DXCXMvtQnd2azd7rXo5puT9YrKS3/H9Nw9hkKI1RwQ
+	9MP+xyHBAs29//NQUOGDA9CR+uA8mULTfuuOUSnx/kqmY0ULnlEiN6JtGXf7ogeT+gVYaJzu7pZMU
+	gRDfM4qUJ5aLo34RbUsxL2h5erXs2COZ77NI6b5EtXNnCJHsQtMvacC8/j9QL3TG8Nm3oG7qeYXri
+	kkQaEEqFUzH9f7mTiT4DRPumdoZ+b7Rf8gL7L0mMryEeEpdmbfSpIqIVd82ntffjwsUtqt/xaQ0/Q
+	sThohZZRf9LXQZ6jpDhL5UVh;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1xWz02-00000001Puq-3NdN;
+	Fri, 27 Nov 2026 16:40:38 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>
+Cc: metze@samba.org,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	stable@vger.kernel.org
+Subject: [PATCH v2 00/13] smb: smbdirect: urgent fixes for teardown races, sends and MR invalidation
+Date: Fri, 27 Nov 2026 17:40:19 +0100
+Message-ID: <cover.1795794871.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -104,52 +71,181 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <DMZ4VQ7SZ07T.29WMPQ0BQZGSS@gmail.com> <20261119153222.65195-1-lauri.gates@gmail.com>
- <20261127-disput-nestbau-wahlparty-c189ad680243@brauner>
-In-Reply-To: <20261127-disput-nestbau-wahlparty-c189ad680243@brauner>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Fri, 27 Nov 2026 17:18:39 +0100
-X-Gm-Features: Aa3M54qCjcbbYjv0mzgNqjSQ7Sw_WVEr_GJN4PX5Bm9lrA0JqzVoRsl7zVlER60
-Message-ID: <CAOQ4uxhE38TnXseMOyWY1OvidBWew2hAYAV+rYeTPaqRYZb45g@mail.gmail.com>
-Subject: Re: Concurrent FIEMAP on reflinked files serialises on the AGF buffer lock
-To: Christian Brauner <brauner@kernel.org>
-Cc: Lauri Gates <lauri.gates@gmail.com>, koraynilay <koray.fra@gmail.com>, 
-	Dave Chinner <dgc@kernel.org>, Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org, 
-	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-api@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	ocfs2-devel@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 27, 2026 at 1:44=E2=80=AFPM Christian Brauner <brauner@kernel.o=
-rg> wrote:
->
-> On Thu, Nov 19, 2026 at 05:32:22PM +0200, Lauri Gates wrote:
-> > One constraint for that case: the flag has to stay out of
-> > FS_XFLAGS_MASK. As I read your fileattr_to_file_attr(), every bit in
-> > FS_XFLAGS_MASK is reported as supported on every filesystem, so a
-> > plain flag there would read as "supported, not shared" on btrfs.
->
-> Right.
->
-> > Christian, with this mask on the way, would you take a plain flag
-> > (say FS_XFLAG_MAYSHARE, "may have extents shared with another file")
-> > that filesystems advertise through fsx_xflags_mask? If so, I'll build
-> > the RFC on top of koraynilay's series instead of using the inverted
-> > FS_XFLAG_NOSHARED.
->
-> Yes, a plain flag is fine. It's simply the stx_attributes_mask model.
-> Filesystems that have support raise the flag in the mask and everyone
-> else just doesn't. I see that Amir's busy discussing some details in v2
-> so maybe base the RFC on that series, I guess.
+Hi Namjae, hi Paulo,
 
-FWIW, I think the v2 posted API is a solid candidate wrt the UAPI -
-The AT_FILEATTR_ opt-in and the struct extension leave very little
-open questions - the remaining discussion over v2 and obviously needed v3
-is around implementation and the fine details of the contract, but for a si=
-mple
-readonly flag like FS_XFLAG_MAYSHARE, it is very clear how it behaves.
+these are fixes for fs/smb/smbdirect:
 
-Thanks,
-Amir.
+  - Don't register MRs or post sends on a connection that is being
+    torn down concurrently (NULL pointer dereferences of mr->mr and
+    sc->ib.qp, reported by Sashiko).
+
+  - Handle errors of smbdirect_iter_to_sgt(), an incomplete sg table
+    was registered before.
+
+  - A send credit leaked if the wait for a recv credit to grant
+    failed, so all following sends waited until the connection was
+    torn down.
+
+  - After an error in the middle of a PDU, the fragments built so far
+    were still posted, so the peer appended the next PDU to the
+    incomplete one. Now the connection is torn down instead, also
+    for smbd_send() of the client.
+
+  - If the peer didn't invalidate a remotely invalidated MR, e.g.
+    because of an error in the server, the client also skipped the
+    local invalidation, so the peer kept access to the memory.
+    smbdirect now tracks the remote invalidations itself.
+
+  - The LOCAL_INV of an MR reused the cqe of the REG_MR and
+    overwrote its done handler, so a not yet polled REG_MR completion
+    finished the invalidation too early and the MR went back to the
+    ready list while the LOCAL_INV was still outstanding. Now the
+    LOCAL_INV has its own cqe.
+
+  - INIT_[DELAYED_]WORK() in the connect and accept code reset the
+    disable count of the work items, so a disable from a concurrent
+    teardown was lost and e.g. the idle timer could be queued again
+    after the socket was freed. Now the teardown sets first_error
+    and disables the work items under a new lock and they are only
+    activated under that lock while first_error is still 0.
+
+  - SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}() warned about a status
+    changed by a concurrent teardown, e.g. when the waiter of a
+    connect was interrupted by a signal (reported by syzbot).
+
+  - An IB_WR_REG_MR or IB_WR_LOCAL_INV posted after a status check
+    that raced with smbdirect_socket_destroy() could miss the drain
+    of the QP, its completion then used the mr after it was detached
+    from the socket (reported by Sashiko).
+
+  - The error paths of smbdirect_connection_send_single_iter() gave
+    back credits without waking up the waiters and didn't give back
+    the receive credits granted in the message that wasn't sent
+    (reported by Sashiko).
+
+  - The DMA address of the first page was used as iova of our MRs and
+    sent to the peer as offset of the buffer descriptor, without an
+    IOMMU these are physical addresses. Now only the offset within
+    the first page is kept in the low 24 bits, the bits above up to
+    bit 55 are random and the top byte stays 0. This also avoids irdma
+    rejecting an MR ending exactly at 2^64 (IRDMA_AE_AMP_TO_WRAP),
+    which happens with an IOMMU allocating the first 64-bit IOVA
+    range at the very top.
+
+Reports fixed by this series:
+
+  - https://sashiko.dev/#/patchset/cover.1791225453.git.metze%40samba.org
+      smb: smbdirect: don't register MRs on a torn-down connection
+      smb: smbdirect: don't post sends on a torn-down connection
+
+  - https://syzkaller.appspot.com/bug?extid=a989758ffc6f93223eb6
+      smb: smbdirect: don't let INIT_[DELAYED_]WORK() undo a disable from the teardown
+      smb: smbdirect: don't warn about a status changed by a concurrent teardown
+
+  - https://sashiko.dev/#/bug/linux-4461fbd8-a522-43ee-81d1-651432a55de9
+      smb: smbdirect: don't let MR work requests miss the QP drain
+
+  - https://sashiko.dev/#/bug/linux-a2180487-c0d3-4f9a-92d7-208e032dd966
+      smb: smbdirect: wake up the credit waiters after a failed send
+
+  - https://sashiko.dev/#/bug/linux-27f04b17-0356-40b9-94be-b0b865fde826
+      smb: smbdirect: give back granted receive credits if a send fails
+
+The urgent client fixes and the ksmbd fixes are posted separately,
+they are independent of these, the remaining smbdirect fixes follow
+on top of all of them.
+
+These patches were developed with the help of Claude (Anthropic),
+which was used for code analysis, writing parts of the code and the
+commit messages. I reviewed all changes and take full responsibility
+for them.
+
+Testing: v1 and again v2 on real hardware, client and server running
+the urgent client, smbdirect and ksmbd series together, over RoCE with
+mlx5 (ConnectX), irdma (Intel E810) and rxe:
+
+  - xfstests (59 tests of the cifs and generic groups) and O_DIRECT
+    reads/writes with data verification
+  - removing the local address or setting the link down while a
+    connection is established, the umount finishes in time
+  - 10 ksmbd restarts per device while I/O is running and
+    /proc/fs/cifs/DebugData is read in a loop, each restart reconnects
+  - mounts killed by a signal while their RDMA connect is pending
+    (the syzbot case), no tasks in D state and no warnings
+
+Note I didn't test with iWarp as there are existing problems with it,
+I have patches to fix iWarp, but I'll post them later, as they
+also rely on some rdma-core changes.
+
+As we are already late in the 7.4 cycle, I leave it up to you two to
+decide if they should still go into 7.4 or into the next merge
+window, all of them are marked for stable.
+
+Changes in v2 (thanks to the review by Sashiko):
+
+  - Patch 1: if smbdirect_connection_destroy_mr_list() already
+    disabled the mr, only drop our reference, without setting
+    mr->state to SMBDIRECT_MR_ERROR, which led to a second
+    smbdirect_mr_io_disable_locked() with mr->socket == NULL.
+  - Patch 3: fix the function name in the error message.
+  - Patch 5: smbdirect_connection_send_wait_zero_pending() also waits
+    for the posted messages if the connection is broken, so the
+    device no longer reads the pages of the caller after it returned.
+  - Patch 6: clear need_invalidate before mr->mr is deregistered, so
+    smbdirect_connection_invalidate_rkey() never uses a deregistered
+    mr->mr.
+  - Patch 8: smbdirect_connection_recv_io_done() leaves disabling
+    refill_work to smbdirect_socket_schedule_cleanup(), and refill_work
+    and immediate_work are activated before the receives of the data
+    transfer phase are posted, not in
+    smbdirect_connection_negotiation_done(), as a receive completion
+    may already queue them.
+  - New patches 11-13 for the problems found by Sashiko in the
+    unchanged code, the commit messages of patches 1, 4 and 5 point
+    to them.
+  - Dropped the Cc of Long Li, his address bounces.
+
+v1: https://lore.kernel.org/linux-cifs/cover.1795781300.git.metze@samba.org/
+
+Base: v7.4-rc4, like the other smb series. The patches also apply
+cleanly (git am) on cifs-next (61c581ea62ee), on ksmbd-for-next
+(3c31349456c5) and on both merged, with or without the urgent client
+series, and build on both merged.
+
+
+Stefan Metzmacher (13):
+  smb: smbdirect: don't register MRs on a torn-down connection
+  smb: smbdirect: don't post sends on a torn-down connection
+  smb: smbdirect: handle errors from smbdirect_iter_to_sgt()
+  smb: smbdirect: give back the send credit if waiting for a recv credit
+    fails
+  smb: smbdirect: don't post a partial PDU after a send error
+  smb: smbdirect: introduce smbdirect_connection_invalidate_rkey() and
+    its logic
+  smb: smbdirect: use separate cqes for MR registration and invalidation
+  smb: smbdirect: don't let INIT_[DELAYED_]WORK() undo a disable from
+    the teardown
+  smb: smbdirect: don't warn about a status changed by a concurrent
+    teardown
+  smb: smbdirect: don't expose DMA addresses as iova of our MRs
+  smb: smbdirect: don't let MR work requests miss the QP drain
+  smb: smbdirect: wake up the credit waiters after a failed send
+  smb: smbdirect: give back granted receive credits if a send fails
+
+ fs/smb/client/smbdirect.c     |  14 ++-
+ fs/smb/smbdirect/accept.c     |  28 +++--
+ fs/smb/smbdirect/connect.c    |  24 ++--
+ fs/smb/smbdirect/connection.c | 191 +++++++++++++++++++++++++----
+ fs/smb/smbdirect/internal.h   |   6 +
+ fs/smb/smbdirect/listen.c     |  19 ++-
+ fs/smb/smbdirect/mr.c         | 220 ++++++++++++++++++++++++++++++++--
+ fs/smb/smbdirect/socket.c     | 120 ++++++++++++++-----
+ fs/smb/smbdirect/socket.h     |  51 +++++++-
+ include/linux/smbdirect.h     |   5 +-
+ 10 files changed, 584 insertions(+), 94 deletions(-)
+
+-- 
+2.43.0
+
