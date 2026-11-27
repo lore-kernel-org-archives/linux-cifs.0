@@ -1,68 +1,127 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.156
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795798158;
-	b=4GwDTEDbOWa5Bn4OIF3MApiGhC7HBmlq5goW2QWzs+oKd9scan3wl4Kgoi1p0KCF/xJU
-	 2lRQOFszsGUtU16PDpHfbRz+9xq910Eg4/lj0XLGgy+C2PVgVM5yLG6giguhDxmKzWn4Y
-	 Csz6pZzg1U/IjlDrZuM9AuN2S75meojL0jB2EJOjDloZ5x2R0uU2tYo/kKrT5wp+/+qXk
-	 VlLqTWrFQ/p8dvzYfaX350nvEbYRj5gLJ5gYX/Qs/YXeEW7f72K37Khyyzp0WvSITGeH7
-	 9Fir6a5rrg20Q9Z8HdoSxlc5wN601YflB36uPd4bEwLzlst9P2fSjJPMYtcDMTFYZpw==
+	t=1795812595;
+	b=aULMgBo3SxabN++GCjRsm5eF/+0SdXER600c8taOktH6uqQU/R3W5R0ks/sYhdt+k0QT
+	 UQ9oT71bcSaE+jOnGE3qvzGjB6yRaRipNc6ZI/Xh3u4E+mYK7Y//dh9h0d2OT1/wzfcnw
+	 vYXOinYYYNBnp3HLkeQTrH4esBqKZXbo1i3OiA42MoHbPPv6DwZyC/laihPwFPV2uUjAA
+	 MK0pHZmGWhKaUmgY59w7y2H2aLcVGdRjiCOO6kaTkTNuZLuNTmG4yGyCLypcwxF9C9gBg
+	 Mj85WD7WVWxOlJdeoY4AU3sipRRVE1BKC8LSWWeIfj4FkMpBj46wa4cxq6enXTM+HrA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795798158;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=wII9UiZ+wnzLtUF1zF7bvr1NYoYOEjyLn6jgYW+A26g=;
-	b=h1oWq68uX1vbWaDqe7ln7QV9uvhEeIlSw1idREy5PKfoWKVuskVQp/ZM1bZ4+h47y9X8
-	 3E4X+8bO5Io4wvoyQX8dzuq4KeHVdoEvSyOFkVMQmfqCuhsQj5KbJ2afgl1D7nyp+m0bc
-	 4MMDiM9miHtfEKdjEqVnO/pFoK+r4/qDG8zdDv/NHNGrWuKKp+tGNBAIWp50EyT3FXgcY
-	 2+TRDHFSPOBmoNbKKItXcCHpR0tliLXukVeF4jCZQOtwIpHwnqsHkIaY2D5NwM9ZcaNPT
-	 QRNLfJk07Ui4XTkDFh41sf/9lCN5bcvVzF6AZfTZVRhAPok0fXIv2Fu7pgxuw8k/syw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795812595;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=4ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=;
+	b=KnCGNr+l698DWS5Pe3tEy6FcaN5cup8VdgcisMMDhVvjW0ZyMd4wTIiW+7tc11SE0PAK
+	 7pZFn/KYOL5lwmNjBs/hK1dbYeQ2M3XL+OI0j8Po2mdoqX9uycDO7cxirPdMHQvpUqAOr
+	 QMgEnxSlWM9+I+S2eW8p3NUDRC8gMCIW6o+t67PQvGFnhluruewkBDYROxJhQgc1MdWJH
+	 2lIM47IakJfZY0GUcPouoxxcVH0o14txDAgvCN3Rrk2qGITSKbp+HEKi6+8aPX66tHgow
+	 QG6zyryWTz/ioApTDDHi45MeepDYxZ7kldt3TT5jv/eonxp41e6c91KdkkAeU5ZlIyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=samba.org;
-	spf=pass smtp.mailfrom=samba.org;
-	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b="cP/FdWyD";
-	arc=none smtp.remote-ip=144.76.82.148
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.3 with cipher TLS_CHACHA20_POLY1305_SHA256 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=0xuc4Js8;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=RDHh5nCc;
+	arc=none smtp.remote-ip=202.12.124.156
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592BA606A31E;
-	Fri, 27 Nov 2026 16:49:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 592BA606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03C3606A31C
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 20:49:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C03C3606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=cP/FdWyD
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=wII9UiZ+wnzLtUF1zF7bvr1NYoYOEjyLn6jgYW+A26g=; b=cP/FdWyDcG2kwGMk6fIpZGn9r3
-	ZnZGnNtgPOQqGA3rb9J5xx9wwbXsQ9FeR5gT131xNUqwl/qkbLTHqTME7MYVE74F5TAr+338zCnyy
-	NWYQvHcq1JaPWcqfSb6W7vS2IyaxSd2tM2pNC8CvmPuOLzKJT3c0jFbTB4O+bFcAzznUvzobrBnlb
-	1w0cR4PIs47AXZDmkHZOy1Q1f4eEDAcKg/sQOkRwQvhHBfS5rUZ2xh/wGOjahsUVm1uM8X64Nz+Qk
-	yoR2KTz69+ak5fvZR/itMvHCl4HB1ORxgYrTi21qMo8KFDEzIb520+AkxH31B2S4YXwQDgfmCbX15
-	SEngAvoxwSDG7PcekCIcfDZry5bX4kw0mU0HZM+E6HEsaouw/CMjrTZuhfTDM7aUXdS19z7MRT729
-	pYm8YWww1b4eIsK/CXiR8lI5Apfr1n99SxF1Ia4I61Pl3UE0WYg8yOjwbxooXLwlD7lqPQrfN3LcB
-	+XCq9TOxJaigzcjcFQUtiaw5;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1xWz8H-00000001QXv-0Mnc;
-	Fri, 27 Nov 2026 16:49:09 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=0xuc4Js8;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=RDHh5nCc
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 256257A035C
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 15:49:54 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Fri, 27 Nov 2026 15:49:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1795812593; x=
+	1795898993; bh=4ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=; b=0
+	xuc4Js8mtRODy38DqcB1PViDfpwHQ9lbNXVI3iGFVwInrAUQr57rv7rrS+YYt878
+	r1ztDJDsxPxhZirpNgIHpzcZUzogaFkO0ts2dxK8iJhn/toIIiiqdT1bkeAVkyYq
+	sKAG86foBWDyc4e+4qDF4kky4A7TihytIdcDvByzyikQUBdOEsTZjJfa35P/vpoU
+	d9U0i5fz0yGJJEy4jcZkz2IQxKW1vKAc9xopUrEG8cGW5f0LKM8LgIP9vftpHNfX
+	cjr33lr+gfTCozNnNOiHSzu/gdlavX15vaEwnGqpfdbDIgRQbYl0/AnmXgYlghfK
+	CA3XxMqIu5/a4cDBTVGWg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm3; t=1795812593; x=1795898993; bh=4
+	ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=; b=RDHh5nCcSA2d5qFrU
+	mVLXrqGuyQhuU1MD9kgJ/kq/QD97K43q2pPTyzTQ56ImPqHE2xMeZkpqNFW7uwEZ
+	To2aTCL97/gQUuXyCQBUZaXAUKMSPWYcTAGCBZDQyRICFXYLAZyWakIaGDPz91sW
+	VCb+nk1QtEM8iaZDxlPn/hg83YFp+26mi3oI2vqs4E1qCFDLuTl2qqMzdA8CU48U
+	PhQgc8xMIo+WCJ/jX5X607O4Slm+0nXdzHTwGBhdjBbxP3npOO71W2WLUUJF3+zD
+	lw2wUKhwZkf/xkUad8+0HYN/VIlz2Qeg/eJegw+bcQXwAbotnb3S7YTaGRT3koiT
+	oKJ8Q==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1795812593; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:HN9wNNut/akr26oII06l0JPRkCCzwCqHrmI47uApvg3nTrT
+	3RdsOSiRLmG33Q70DDqUawCSes3qtb4RwJlxOYB29IUigBL8VqGkZnl14OmYoyGR
+	ltevBaUAy9VBZ2iDZWcbDTgpho1a5HH1VxlvaI/z1zT8AtXOju5IK7BzmD3Nt9Er
+	SNONz3P0QHPcL2+HTv5L9r9YwWOmhq2KqeeLXp8R1rJXsALSFByfcrHUKmZR11D4
+	JDpkxBd1FpD7lL49f5V0VrZVFRq62SMM7NfBVtJGnYnikIeDjPT0NcqpwqL8PESP
+	RgSPh7xTUyxBuPNxqCnMZPVLLpXt0IUrYxAVcmQ==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=11;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:R4aeRE9ELHRQ16OjjeltUwcnYeISWOQKmqZx+Rvh6uE=:4ES/kCXUDcoFqNB7JDmXTc6h3gRHJrDhlQgxDxJ9IV8=;
+X-ME-Sender: <xms:8OwJa1Oe1qRjniwv4UZklENgTl1KKTDhrghy1mSdZE6enleeuaCE2A>
+    <xme:8OwJa4axxQG46HjEJE3Z0tMn5j9VB0fXcUvxYhBgssMFPx4zu1lJkj6qKP1dsSAMv
+    mSKhCseHkkKFdK6jmY0IFVUGkWuWtYPSwAiidfsBcqiq2h_nezsghoj>
+X-ME-Received: <xmr:8OwJa0_2OQN2ElgcvZwMSNtGx5bRtCa98yVw7WZdUPSdSM4WfHsPtKbQ_bkHhOFA>
+X-ME-Proxy-Cause: dmFkZTG1Iy+qbUXSh44khR3NSIn6qa8D2E9QegCcrg7sn8eNpHvztzohVSB6sG++kXcbRQ
+    RtJ4Kj2ZH6NAJIFRqlmEVQCVv9/GEhinLMW9NxsvDMwCkSErEYnSBlOJ5Gqzn4BXU8CkRr
+    LV2Lz1Oum6Dqyis2Rig86RNcW141d7MX5PyqQYqTa44wFP6+g7qXr/LT4nKiY08aHUKJDj
+    dwoWYWyYvWOGGXZkOB03T90xQiQZSS4QfHQArzQ6fcfS1mpZMgEd60Qhj4J9QblJ7PQmox
+    Fy38gOZxciXkrIQfNNouC6JfmyBNbVVkCdfiZiQA9MQ9v6Z1QLe7/Mgz7obluH2sWttCN5
+    APH3eU1dADZ/8r8b5/SMzi0ZXfzalcRDC4k1vnCbrk60r8LQLIHkDeyR1b0yvo7diEwYhf
+    cdEJotgMCcL8tF5hdlpPQTF059RChVx3iWSyczYuRphRxlZMgAGcD6Arbp7cE2Saq/tNuW
+    EezzPKZjTrujyzl49/1zmPERKu0oZgtbvW39wHEXMh0I7ACbrPeP/RypgzCxW+LIkBZ8Kc
+    2KibzI1Q2vivzp1o2NO5fCUBhoJlX0d/bgZVwZU0q5uN4rC5FFlhjbuYnDV0ANK8ULUtjf
+    ywG40S3el+/OlILgTT4Wb87xtUwi4GDvcKH0ByQaBN5cDvxxbqUVyanw949A
+X-ME-Proxy: <xmx:8OwJa5TAmH3_3BabMBu2itFGBVxNG1NnbckNGNH7hAvIWKG_HHUY5g>
+    <xmx:8OwJa-cvJQvFg0rFTJJJPG3BfvIY94kD_KL5B-EnSsI4sEU9LCjX3g>
+    <xmx:8OwJa7TwR9NFHdLbgvl6V_X-0hpEiwmVtUAQsNdiz2UyzFSx58zFqQ>
+    <xmx:8OwJa6IM8fH3vcObnCZ5YA-43wWUX6_m9NKZJYd3XbxlfitbqEMgJQ>
+    <xmx:8ewJa9pCCkRNe08AIR0P51TjeyP1-Sl4jdd4hcoUXb_Qo_9w3Q_4Jl7G>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 27 Nov 2026 15:49:52 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
 	stable@vger.kernel.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Subject: [PATCH 1/2] smb: server: use a counter for the nonce of encrypted responses
-Date: Fri, 27 Nov 2026 17:48:58 +0100
-Message-ID: <f8e60e33c424c1efe397e94bee170a45823e3d95.1795797772.git.metze@samba.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1795797772.git.metze@samba.org>
-References: <cover.1795797772.git.metze@samba.org>
+	linkinjeon@kernel.org,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	Ian Bridges <icb@fastmail.org>
+Subject: Re: [PATCH 1/2] smb: server: use a counter for the nonce of encrypted responses
+Date: Fri, 27 Nov 2026 14:49:45 -0600
+Message-ID: <20261127204945.1646186-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <f8e60e33c424c1efe397e94bee170a45823e3d95.1795797772.git.metze@samba.org>
+References: <cover.1795797772.git.metze@samba.org> <f8e60e33c424c1efe397e94bee170a45823e3d95.1795797772.git.metze@samba.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -74,203 +133,32 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The nonce of an encrypted message must not be used for any other
-encrypted message within the session (MS-SMB2 3.1.4.3). This also
-covers the payload of RDMA reads with an
-SMB2_RDMA_TRANSFORM_TYPE_ENCRYPTION transform, which is encrypted with
-the same key. fill_transform_hdr() and smb2_prep_rdma_read() filled it
-with random bytes, which only makes a collision unlikely: with 11
-random bytes for AES-CCM and 12 for AES-GCM the probability of a
-collision after n messages is about n^2 / 2^89 or n^2 / 2^97. But with
-AES-CCM and AES-GCM a reused nonce reveals the XOR of the two
-plaintexts and, for AES-GCM, the authentication key, which allows
-forging messages.
+I tested this patch on ksmbd-for-next 3dcffd93d4da over TCP, with
+KASAN. A raw client used SMB 3.1.1 with AES-128-CCM, AES-128-GCM,
+AES-256-CCM and AES-256-GCM, and SMB 3.0 and 3.0.2. It ran two sessions
+on one connection and one on another, including interim responses.
+Every encrypted response decrypted. In each session the counter started
+at 1 and the random bytes stayed the same. The random bytes differed
+between sessions, and no nonce repeated. Sealed Linux client mounts
+over SMB 3.0, 3.0.2 and 3.1.1, one of them multichannel, read and wrote
+data correctly. A capture of that traffic showed no repeated nonce.
+Encrypted smbtorture runs gave the same results as without the patch,
+and KASAN reported nothing. A Linux client mount over SMB Direct with
+soft-RoCE also read and wrote data correctly. That client does not
+negotiate the RDMA encryption transform, so I only reviewed the
+encrypted RDMA read part.
 
-Like Samba, use a 64-bit counter of the session for the first 8 bytes
-of the nonce, followed by random bits chosen when the session is
-created, 32 bits for AES-GCM and 24 bits for AES-CCM. This makes the
-nonce unique for the session, also
-when several channels encrypt in parallel, see ksmbd_new_enc_nonce().
+The counter also shows a pre-existing waste, which this patch does not
+cause. ksmbd encrypts some responses that it never sends.
+__handle_ksmbd_work() encrypts the response at its send label without
+checking work->send_no_response, and __ksmbd_conn_write() then drops
+it. An encrypted CANCEL takes this path. So does a cancelled
+CHANGE_NOTIFY. smb2_notify() sends its STATUS_CANCELLED reply through
+smb2_send_interim_resp() and then sets send_no_response, so the send
+label encrypts its response once more. In my test each cancelled
+notify used two counter values that never reached the client. The
+nonces stay unique, so the only cost is an encryption for each unsent
+response.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Fixes: 05c978948ea5 ("ksmbd: add SMB Direct RDMA encryption transform")
-Cc: stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/server/auth.c              | 43 +++++++++++++++++++++++++++++++
- fs/smb/server/auth.h              |  4 +++
- fs/smb/server/mgmt/user_session.c |  1 +
- fs/smb/server/mgmt/user_session.h |  3 +++
- fs/smb/server/smb2pdu.c           | 25 +++++++++++-------
- 5 files changed, 66 insertions(+), 10 deletions(-)
-
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 0c51ca0cb14d..51b33cf139d4 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -18,6 +18,7 @@
- #include <crypto/utils.h>
- #include <linux/random.h>
- #include <linux/scatterlist.h>
-+#include <linux/unaligned.h>
- 
- #include "auth.h"
- #include "glob.h"
-@@ -713,6 +714,48 @@ int ksmbd_gen_preauth_integrity_hash(struct ksmbd_conn *conn, char *buf,
- 	return 0;
- }
- 
-+/**
-+ * ksmbd_new_enc_nonce() - generate the nonce for an encrypted response
-+ * @sess: session whose encryption key is used
-+ * @cipher_type: cipher of the connection
-+ * @nonce: nonce output, 11 bytes for AES-CCM, 12 bytes for AES-GCM
-+ *
-+ * The nonce must not be used for any other encrypted message within the
-+ * session (MS-SMB2 3.1.4.3), this also covers the payload of RDMA reads with
-+ * an SMB2_RDMA_TRANSFORM_TYPE_ENCRYPTION transform, which uses the same key.
-+ * A random nonce only makes a collision unlikely, but with AES-GCM and
-+ * AES-CCM a reused nonce reveals the XOR of the plaintexts and allows
-+ * forgeries.
-+ *
-+ * So, like Samba, the nonce is a 64-bit counter of the session followed by
-+ * random bits chosen when the session is created, 32 bits for AES-GCM and
-+ * 24 bits for AES-CCM.
-+ *
-+ * Return: 0 on success, otherwise a negative errno
-+ */
-+int ksmbd_new_enc_nonce(struct ksmbd_session *sess, __le16 cipher_type,
-+			u8 *nonce)
-+{
-+	u64 low = atomic64_inc_return(&sess->enc_nonce_low);
-+	u32 high = sess->enc_nonce_high;
-+
-+	/* the counter can't wrap in practice, but never reuse a nonce */
-+	if (WARN_ON_ONCE(low == 0))
-+		return -EIO;
-+
-+	put_unaligned_le64(low, nonce);
-+	if (cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-+	    cipher_type == SMB2_ENCRYPTION_AES256_GCM) {
-+		put_unaligned_le32(high, nonce + 8);
-+	} else {
-+		nonce[8] = high;
-+		nonce[9] = high >> 8;
-+		nonce[10] = high >> 16;
-+	}
-+
-+	return 0;
-+}
-+
- static int ksmbd_get_encryption_key(struct ksmbd_work *work, __u64 ses_id,
- 				    int enc, u8 *key)
- {
-diff --git a/fs/smb/server/auth.h b/fs/smb/server/auth.h
-index 7ce9c42d58f1..38613ed025ae 100644
---- a/fs/smb/server/auth.h
-+++ b/fs/smb/server/auth.h
-@@ -36,6 +36,10 @@ struct ksmbd_conn;
- struct ksmbd_work;
- struct kvec;
- 
-+struct ksmbd_session;
-+
-+int ksmbd_new_enc_nonce(struct ksmbd_session *sess, __le16 cipher_type,
-+			u8 *nonce);
- int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
- 			unsigned int nvec, int enc);
- int ksmbd_crypt_rdma(struct ksmbd_conn *conn, const u8 *key,
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index 15662fd745ab..3f0546d1c573 100644
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
-@@ -1042,6 +1042,7 @@ static struct ksmbd_session *__session_create(struct ksmbd_conn *conn, int proto
- 	xa_init(&sess->rpc_handle_list);
- 	INIT_LIST_HEAD(&sess->dispose_entry);
- 	sess->sequence_number = 1;
-+	get_random_bytes(&sess->enc_nonce_high, sizeof(sess->enc_nonce_high));
- 	atomic_set(&sess->refcnt, 2);
- 	init_rwsem(&sess->tree_conns_lock);
- 	init_rwsem(&sess->rpc_lock);
-diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
-index 5f0f6276e316..fd455c52ce1a 100644
---- a/fs/smb/server/mgmt/user_session.h
-+++ b/fs/smb/server/mgmt/user_session.h
-@@ -75,6 +75,9 @@ struct ksmbd_session {
- 	struct xarray			rpc_handle_list;
- 
- 	__u8				smb3encryptionkey[SMB3_ENC_DEC_KEY_SIZE];
-+	/* see ksmbd_new_enc_nonce() */
-+	atomic64_t			enc_nonce_low;
-+	u32				enc_nonce_high;
- 	__u8				smb3decryptionkey[SMB3_ENC_DEC_KEY_SIZE];
- 	__u8				smb3signingkey[SMB3_SIGN_KEY_SIZE];
- 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index fe17d4061237..332f9bb963e1 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -9631,7 +9631,9 @@ static int smb2_prep_rdma_read(struct ksmbd_work *work,
- 	crypto->NonceLength = cpu_to_le16(nonce_len);
- 	nonce = crypto->Signature + SMB2_SIGNATURE_SIZE;
- 
--	get_random_bytes(nonce, nonce_len);
-+	err = ksmbd_new_enc_nonce(work->sess, conn->cipher_type, nonce);
-+	if (err)
-+		return err;
- 	err = ksmbd_crypt_rdma(conn,
- 			       work->sess->smb3encryptionkey,
- 			       data, datalen, nonce, nonce_len,
-@@ -13118,24 +13120,23 @@ void smb3_preauth_hash_rsp(struct ksmbd_work *work)
- 	}
- }
- 
--static void fill_transform_hdr(void *tr_buf, char *old_buf, __le16 cipher_type)
-+static int fill_transform_hdr(struct ksmbd_work *work, void *tr_buf)
- {
- 	struct smb2_transform_hdr *tr_hdr = tr_buf + 4;
--	struct smb2_hdr *hdr = smb_get_msg(old_buf);
--	unsigned int orig_len = get_rfc1002_len(old_buf);
-+	struct smb2_hdr *hdr = smb_get_msg(work->response_buf);
-+	unsigned int orig_len = get_rfc1002_len(work->response_buf);
- 
- 	/* tr_buf must be cleared by the caller */
- 	tr_hdr->ProtocolId = SMB2_TRANSFORM_PROTO_NUM;
- 	tr_hdr->OriginalMessageSize = cpu_to_le32(orig_len);
- 	tr_hdr->Flags = cpu_to_le16(TRANSFORM_FLAG_ENCRYPTED);
--	if (cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
--	    cipher_type == SMB2_ENCRYPTION_AES256_GCM)
--		get_random_bytes(&tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
--	else
--		get_random_bytes(&tr_hdr->Nonce, SMB3_AES_CCM_NONCE);
- 	memcpy(&tr_hdr->SessionId, &hdr->SessionId, 8);
- 	inc_rfc1001_len(tr_buf, sizeof(struct smb2_transform_hdr));
- 	inc_rfc1001_len(tr_buf, orig_len);
-+
-+	/* the same session as in ksmbd_get_encryption_key() */
-+	return ksmbd_new_enc_nonce(work->sess, work->conn->cipher_type,
-+				   tr_hdr->Nonce);
- }
- 
- int smb3_encrypt_resp(struct ksmbd_work *work)
-@@ -13149,7 +13150,11 @@ int smb3_encrypt_resp(struct ksmbd_work *work)
- 		return rc;
- 
- 	/* fill transform header */
--	fill_transform_hdr(tr_buf, work->response_buf, work->conn->cipher_type);
-+	rc = fill_transform_hdr(work, tr_buf);
-+	if (rc) {
-+		kfree(tr_buf);
-+		return rc;
-+	}
- 
- 	iov[0].iov_base = tr_buf;
- 	iov[0].iov_len = sizeof(struct smb2_transform_hdr) + 4;
--- 
-2.43.0
-
+Reviewed-by: Ian Bridges <icb@fastmail.org>
+Tested-by: Ian Bridges <icb@fastmail.org>
