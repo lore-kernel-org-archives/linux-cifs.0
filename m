@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795828648;
-	b=CbbYv3rGtLLqeeVSWK1JSUO+NN8hYRCuf3oDEpgHYxusyvtiTM2OXVvPSZURSKGdF9aW
-	 Ija/F5FbRz5wngrdd5o8cS7btNul1BHg6Y5xdQR+sU+G/hRTxLXfBOLV11j9q3t6tJdUq
-	 Uql6JEY6ZSrSiwUbJ1JP+u19jr9XgbuxUgEAxtFcwBQ6vqGDYPZd8eR/KT5rkSqMv09xf
-	 rO8atCNjZcoSjkrm4qO329aofQ6EHD/DRxJJ+W29LebozREhC30VS8ppSGHx2vVCyjwvz
-	 5uFid5hhMNtfnpJ3Ycj9Bahe04zV4aJsAJ3SfH5fwoda65mcOJO+Ts8mP2/NHdVN1DQ==
+	t=1795828662;
+	b=GUmXi9AagxAVrDHeWFtszfmuWo/Zb+c3f7cOPmfHkZWPudIgndZCPxxGEAEIf/EcEqJH
+	 dWCRPuKV+g65+ox3xm9O4kB+uVqz9DPmlv1kXpFYFfE5k9ZbixqWER8dgTjPKkelGcQEL
+	 pKH7/H7rSCz+xgNYsOKg0mksMnrVcMRtajMzd1umpK5l4jDdRb8hBKcNPFJVhIdOwcL4r
+	 FDjfS8bLAkpTvct9PD6Hl75hMRIeSlO4vIHYO9/iMjhAyCxnv4hv1vLRjNz8ocajDKSjY
+	 ah0jXc9ZbqfROtj64YWH5CdoOO0JAKShtQSubrtHh7f2IhtnS+Gzs/Vi8JvcBzah7Vw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795828648;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795828662;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=6SPUkkDnbGx0di3Iciwy/aQpzoJCxAXF+HCwj4dQ2nQ=;
-	b=PBVSJN1wKsSsfNhIsV2nWKbeDZVxsbwTAKfLNtUUy/Lh4gWOP6XSuBTJAuY6opVQH6mb
-	 qT9LSTf6lWuw948Idjp8I8JZ4Kn2gS6g2lv2WE9BUFT8bXksuli+rC3a4kfRJ1DDhU1FR
-	 kqKkxdtYM52vy4oVU33y39QTdrOmULKfR8aYMUyQN34aVCAPNNG09wJOGKOPxVXPTHFcm
-	 eRwLog8y6qt0cMuGU0U5Zv4FEF4mpdzcnKIbMz3cj2ev8feuaM/04gE2h1BFCnUejv1vU
-	 8Gp5bdGOXabbve+Z2ZaeCHYYfzXEmRPRgDQ29uzj/zJE1setbMKNM4g6RC9THDFdPpQ==
+	bh=ynYpBMFbnjt1BZ3puDYcCNO837G+Oo0nRDEUrJjBmwA=;
+	b=k2JTiZqBtwqQ0PsEngvXOn+6xGocdVLQi/QJYCIXTWiX3UMGMGEBNk5AUglIhCO2r8jS
+	 1hgJ8ZFGj60yPva/e3CujYa4hJnum3nodpbwCqAVgUHFpd7OwP9xqaEH+Kpd51+XZylKH
+	 Q1l+0GLDQDmyoFNiSeXIA0nGTCF40vv3RDzN79/3ji6OlLCbYFCC8imiCjUSxTqS5cVER
+	 8G2YkNuUHyBxEmG+YH3BxJ8Jop+2oxBrMTWzef34aBcsycXZTY71LbgFFB1KqaipmSGLk
+	 /Nipy/YzViOgBqPfZJUkiqLrixs423GbhmTGFOwLi8o1yaVKpheAMs+W9ptrWZDGDBg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QevbtlhX;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fknHhXfK;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E387606A31C
-	for <linux-cifs@vger.kernel.org>; Sat, 28 Nov 2026 01:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6BB606A324
+	for <linux-cifs@vger.kernel.org>; Sat, 28 Nov 2026 01:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QevbtlhX
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0C751F00898
-	for <linux-cifs@vger.kernel.org>; Sat, 28 Nov 2026 01:17:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fknHhXfK
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F6E1F00925
+	for <linux-cifs@vger.kernel.org>; Sat, 28 Nov 2026 01:17:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795828647;
-	bh=6SPUkkDnbGx0di3Iciwy/aQpzoJCxAXF+HCwj4dQ2nQ=;
+	s=k20260515; t=1795828662;
+	bh=ynYpBMFbnjt1BZ3puDYcCNO837G+Oo0nRDEUrJjBmwA=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=QevbtlhXPaFPCy2DKvXJNaYEq4+oZ7q0DYAAKtT9oQa6N06FdNKJxNZPy7R83xqpx
-	 y6Z87xtaAObr/la2oCKt6gXlusAdmrOsyqejsFN3jVp9xoxS61amcSg3/ueLSBnc+X
-	 aU+CnA+AKQGhjNd4xaF/P5amd4ezP0U9D8tKNRdCC7oWQMPlKLoXJ6/+nJLjYC/cN2
-	 Xo2cxu8V6aVRfWeHEtB54J3LO5MGXh09GKYgtqOgKvYRsc8kH0te+psOZ91PIDwntS
-	 lrqAC3sQjgROKpyfGgJzrZsZi7RRE8EgVZ36RsJmOaSGo2e+cj7KcTB7imIw1gb3CW
-	 nlW8BdzgrCSzw==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c5126505cb3so1135781566b.0
-        for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 17:17:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEvcFf4SnJ9enMNeK7WD7cgb4ChC2BjKbTroYHcCF7YsBKT9N1n7KmcGqm8gQD5XVQtFAX+t3E82rRf@vger.kernel.org
-X-Gm-Message-State: APuU4Z+jWFPDDhdcMUCmLLmgTMyltikBSVck7iE3rvJNSZviezEQbcee
-	24Z3g3XKDIRLhYu8EIlwAHS4+vviGP/srjBvKVOL+ZmeOC30Zgqv1fPvehrBiKhwEFHIDEs56yV
-	M+IX1Wr/N32rCf6v/0yhKNGWtXsfSsDI=
-X-Received: by 2002:a17:907:934c:b0:c51:282b:5489 with SMTP id
- a640c23a62f3a-c513a4aea3bmr2092619266b.3.1795828646455; Fri, 27 Nov 2026
- 17:17:26 -0800 (PST)
+	b=fknHhXfKVkJOJtN4EUHQe0uCE0r0o4h4teyp+31+R0yo5r9nzyYzWzWF6YH7CpY1F
+	 w3MA/7cIGbzLsBiTiQCx07IcSV5GfW9MzE4Yk4CS8YOay32MR5EY8y3+cPoED1epbv
+	 T0+M6jWFfdDANAo04Lvn3rPWDm224OUNGNxtUmmc44X+yqHShw3mCw16SsIrXC2PcP
+	 3Ho1EV9UsIZEPH5epP+mhi+bPm2UwfsN+15qm739+sWqNmH7IFn2LXC6esiDSt/QgG
+	 JL3vN++Azd8ggesX34Lb7d8ONhqb+XWn2E2bSwzLoKyiAImdw7rDkUIzKJAA8xee1P
+	 NV7vQiZyh2BDg==
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c4322d310e7so464965866b.0
+        for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 17:17:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErH/z2cvdgWY43KEjDcY2Y79doO/N+v9//B4UjACZuKtLxcGlnRw2NbA3a980Up06WPK5u48mT0kgWtV@vger.kernel.org
+X-Gm-Message-State: APuU4Z/hO85WXbz+/KTS8j7L7vCmCysXQiIHG0rHlv3QqFs8FGqX6HDz
+	GnSfLRwX7UnIqS7gkbNrOCKg34JpPLVJM/s6rqAuGkJLnQ8VQTijVm7DAuYbOkgDkkxb/KN/hzT
+	pLud/eevfrroa3un7Dny+Q1XJ6HVi0iw=
+X-Received: by 2002:a17:906:f59d:b0:c31:5bb8:4b3b with SMTP id
+ a640c23a62f3a-c513a47d551mr2219289266b.2.1795828660929; Fri, 27 Nov 2026
+ 17:17:40 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,45 +59,29 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261128000906.1677969-1-icb@fastmail.org>
-In-Reply-To: <20261128000906.1677969-1-icb@fastmail.org>
+References: <20261128003913.1684555-1-icb@fastmail.org>
+In-Reply-To: <20261128003913.1684555-1-icb@fastmail.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 28 Nov 2026 10:17:11 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8_QgT5sM0Uwg7DkKPoyKqBVaFmbCb8Ay13sUp3cBYY1Q@mail.gmail.com>
-X-Gm-Features: Aa3M54r2iLdu7Vku85h51LckhMl8uk9uQ3dQlA_gkNCPmaojH9-_QYon5N12iqM
-Message-ID: <CAKYAXd8_QgT5sM0Uwg7DkKPoyKqBVaFmbCb8Ay13sUp3cBYY1Q@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: don't take an existing file's attributes from an
- open request
+Date: Sat, 28 Nov 2026 10:17:28 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9As9f-7Q=F7CJBqcF7qCdbwnFeQYQ0HytdU5wTvBPuag@mail.gmail.com>
+X-Gm-Features: Aa3M54oxvdO9s8JRrz7L-H09Rdnc8vxQ05eSOl7Ki45QmXcG_h5g_M20FbFOIH4
+Message-ID: <CAKYAXd9As9f-7Q=F7CJBqcF7qCdbwnFeQYQ0HytdU5wTvBPuag@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: don't create a missing stream for FILE_OVERWRITE
 To: Ian Bridges <icb@fastmail.org>
 Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 28, 2026 at 9:09=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
+On Sat, Nov 28, 2026 at 9:39=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
 e:
 >
-> When smb2_open() opens an existing file that has no other open handle,
-> it sets the cached attributes of the file from the FileAttributes field
-> of the request. MS-FSA uses that field only when a file is created or
-> overwritten. Any other open of an existing file ignores it.
+> An open of a named stream that does not exist fails with
+> STATUS_OBJECT_NAME_NOT_FOUND only for FILE_OPEN. With FILE_OVERWRITE
+> the stream is created and the open succeeds. MS-FSA 2.1.5.1.2 fails
+> both dispositions when the stream is not found. Fail FILE_OVERWRITE the
+> same way. FILE_OVERWRITE_IF still creates the stream.
 >
-> The cached attributes are shared by all handles to the file. So the
-> client that first opens an existing file decides the attributes that
-> the other clients see while its handle is open. Stored DOS attributes
-> replace them only on a share that stores DOS attributes and only if
-> the file has them. If the DOS attributes are written while the handle
-> is open, the attributes from the request are stored and stay after the
-> last close. ksmbd also bases its own checks on the cached attributes.
->
-> Take the attributes from the request only for a new file. An open of an
-> existing file starts from the attributes that the inode implies, and
-> the stored DOS attributes are read as before. An overwrite still takes
-> the attributes from the request.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
 > Signed-off-by: Ian Bridges <icb@fastmail.org>
 Applied it to #ksmbd-for-next.
 Thanks!
