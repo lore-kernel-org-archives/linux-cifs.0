@@ -1,124 +1,122 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.158
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795818521;
-	b=gty5AOnkrh8yuhDvv4/dL6yFCO4fBSRpZtc1suUIEPSd4GYlVEsPJclS5ABVcDgJcnuB
-	 rFvtohXqgEpP8xVuNuUDwgINfMwdBp37VO8LjhN+07ggJKTggLTkiesa2GCRotNqi8yO4
-	 ksohHGiAyWqv0bUKA54PuoUoY1nEyZWZ8O3955qA2kqa5X5kjY31+b2iMhfPfn2DYV9yA
-	 pyjiKMIc8vHxZNj4Ijlih7UPKzSkOm454hmd6cAC6HbnVfioz1nwKGLOgHoyi7nUyvhQL
-	 doXy4SYCJ7OnLkmg/w06IBdbEH5p3W/+XMOAeGFaHXwWU7WQp6M3zrwyOEm6doKHrNA==
+	t=1795824557;
+	b=gdz80PbL89WxEn7O+CefpT0SEscqAyylknRsNYvj6fI7MOqecfLJNAQPJUHuQlTWiMVp
+	 /5qNQedGQycoeQlK0PIQ0NoKmQ0MDAVaMCxnCyu60Oi42BXV6LQB+AhBW9krYD+7UeaCl
+	 vhOL/ay54d1zeVUEQzz1w+PbqnlgxW5Q1ZKv1rtqpQ7zKUJ6czLzb7dixwTSU9/ufwah/
+	 hO0mjAYF4Vtss1guPwbx2KXiCKOcpfw9lshFwwPVAiYOe3S5H6E0GKEclUGG2sTspn3yh
+	 BAldNI5Q3EkvQ2A0LtQ+web7eTY86dVKweWW3oKVX/Us+K4B2eaAmad0f8TI4Sszj4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795818521;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795824557;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
 	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
 	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=tPANJmDtmOmTq3O/C8+lC4vPHItwbYvMTa06DRKSDKs=;
-	b=ResU5hqOpljcBGCUpe2fQk8zgpFYIeaU4fqerWtlnJY65R2QuagevxnjMjnObjr0k/g0
-	 Rjt6yOQD86ihjcoAJuqf1zqJXqhp0IBPUbTLINJVA9DHUe6z8CsRiu6Ewf4s84CmSaK3Q
-	 MI8faYZgtJrSf3bvhENDE+jy1pV9ogZKdB2cttuJuC8vl4pXd2zTeJYZjM13es+cPunfT
-	 Sj/UAw+z4EhFt2XpRxQAGnNVqw9p/9xJwd19VbfWyAW66Z7KiBD6q4rplubItIcQJuxiZ
-	 PNV217O9CTuH+g7Mrgep4zPxgd7M2Pt4BLscuZGpE5rTJ/FrseVwq/uBNY0sJ37cWBw==
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=Sa8dy2gzyUZnZppsvzVqeOCYAx4nZ2Xu/h/+7vp+Af8=;
+	b=wianPRTNrpPWD6bNX/0sP5/PDfby4yspLDqW+MgvZqA0OliN/En3ClDVR3I2P9phe30Z
+	 jSJZoN7qKX1rOdpZjs9+P6bjR2NTnim9jGOK05ayXIAq6aJfuZfFI9XSNZ3FV8bDF+Pjn
+	 Apx6v7nD/l8ClpOiClkzT6grYwSiykYk0F4f+8Gr7qOYRBEWDyCe/Sfb4mVH6Y0J9kjSb
+	 6D72Nj/CMNIUzgPNfn8oanaztlAyn85Opsto2oJhFIVm7Y6Z+Z7jjkwKebhOET8R8haUf
+	 CmwiE5pa4btD+/jqFEaF3rTchyQhVhaSpnWnTKXjHs7RcHm1M6r6fI5AOEdokeITwNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=fastmail.org;
 	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=tlf86Giu;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=s+b89b1l;
-	arc=none smtp.remote-ip=202.12.124.157
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=T1A6FV5B;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=KsPPcN4F;
+	arc=none smtp.remote-ip=202.12.124.158
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC74F606A31C
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 22:28:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC74F606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516C2606A31E
+	for <linux-cifs@vger.kernel.org>; Sat, 28 Nov 2026 00:09:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 516C2606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=tlf86Giu;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=s+b89b1l
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 270E47A0363
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 17:28:40 -0500 (EST)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=T1A6FV5B;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=KsPPcN4F
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 8EA227A048E
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Nov 2026 19:09:15 -0500 (EST)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Fri, 27 Nov 2026 17:28:40 -0500
+  by phl-compute-03.internal (MEProxy); Fri, 27 Nov 2026 19:09:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1795818519; x=
-	1795904919; bh=tPANJmDtmOmTq3O/C8+lC4vPHItwbYvMTa06DRKSDKs=; b=t
-	lf86GiuXnga+3FC1/51zRmEmg4Rsobg/7jzdTD3ktvoUwvpcUJbyBM5I7H0y/niH
-	SDs+VdwMWOYE4pRTkVXhfINR3weGyy8AcQJqBCFeO3MFwk+KCXOc/ClJ2aQbpsBm
-	blA31R8XMvD1X53rPHVGpFTfGChdxoVOGhvAJg18GMUv4IgISsL+AgjutxekxyOt
-	bMk7ycWv1RWVQuzhM+L2XxyW7ZJZQBzuAKk+v4eV0EQCsg9SfAhTDPPrk55CIwau
-	aBkf7rKm1z5qlSVeaTlD0KWwV9pVCxkdpy9poYhIAf+BQ7nQWvi6rMrhKE7rSu7U
-	E1F5PUgHTM4NCaUAGQuiA==
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1795824554; x=1795910954; bh=Sa8dy2gzyUZnZppsvzVqe
+	OCYAx4nZ2Xu/h/+7vp+Af8=; b=T1A6FV5B9ZAmuOF4r4uY0pi7oKYPnWUS6tOMK
+	ZoaHBLtWHKjqztaeijKJALQwo00kEdnFotcBMvaS+iGDamPAYcLvIvhbvRJeO9UG
+	BkaLNd0y7NT9mCkStagbE+W199IvIc2E5Tv1NEug7tv0uHJxQ/ZE4kLZYVtRz1Ke
+	ph2Hcet6GvwE1iRjij7FH4/AjXT78ShXCLUQypKg6esp/D3Yor0VCzlWu9xxZjZp
+	5XU33NSV2FP4+DeE+jJu/mEjzMhbUo6kYateOvRutelHlVklDWewyRsk0jyRJqFi
+	5s2PnIil8StrQcoPr+pUiJLxrDY7tH9jGDfG6FrgPmjsexEIw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1795818519; x=1795904919; bh=t
-	PANJmDtmOmTq3O/C8+lC4vPHItwbYvMTa06DRKSDKs=; b=s+b89b1lpkfI7sJi7
-	S/QSNkEjucxoOxOnThWiqCBTvL6qxeK8MkZf66w5L/PO3S0EVPtdnbdXvwlOBUVO
-	e8oDO7yPDlSv6VVhv8yw23okMjGI1pZFUrkiJIoJnf1fgH4BnBAI/yvDSe27VS8+
-	KgG1QDY4gk3lhCfdVtYZGojCxyii32B5IcRlpowHQ/fzvxUnklHi/UjlhzlZmQN/
-	IHPyaTKpdSXqqC3rkTdMlIKDkIh2ooRw7+jNLnpjuk8lrHzifmZIfN9fQyAP4843
-	fIQAUso7yEiIbIZo20O0fBoBU3SmDZPVnh7FJJDlgyyqLh5AdbxfuIYopa0L72oq
-	OjheQ==
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1795824554; x=1795910954; bh=Sa8dy2gzyUZnZppsvzVqeOCYAx4nZ2Xu/h/
+	+7vp+Af8=; b=KsPPcN4Ftu177Wdlyh3eC13g/rINfz3wxf/IEmHscMb2yANlBur
+	Hq7mDUBmsYpeoquV0r/Hbn1BBdkDrFXKZO6hu+linSEQbundPhkIQzScZwmZjIOm
+	DoC6vAiaFRWPV3+Yw2LwrrUo9U9U7IRkAM8Ne9pnLJn7QvjrazT18IxgiXbMYRCq
+	7JfJnfCzp8+OOHR0cpoYkewKKrT9hGZzdDvQzMehocittTFCxKMqmJ9Jcx/qgQYu
+	RLBsvJP7IAQ33oH6WHST2WW+NASt40agxnvILmW6e7Yu6ROXpT3L25/xkq4RRg8i
+	fhz0MHiU9Iwf42Coofi5MjvlDf1ZhcOnlHQ==
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1795818519; d=fastmail.org;
+DKIM2-Signature: i=1; m=1; t=1795824554; d=fastmail.org;
 	mf=PGljYkBmYXN0bWFpbC5vcmc+;
 	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:hj9XzLqDenVmS0Ar7zZ62iVm+EVwMzqdFpC9vqdMUGRy7bE
-	enibfl/m63w0a2cU5tWPmtqoCrz65Xm04fI+ARqGbOWMnJY/RMIoLbY2gBePxhSc
-	K1xI1+msjwNakA5kEB0xP1013N8/OsCC2v84SZsqfYGgswD3uGvVo7woM/wXfjKB
-	vqWd9+rhCJ3NUww3SfumeJ5Ri8dyGeFpFx7vofEla1uBITcE7p0r++fxEXMMVNqF
-	MV8739nf7Z0PtB8ZGKv8c78ycna/hA7guS4bQHRBSrtRG3hCqRIMfub+DpArg6Lg
-	wtTQyJNtCAxf3OORvVKnkxV1pDGfk2ByvdmJ+iA==;
+	s=fm3:rsa-sha256:u6PGYG2o1Uw4mYS1VGeAXFME2Xy8GmToC1r4nGRl1Tq0LOs
+	9IzAbDlFQDGnC1vLCkJmEBVkLRZLUrpVgWO0H5xisJ4RlHKdOlGAOVN910wiqsTZ
+	+7V38RcdJu/37cltqteS1If0NYgC6//FBUE40ohb7aylzUT1DXlcaM6DJmOvSnwd
+	FC4HNw49uvyKHVxWbEv5dS1pO4lbHDr4g4XjCSHxThrhPePyLFly91Nps2lCr7+j
+	V8ZGq6OL1XDxNTSwJjOG4FUqeM4zxy+M7WVBq4DrtwNPsj80AmL63oezXaaiKO70
+	xIN1b3bVXZCPv8PHlxLvOad8hJ1kC57IzG1DSaw==;
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=11;
+	action=mi-m=1; hc=9;
 	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:WMjoMkV4R+X2Pb09AyG81hPeYXd04IAnw8CPXO6kHI0=:q9OrlNUKlZEMTZXJYZaqOkTTgO63HCItOhgLxGsfS44=;
-X-ME-Sender: <xms:FgQKazMNTfTpJAJHaksZIp-MBNegD3moFpPnktNdMsQyZMLe7-9EXw>
-    <xme:FgQKaxqyH5vrZFtFxIVA8k6uaAPyVVOTHvT2EBTRx25nyxTj1zSxgtl06taB1tdLJ
-    Mr-0-yD-_3_tK9tEaPqAgdzBJDPCdtoBBb_xYfuOvIfi4IyVn_k9VA5>
-X-ME-Received: <xmr:FgQKa8GLPYuV1O6VH4cH02tU9Hg9wueU790aVW4Alj8cvudlkPdPvI-a3O5EJinQ>
-X-ME-Proxy-Cause: dmFkZTE4BlLF5c7CcvWc+LvNJ4Pydr49WF+ngSDCia2JkWER6ku2RPIqxZqOfRKU1iDMrk
-    BYE0MPx0u2IhwcZZw6FxrEEN8k/AcoOkoUnsM078k6JnDPKgrnrUhnvJwnvQDd25jA3d7x
-    lRtxHwsyzouHzYvlUZ2gKeKk7V7/s8v9vV1RgZGp2uIGYaZpcU0qV/kuUVgwwSXVtDMWLi
-    H5ueVhdKbJvWcPrhjpjrNhMKz6Q5moe9PULHHdEB3653qqZ/FtQJt2BOs7HaluZQKMLinL
-    c+LGpcUkgZFM9zIjixFCAEwpgYLMf4zIUywaouV2zxT9/5U+8Mwu2ARpAeTm2CdG4fXrnq
-    msvyyS7+5AnSMx9bhOcD2Xjf0qUjaruyHUx3EiJBpL4pqZzTkR8NEUvbxqop/Ko+3p3QGM
-    f9WJPA4YHPZwt7goZFL6NQaWetUMdEITdy2qxPdALb3+6Ht7QTRfJ41r97+i7rHo0Tx96G
-    w3FKE7xmFHTn6f/+y0roynA7alwRH50NkovFFGSDNEMTYRnqjnn8qZwLHB/3BQ/IYRHVKG
-    yvdipfpOQk9EG4FtMSDZwh2LQ6Y5SNavbNL1iTTQnUBR2Hs0Q+SBk5BPmkoeevO5BIbHzx
-    sknb34jhMgictLRTIeU333EfVJHUI5KQR3KXhZxSoCQKEx/IiF9kls1EpiZg
-X-ME-Proxy: <xmx:FgQKa-pWnaxchA-MDX4z96q0-IKw3Vj01xQkND6P1jKgm9Qqn3I7CQ>
-    <xmx:FgQKa9YMQk0uYApGCtww3T52X7i5SgU-IDbGN5YCS8PPtFTsjiNE8w>
-    <xmx:FgQKa_XZHzUEZtK7sBfjdZRsSV0-Blh7_kIvNxThctfO9BNKP0Evkg>
-    <xmx:FgQKa-9hRq5Xvs2ygs7kS_DBnnUgiXSMMTgn_8eS35pyFBr11wmB6w>
-    <xmx:FwQKa-tU9R6rROVsAeaVCLU-mPhwTRljfDvLgbeT5QOC5K9Q9DKu81Pu>
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:lNaQgS6PKRWq5XvjYVXhUvc0+WTrpRPDbe7BAWW76iI=:g1eBuwrI6oQrhEZUM8JEaFdGfWjWgiARQ1oL20oR+0A=;
+X-ME-Sender: <xms:qhsKa2uaMsM71cxKI30vOCYsvHX2IJqY4Jg_fZE7dh_Ho0ezxVNHyw>
+    <xme:qhsKa3ffo5icje0kBrEQT_C8zM1vBnVAssc0nH2V9WI-UFal7fXqQ4dClFltCs1SN
+    CIO623VnIohm6F8uzZV0Y0ENg2zUm6WPhQClw0UBQE4Ix6bQYaA-PGg>
+X-ME-Received: <xmr:qhsKaz9gAu-ZYgz8wNCvOxRY9zhD4GSh_5i68FvGohYHUKd-dpJUcaBkLlWyHAmo>
+X-ME-Proxy-Cause: dmFkZTFrh38SLvK3uQebmd7Gos4B4RHRqfcOE0APprEz5Fhl2rY5GR+9NC3Rh/mg72Y7v1
+    xvn6UOimGhtPeBv995mtrFKXFZrl84I6m7Wr2YYiUrRTrj6L6fI0Dhdqp0t6UGoBuTPB0j
+    1bbNdyHSdthr3L5IWMAruGT7vHPoHbUuLPJcXkIoWvjSKTYsVpKljPV5XcrA7ydZKGXb8K
+    rnpYIvI2dD4tg+8XzEiF6uTLOPwKAB4dnYsqw2rEc5dZ5OlRfA41whLxPPIAFsfAX2Nl2Z
+    2eK2JPIVtz4pcwHND3u21b/nfY56WB6lCOZhcjWHH4CFYvYvRVgjmC4K9RCJhani7Y/IJx
+    CozCeSvP9frNjeAuHkY7gLiOtJab6dTzKx6Fp/3QZUcT19HnIMbBp9lFuie5fGyw+FVqWA
+    NRfPNfxaf9aCG8/C1RciADhmJQIfOmYi2GMVEgmjVlR3LmtjBaT7wP4agydGAzLw38j6W4
+    Bo4uykpP0DmIh+QEd/FnA95nrMpRQx3Yo8joXfD3jC4ryW2+ApBmmTEejvdGIR94MxmiK/
+    N81lcg/FZXO8e9mLOspIjCsrD2njWxAB5lpYBGq+qyk75B1/XDSnP/5MTjSGZJghkUZjy7
+    HjfiXmrz7C1SwRoEXXI/tGk5JGYbk7Ud1s4CM48o90/67HWrF3bL/5kR0Oqw
+X-ME-Proxy: <xmx:qhsKayR1Q3Ves7iurqehfycGvdFLKYzyRVHf1RwpceMzWrDkbEMntQ>
+    <xmx:qhsKa0oNRUX_K3jiXB_re-W2f1p4Lcrh-ScYwn9yw4RKlBR1ZYbY1w>
+    <xmx:qhsKa_nZGwL4uwAqVeXkqOa5-DsDpQwZS0X8OrNjVoS7Gk2ACWkipQ>
+    <xmx:qhsKa9e0vUzmOi7AsUwF2qo3OWvFq04gH54cnQnRRlVbTuUfXnWdlA>
+    <xmx:qhsKa32uhsrUpooiHN2dWPc_pKETo_UYHxetT0riRbUpnuoYFBLYuX6x>
 Feedback-ID: ib53e4b78:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 27 Nov 2026 17:28:37 -0500 (EST)
+ 27 Nov 2026 19:09:13 -0500 (EST)
 From: Ian Bridges <icb@fastmail.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
 	linux-cifs@vger.kernel.org,
-	Ian Bridges <icb@fastmail.org>
-Subject: Re: [RFC] ksmbd: rework the DACL access check?
-Date: Fri, 27 Nov 2026 16:28:29 -0600
-Message-ID: <20261127222829.1664817-1-icb@fastmail.org>
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: don't take an existing file's attributes from an open request
+Date: Fri, 27 Nov 2026 18:09:06 -0600
+Message-ID: <20261128000906.1677969-1-icb@fastmail.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <CAKYAXd9NSCsBsX3diAiKez1zE221+pZ62X+fcQZRxYx2xmwCvA@mail.gmail.com>
-References: <CAKYAXd9NSCsBsX3diAiKez1zE221+pZ62X+fcQZRxYx2xmwCvA@mail.gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -130,185 +128,67 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 26, 2026 at 3:04 PM Namjae Jeon <linkinjeon@kernel.org> wrote:
-> I agree. Please verify that the relevant ACLs-related smbtorture tests
-> pass after implementation.
+When smb2_open() opens an existing file that has no other open handle,
+it sets the cached attributes of the file from the FileAttributes field
+of the request. MS-FSA uses that field only when a file is created or
+overwritten. Any other open of an existing file ignores it.
 
-Thanks, I will.
+The cached attributes are shared by all handles to the file. So the
+client that first opens an existing file decides the attributes that
+the other clients see while its handle is open. Stored DOS attributes
+replace them only on a share that stores DOS attributes and only if
+the file has them. If the DOS attributes are written while the handle
+is open, the attributes from the request are stored and stay after the
+last close. ksmbd also bases its own checks on the cached attributes.
 
-Before I send the series, I would like to agree on its rules. There is
-one formula, from my first mail. A table defines its last term, and a
-few rules sit outside the table. Three questions for you are at the
-end.
+Take the attributes from the request only for a new file. An open of an
+existing file starts from the attributes that the inode implies, and
+the stored DOS attributes are read as before. An overwrite still takes
+the attributes from the request.
 
-The formula
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ian Bridges <icb@fastmail.org>
+---
+Tested on ksmbd-for-next 3dcffd93d4da with KASAN, on a share that
+stores DOS attributes. One user opened a file that had no stored DOS
+attributes, with FILE_READ_ATTRIBUTES access and FileAttributes set to
+FILE_ATTRIBUTE_READONLY, and kept the handle. On the base a second user
+saw the attribute and could not set delete pending. A creation time set
+by the second user stored the attribute, and the file was still
+read-only after the last close. With the patch the attribute does not
+appear. Stored attributes, the attributes of a new file, and attributes
+set by an overwrite are reported as on the base. smbtorture gives the
+same results as on the base.
 
-	granted = (DACL rights | parent rights) & filesystem rights
+This patch was developed with LLM assistance.
 
-Every access decision uses it.
+ fs/smb/server/smb2pdu.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-DACL rights are what one ordered walk of the file's stored DACL grants.
-A file with no stored DACL, or with a stale one, has every DACL right,
-so the filesystem alone decides. If the stored security descriptor
-cannot be read, the request fails.
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 28fb77bcd3dc..c375d5c71231 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5484,9 +5484,15 @@ int smb2_open(struct ksmbd_work *work)
+ 	fp->change_time = ksmbd_UnixTimeToNT(stat.ctime);
+ 	fp->allocation_size = S_ISDIR(stat.mode) ? 0 :
+ 		(alloc_size ?: stat.blocks << 9);
+-	if (created || fp->f_ci->m_fattr == 0)
++	/*
++	 * The requested attributes are for a new file. An open of an existing
++	 * file does not change its attributes, except for an overwrite below.
++	 */
++	if (created)
+ 		fp->f_ci->m_fattr =
+ 			cpu_to_le32(smb2_get_dos_mode(&stat, le32_to_cpu(req->FileAttributes)));
++	else if (fp->f_ci->m_fattr == 0)
++		fp->f_ci->m_fattr = cpu_to_le32(smb2_get_dos_mode(&stat, 0));
+ 
+ 	if (!created)
+ 		smb2_update_xattrs(tcon, &path, fp);
 
-Parent rights are the two rights that a parent directory can give
-(MS-FSA 2.1.5.1.2.1). They are DELETE if the parent's DACL grants
-FILE_DELETE_CHILD, and FILE_READ_ATTRIBUTES if it grants
-FILE_LIST_DIRECTORY. A parent with no stored DACL gives both. A parent
-whose security descriptor cannot be read gives neither, and the share
-root has no parent.
+base-commit: 3dcffd93d4da3b3231cbb845993194342fdd2150
+-- 
+2.47.3
 
-Filesystem rights are what the Linux permissions allow, the POSIX
-rights of my first mail. The table defines them.
-
-The table
-
-Each row is one right of FILE_ALL_ACCESS, and each column is a kind of
-object. A cell says what the filesystem must allow the caller before
-the right is granted.
-
-  right                  file        directory     named stream
-  FILE_READ_DATA         r           rx, list      r on base
-  FILE_WRITE_DATA        w           wx, add file  rw on base
-  FILE_APPEND_DATA       w           wx, add dir   rw on base
-  FILE_READ_EA           r           r             r on base
-  FILE_WRITE_EA          w           w             w on base
-  FILE_EXECUTE           rx          x, traverse   rx on base
-  FILE_DELETE_CHILD      w           wx            w on base
-  FILE_READ_ATTRIBUTES   none        none          none
-  FILE_WRITE_ATTRIBUTES  w           w             w on base
-  DELETE                 wx parent   wx parent     w on base
-  READ_CONTROL           none        none          none
-  WRITE_DAC              owner       owner         owner
-  WRITE_OWNER            owner       owner         owner
-  SYNCHRONIZE            none        none          none
-
-  r, w, x     Read, write, and execute or search permission on the
-              object itself, as the kernel would give it to the caller.
-              A read-only filesystem, an immutable file, and an LSM
-              count too.
-  list        What FILE_READ_DATA is called on a directory
-              (FILE_LIST_DIRECTORY). Likewise add file (FILE_ADD_FILE),
-              add dir (FILE_ADD_SUBDIRECTORY), and traverse
-              (FILE_TRAVERSE).
-  on base     Checked on the stream's base file.
-  wx parent   What the kernel asks before it removes an entry. That is
-              w and x on the directory that holds the object, the
-              sticky rule, and no immutable or append-only flag. The
-              share root has no such directory, so DELETE is not
-              granted on it.
-  owner       The caller owns the object or has CAP_FOWNER. A change
-              of owner or group through SET_INFO is still subject to
-              the kernel's own rules.
-  none        No filesystem check at open.
-
-A request is checked as a whole. The permissions that its rights need
-are combined into one check on each object, because a POSIX ACL grants
-a request only if one entry holds all of it.
-
-The table is only for the access check. It is not the mapping between
-a DACL and the mode that QUERY_INFO and SET_INFO use.
-
-Most cells follow from what the operation behind the right does. These
-are the ones that need a reason.
-
-- FILE_EXECUTE on a file needs r as well as x. A handle with
-  FILE_EXECUTE can read the file over SMB, so it needs r, and x makes
-  the right mean what the mode says.
-- Listing a directory needs x as well as r, because a listing returns
-  information about each entry, and that needs search permission. A
-  caller with r and no x is refused when it opens the directory.
-- FILE_WRITE_EA needs w on a directory as on a file, because EAs are
-  stored as user extended attributes. In a sticky directory the kernel
-  also requires ownership to write one, which the table does not cover.
-- FILE_WRITE_ATTRIBUTES needs w, so that a caller cannot change the DOS
-  attributes of a file it cannot write.
-- FILE_DELETE_CHILD has no operation on a file or a stream. It needs w
-  there, so that it goes with the write rights.
-- The named stream column differs from the file column because a stream
-  is stored as an extended attribute of its base file. Writing a stream
-  needs r as well as w, because a write reads the stream first.
-  Deleting it needs w on the base file and nothing from the directory,
-  because it removes the attribute.
-
-One consequence is worth stating. FILE_ALL_ACCESS and GENERIC_ALL hold
-every right in the table, so an explicit request for either needs r, w,
-and x on the file, ownership, and wx on the parent.
-
-Rules outside the table
-
-A named stream has no security descriptor of its own. It uses the DACL
-of its base file, and its parent rights come from the base file's
-directory (MS-FSA 2.1.5.1 and 2.1.5.1.2.1). Opening a stream that
-exists also needs r on the base file, since the stream is read from it.
-
-A data file with FILE_ATTRIBUTE_READONLY refuses an explicit request
-for FILE_WRITE_DATA or FILE_APPEND_DATA, and MAXIMUM_ALLOWED does not
-add those two rights or FILE_DELETE_CHILD (MS-FSA 2.1.5.1.2.1). A
-read-only filesystem needs no rule of its own, since the kernel already
-refuses w there.
-
-A read-only share is share access, not a read-only volume. MS-SMB2
-3.3.5.9 checks a request against the access the share allows, and Samba
-removes FILE_WRITE_DATA, FILE_APPEND_DATA, FILE_WRITE_EA,
-FILE_WRITE_ATTRIBUTES, and FILE_DELETE_CHILD from that access on a
-read-only share. I propose the same. An explicit request for any of
-them fails with STATUS_ACCESS_DENIED at open, and MAXIMUM_ALLOWED does
-not add them, or DELETE.
-
-A request with MAXIMUM_ALLOWED must be granted every right that it
-names. The other rights are added only while the filesystem permits the
-combined request, in the order read, write, execute, ownership, and
-DELETE. So a bare MAXIMUM_ALLOWED keeps read when read and write cannot
-be held together. The open fails if it ends with no rights. The maximal
-access reply reports what a bare MAXIMUM_ALLOWED request would get.
-
-The formula is applied to the rights that a request needs, and those
-are not always the rights that it names.
-
-- An open of an existing file needs every right it asks for, with or
-  without delete-on-close. ACCESS_SYSTEM_SECURITY and undefined bits
-  are refused, since no rule grants them.
-- An overwrite also needs FILE_WRITE_DATA, and a supersede DELETE. On
-  the unnamed stream both also need FILE_WRITE_EA and
-  FILE_WRITE_ATTRIBUTES (MS-FSA 2.1.5.1.2). An overwrite of a read-only
-  file is therefore refused. The handle keeps only the rights that the
-  client asked for.
-- Creating a named stream on an existing file needs FILE_WRITE_DATA
-  (same section).
-- A new file gets the rights it asked for, or every right for
-  MAXIMUM_ALLOWED (MS-FSA 2.1.5.1.1).
-- Creating, renaming, or linking needs FILE_ADD_FILE or
-  FILE_ADD_SUBDIRECTORY on the target directory (MS-FSA 2.1.5.1.1,
-  2.1.5.15.12, and 2.1.5.15.7).
-- A rename that replaces a file needs DELETE on that file, from the
-  file's own DACL or from FILE_DELETE_CHILD on its directory. The file
-  must not be a directory or read-only (MS-FSA 2.1.5.15.12). MS-FSA
-  sets no rule for a link that replaces a file, and I would apply the
-  same checks.
-- A listing with hide unreadable applies the formula to each entry,
-  and an app instance takeover applies it to the open it replaces.
-  Both ask for read rights.
-
-An operation on an open handle still checks the rights that the handle
-was granted. That does not change.
-
-Questions
-
-1. Are the table and the rules outside it acceptable?
-
-2. MS-FSA applies the MAXIMUM_ALLOWED half of the read-only file rule
-   to a directory too. I propose to leave directories out, because an
-   explicit request for the same rights on a read-only directory is
-   still granted, in MS-FSA as well. Should the rule cover them?
-
-3. For MAXIMUM_ALLOWED with GENERIC_EXECUTE on a regular file, ksmbd
-   lets the full set of read rights stand in for FILE_EXECUTE. Under
-   the formula the DACL must grant FILE_EXECUTE. smbtorture's
-   smb2.maximum_allowed.maximum_allowed expects the existing behavior,
-   so it would fail. Do you want ksmbd to keep the existing behavior
-   here?
-
-Thanks,
-Ian
